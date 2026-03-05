@@ -1,9 +1,10 @@
-import { Play, FileText, Trophy, Bell, BookOpen, TrendingUp } from "lucide-react";
+import { Play, FileText, Trophy, Bell, BookOpen, TrendingUp, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { announcements } from "@/lib/mock-data";
+import teacherBanner from "@/assets/teacher-banner.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -11,6 +12,29 @@ const HomePage = () => {
 
   return (
     <div className="space-y-5 animate-slide-up">
+      {/* Teacher Banner */}
+      <Card className="overflow-hidden relative">
+        <div className="relative">
+          <img
+            src={teacherBanner}
+            alt="Teacher Banner"
+            className="w-full h-40 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+          <div className="absolute inset-0 p-4 flex flex-col justify-center">
+            <p className="text-primary-foreground/80 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
+            <h3 className="text-primary-foreground font-bold text-xl mt-1">Rajesh Kumar Sir</h3>
+            <p className="text-primary-foreground/70 text-xs mt-0.5">Mathematics & Physics Expert</p>
+            <div className="flex items-center gap-1 mt-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 text-warning fill-warning" />
+              ))}
+              <span className="text-primary-foreground/70 text-[10px] ml-1">4.9 (2.3k reviews)</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Greeting */}
       <div>
         <h2 className="text-2xl font-bold">Welcome back! 👋</h2>
