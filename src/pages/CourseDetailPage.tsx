@@ -3,7 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { lectures, courses } from "@/lib/mock-data";
 import { useParams, useNavigate } from "react-router-dom";
-import { Play, CheckCircle, ChevronLeft, Clock } from "lucide-react";
+import { Play, CheckCircle, ChevronLeft, Clock, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 const CourseDetailPage = () => {
   const { courseId } = useParams();
@@ -14,6 +15,29 @@ const CourseDetailPage = () => {
   const chapters = [...new Set(courseLectures.map((l) => l.chapter))];
 
   if (!course) return <div className="p-8 text-center text-muted-foreground">Course not found</div>;
+
+  if (course.locked) {
+    return (
+      <div className="space-y-4 animate-slide-up">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="w-4 h-4" /> Back
+        </button>
+        <div className={`rounded-2xl p-5 bg-gradient-to-r ${course.color} relative overflow-hidden`}>
+          <div className="absolute inset-0 bg-foreground/30 flex items-center justify-center">
+            <div className="text-center">
+              <Lock className="w-10 h-10 text-primary-foreground mx-auto mb-2" />
+              <p className="text-primary-foreground font-bold text-lg">Course Locked</p>
+              <p className="text-primary-foreground/70 text-sm">Contact your teacher to get access</p>
+            </div>
+          </div>
+          <div className="opacity-30">
+            <div className="text-4xl mb-2">{course.thumbnail}</div>
+            <h2 className="text-xl font-bold text-primary-foreground">{course.title}</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -55,8 +79,11 @@ const CourseDetailPage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm">{lecture.title}</h4>
-                    <div className="flex items-center gap-1 text-muted-foreground text-xs mt-0.5">
-                      <Clock className="w-3 h-3" /> {lecture.duration}
+                    <div className="flex items-center gap-2 text-muted-foreground text-xs mt-0.5">
+                      <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" /> {lecture.duration}</span>
+                      {lecture.watchedPercent > 0 && !lecture.completed && (
+                        <span className="text-primary">{lecture.watchedPercent}% watched</span>
+                      )}
                     </div>
                   </div>
                   {lecture.completed && <Badge variant="secondary" className="text-[10px]">Done</Badge>}

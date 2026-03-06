@@ -2,15 +2,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
-import { courses, performanceData } from "@/lib/mock-data";
+import { courses, performanceData, lectures, quizzes } from "@/lib/mock-data";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, BookOpen, Trophy, TrendingUp, LogOut, ChevronRight } from "lucide-react";
+import { User, Mail, BookOpen, Trophy, TrendingUp, LogOut, ChevronRight, Video, CheckCircle } from "lucide-react";
 
 const ProfilePage = () => {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
 
   const avgScore = Math.round(performanceData.reduce((a, b) => a + b.score, 0) / performanceData.length);
+  const completedLectures = lectures.filter((l) => l.completed).length;
+  const completedQuizzes = quizzes.filter((q) => q.status === "completed").length;
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -27,10 +29,10 @@ const ProfilePage = () => {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Card className="p-3 text-center">
           <BookOpen className="w-5 h-5 text-primary mx-auto mb-1" />
-          <p className="text-lg font-bold">{courses.length}</p>
+          <p className="text-lg font-bold">{courses.filter((c) => !c.locked).length}</p>
           <p className="text-[10px] text-muted-foreground">Courses</p>
         </Card>
         <Card className="p-3 text-center">
@@ -39,9 +41,14 @@ const ProfilePage = () => {
           <p className="text-[10px] text-muted-foreground">Avg Score</p>
         </Card>
         <Card className="p-3 text-center">
-          <TrendingUp className="w-5 h-5 text-success mx-auto mb-1" />
-          <p className="text-lg font-bold">12</p>
-          <p className="text-[10px] text-muted-foreground">Day Streak</p>
+          <Video className="w-5 h-5 text-info mx-auto mb-1" />
+          <p className="text-lg font-bold">{completedLectures}</p>
+          <p className="text-[10px] text-muted-foreground">Lectures Done</p>
+        </Card>
+        <Card className="p-3 text-center">
+          <CheckCircle className="w-5 h-5 text-success mx-auto mb-1" />
+          <p className="text-lg font-bold">{completedQuizzes}</p>
+          <p className="text-[10px] text-muted-foreground">Quizzes Done</p>
         </Card>
       </div>
 
@@ -50,6 +57,8 @@ const ProfilePage = () => {
         {[
           { label: "My Dashboard", to: "/dashboard" },
           { label: "Test Results", to: "/results" },
+          { label: "Live Classes", to: "/live-classes" },
+          { label: "My Doubts", to: "/doubts" },
           { label: "Notifications", to: "/notifications" },
         ].map((item) => (
           <Card

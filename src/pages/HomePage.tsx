@@ -1,25 +1,26 @@
-import { Play, FileText, Trophy, Bell, BookOpen, TrendingUp, Star } from "lucide-react";
+import { Play, FileText, Trophy, Bell, BookOpen, TrendingUp, Star, Video, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
-import { announcements } from "@/lib/mock-data";
+import { announcements, liveClasses, courses } from "@/lib/mock-data";
 import teacherBanner from "@/assets/teacher-banner.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const upcomingLive = liveClasses.filter((c) => c.status === "upcoming");
+  const unlockedCourses = courses.filter((c) => !c.locked);
+  const lockedCourses = courses.filter((c) => c.locked);
+
   return (
     <div className="space-y-5 animate-slide-up">
       {/* Teacher Banner */}
       <Card className="overflow-hidden relative">
         <div className="relative">
-          <img
-            src={teacherBanner}
-            alt="Teacher Banner"
-            className="w-full h-40 object-cover"
-          />
+          <img src={teacherBanner} alt="Teacher Banner" className="w-full h-40 object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
           <div className="absolute inset-0 p-4 flex flex-col justify-center">
             <p className="text-primary-foreground/80 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
@@ -63,6 +64,28 @@ const HomePage = () => {
         <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary-foreground/10" />
       </Card>
 
+      {/* Live Class Alert */}
+      {upcomingLive.length > 0 && (
+        <Card
+          className="p-4 cursor-pointer hover:card-shadow-lg transition-shadow border-primary/30 bg-primary/5"
+          onClick={() => navigate("/live-classes")}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Video className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="font-semibold text-sm">Upcoming Live Class</h4>
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></span>
+              </div>
+              <p className="text-muted-foreground text-xs mt-0.5 truncate">{upcomingLive[0].title}</p>
+            </div>
+            <Badge className="bg-primary/10 text-primary border-0 text-[10px]">Live</Badge>
+          </div>
+        </Card>
+      )}
+
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-2 gap-3">
         <Card
@@ -95,7 +118,7 @@ const HomePage = () => {
             <BookOpen className="w-5 h-5 text-primary" />
           </div>
           <h4 className="font-semibold text-sm">My Courses</h4>
-          <p className="text-muted-foreground text-xs mt-0.5">3 courses enrolled</p>
+          <p className="text-muted-foreground text-xs mt-0.5">{unlockedCourses.length} unlocked · {lockedCourses.length} locked</p>
         </Card>
 
         <Card
@@ -117,7 +140,7 @@ const HomePage = () => {
           <button onClick={() => navigate("/notifications")} className="text-primary text-xs font-medium">View all</button>
         </div>
         <div className="space-y-2">
-          {announcements.slice(0, 2).map((a, i) => (
+          {announcements.slice(0, 3).map((a, i) => (
             <Card key={a.id} className="p-3 flex items-start gap-3" style={{ animationDelay: `${i * 100}ms` }}>
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                 a.type === "info" ? "bg-info/10" : a.type === "success" ? "bg-success/10" : "bg-warning/10"

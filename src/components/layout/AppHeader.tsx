@@ -2,6 +2,7 @@ import { Bell, GraduationCap, LogOut, ArrowLeftRight } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { announcements } from "@/lib/mock-data";
 
 export function AppHeader() {
   const { user, role, logout, switchRole } = useAuth();
@@ -35,7 +36,9 @@ export function AppHeader() {
             className="relative w-9 h-9 rounded-xl bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors"
           >
             <Bell className="w-4 h-4 text-accent-foreground" />
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">3</span>
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
+              {announcements.length}
+            </span>
           </button>
           <button
             onClick={() => { logout(); navigate("/login"); }}

@@ -19,11 +19,16 @@ import QuizPlayPage from "./pages/QuizPlayPage";
 import ResultsPage from "./pages/ResultsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
+import LiveClassesPage from "./pages/LiveClassesPage";
+import DoubtsPage from "./pages/DoubtsPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminContent from "./pages/admin/AdminContent";
 import AdminQuizzes from "./pages/admin/AdminQuizzes";
 import AdminStudents from "./pages/admin/AdminStudents";
 import AdminAnnouncements from "./pages/admin/AdminAnnouncements";
+import AdminLiveClasses from "./pages/admin/AdminLiveClasses";
+import AdminDoubts from "./pages/admin/AdminDoubts";
+import AdminCourseAccess from "./pages/admin/AdminCourseAccess";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +61,8 @@ function AppRoutes() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/live-classes" element={<LiveClassesPage />} />
+        <Route path="/doubts" element={<DoubtsPage />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
@@ -63,6 +70,9 @@ function AppRoutes() {
         <Route path="/admin/quizzes" element={<AdminQuizzes />} />
         <Route path="/admin/students" element={<AdminStudents />} />
         <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+        <Route path="/admin/live" element={<AdminLiveClasses />} />
+        <Route path="/admin/doubts" element={<AdminDoubts />} />
+        <Route path="/admin/access" element={<AdminCourseAccess />} />
 
         <Route path="/login" element={<Navigate to="/" replace />} />
         <Route path="/signup" element={<Navigate to="/" replace />} />

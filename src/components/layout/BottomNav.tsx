@@ -1,11 +1,11 @@
-import { Home, BookOpen, FileText, Trophy, User, LayoutDashboard, Users, Megaphone } from "lucide-react";
+import { Home, BookOpen, FileText, Trophy, User, LayoutDashboard, Users, Megaphone, Video, MessageCircle, Lock } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 
 const studentNav = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/courses", icon: BookOpen, label: "Courses" },
-  { to: "/notes", icon: FileText, label: "Notes" },
+  { to: "/live-classes", icon: Video, label: "Live" },
   { to: "/quizzes", icon: Trophy, label: "Quizzes" },
   { to: "/profile", icon: User, label: "Profile" },
 ];
@@ -15,7 +15,7 @@ const adminNav = [
   { to: "/admin/content", icon: BookOpen, label: "Content" },
   { to: "/admin/quizzes", icon: Trophy, label: "Quizzes" },
   { to: "/admin/students", icon: Users, label: "Students" },
-  { to: "/admin/announcements", icon: Megaphone, label: "Announce" },
+  { to: "/admin/live", icon: Video, label: "Live" },
 ];
 
 export function BottomNav() {
@@ -27,7 +27,7 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t safe-bottom">
       <div className="max-w-5xl mx-auto flex justify-around py-1.5 px-2">
         {items.map((item) => {
-          const isActive = location.pathname === item.to || 
+          const isActive = location.pathname === item.to ||
             (item.to !== "/" && item.to !== "/admin" && location.pathname.startsWith(item.to));
           return (
             <NavLink

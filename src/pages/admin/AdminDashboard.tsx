@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { students, courses, quizzes, announcements } from "@/lib/mock-data";
-import { Users, BookOpen, Trophy, Megaphone, TrendingUp } from "lucide-react";
+import { students, courses, quizzes, announcements, liveClasses, lectures, doubts } from "@/lib/mock-data";
+import { Users, BookOpen, Trophy, Megaphone, TrendingUp, Video, MessageCircle, Eye } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 const studentActivityData = [
@@ -14,11 +14,15 @@ const studentActivityData = [
 ];
 
 const AdminDashboard = () => {
+  const pendingDoubts = doubts.filter((d) => !d.reply).length;
+
   const stats = [
     { icon: Users, label: "Students", value: students.length, color: "text-primary", bg: "bg-primary/10" },
     { icon: BookOpen, label: "Courses", value: courses.length, color: "text-info", bg: "bg-info/10" },
     { icon: Trophy, label: "Quizzes", value: quizzes.length, color: "text-warning", bg: "bg-warning/10" },
-    { icon: Megaphone, label: "Announcements", value: announcements.length, color: "text-success", bg: "bg-success/10" },
+    { icon: Video, label: "Lectures", value: lectures.length, color: "text-success", bg: "bg-success/10" },
+    { icon: Megaphone, label: "Announcements", value: announcements.length, color: "text-primary", bg: "bg-primary/10" },
+    { icon: MessageCircle, label: "Pending Doubts", value: pendingDoubts, color: "text-destructive", bg: "bg-destructive/10" },
   ];
 
   return (
@@ -28,14 +32,14 @@ const AdminDashboard = () => {
         <p className="text-muted-foreground text-sm">Welcome back, Teacher Admin</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {stats.map((s) => (
-          <Card key={s.label} className="p-4">
-            <div className={`w-10 h-10 rounded-xl ${s.bg} flex items-center justify-center mb-2`}>
-              <s.icon className={`w-5 h-5 ${s.color}`} />
+          <Card key={s.label} className="p-3 text-center">
+            <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mx-auto mb-1`}>
+              <s.icon className={`w-4 h-4 ${s.color}`} />
             </div>
-            <p className="text-2xl font-bold">{s.value}</p>
-            <p className="text-xs text-muted-foreground">{s.label}</p>
+            <p className="text-lg font-bold">{s.value}</p>
+            <p className="text-[10px] text-muted-foreground">{s.label}</p>
           </Card>
         ))}
       </div>
