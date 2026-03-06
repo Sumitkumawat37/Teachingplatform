@@ -8,6 +8,8 @@ export const courses = [
     progress: 65,
     thumbnail: "📐",
     color: "from-primary to-info",
+    locked: false,
+    price: 999,
   },
   {
     id: "2",
@@ -18,6 +20,8 @@ export const courses = [
     progress: 30,
     thumbnail: "⚛️",
     color: "from-info to-success",
+    locked: true,
+    price: 1299,
   },
   {
     id: "3",
@@ -28,16 +32,18 @@ export const courses = [
     progress: 10,
     thumbnail: "🧪",
     color: "from-warning to-destructive",
+    locked: true,
+    price: 1199,
   },
 ];
 
 export const lectures = [
-  { id: "1", courseId: "1", chapter: "Algebra", title: "Linear Equations", duration: "18:30", completed: true },
-  { id: "2", courseId: "1", chapter: "Algebra", title: "Quadratic Equations", duration: "22:15", completed: true },
-  { id: "3", courseId: "1", chapter: "Algebra", title: "Polynomials", duration: "25:00", completed: false },
-  { id: "4", courseId: "1", chapter: "Calculus", title: "Limits & Continuity", duration: "30:45", completed: false },
-  { id: "5", courseId: "1", chapter: "Calculus", title: "Differentiation", duration: "28:20", completed: false },
-  { id: "6", courseId: "1", chapter: "Geometry", title: "Triangles", duration: "20:10", completed: false },
+  { id: "1", courseId: "1", chapter: "Algebra", title: "Linear Equations", duration: "18:30", completed: true, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", watchedPercent: 100 },
+  { id: "2", courseId: "1", chapter: "Algebra", title: "Quadratic Equations", duration: "22:15", completed: true, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", watchedPercent: 100 },
+  { id: "3", courseId: "1", chapter: "Algebra", title: "Polynomials", duration: "25:00", completed: false, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", watchedPercent: 35 },
+  { id: "4", courseId: "1", chapter: "Calculus", title: "Limits & Continuity", duration: "30:45", completed: false, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", watchedPercent: 0 },
+  { id: "5", courseId: "1", chapter: "Calculus", title: "Differentiation", duration: "28:20", completed: false, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", watchedPercent: 0 },
+  { id: "6", courseId: "1", chapter: "Geometry", title: "Triangles", duration: "20:10", completed: false, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", watchedPercent: 0 },
 ];
 
 export const notes = [
@@ -53,6 +59,7 @@ export const quizzes = [
     id: "1",
     title: "Algebra Basics Quiz",
     courseId: "1",
+    chapter: "Algebra",
     questions: 10,
     duration: "15 min",
     status: "available" as const,
@@ -62,6 +69,7 @@ export const quizzes = [
     id: "2",
     title: "Quadratic Equations Test",
     courseId: "1",
+    chapter: "Algebra",
     questions: 8,
     duration: "12 min",
     status: "completed" as const,
@@ -71,6 +79,7 @@ export const quizzes = [
     id: "3",
     title: "Physics: Newton's Laws",
     courseId: "2",
+    chapter: "Mechanics",
     questions: 10,
     duration: "15 min",
     status: "available" as const,
@@ -80,6 +89,7 @@ export const quizzes = [
     id: "4",
     title: "Chemical Bonding Quiz",
     courseId: "3",
+    chapter: "Chemical Bonding",
     questions: 12,
     duration: "20 min",
     status: "upcoming" as const,
@@ -125,14 +135,16 @@ export const announcements = [
   { id: "2", title: "Quiz Results Published", message: "Quadratic Equations test results are now available. Check your scores!", date: "2026-03-03", type: "success" as const },
   { id: "3", title: "Holiday Schedule", message: "No classes on March 10th due to national holiday.", date: "2026-03-02", type: "warning" as const },
   { id: "4", title: "Study Material Updated", message: "New practice problems added for Physics mechanics chapter.", date: "2026-03-01", type: "info" as const },
+  { id: "5", title: "Live Class Scheduled", message: "Doubt clearing session for Algebra on March 8th at 5:00 PM.", date: "2026-03-05", type: "info" as const },
+  { id: "6", title: "New Notes Uploaded", message: "Differentiation Rules PDF has been added to Calculus chapter.", date: "2026-03-04", type: "success" as const },
 ];
 
 export const students = [
-  { id: "1", name: "Aarav Sharma", email: "aarav@example.com", courses: 3, avgScore: 82, lastActive: "2 hours ago" },
-  { id: "2", name: "Priya Patel", email: "priya@example.com", courses: 2, avgScore: 91, lastActive: "1 hour ago" },
-  { id: "3", name: "Rohan Kumar", email: "rohan@example.com", courses: 3, avgScore: 74, lastActive: "5 hours ago" },
-  { id: "4", name: "Ananya Singh", email: "ananya@example.com", courses: 1, avgScore: 88, lastActive: "1 day ago" },
-  { id: "5", name: "Vikram Mehta", email: "vikram@example.com", courses: 2, avgScore: 67, lastActive: "3 hours ago" },
+  { id: "1", name: "Aarav Sharma", email: "aarav@example.com", courses: ["1", "2", "3"], avgScore: 82, lastActive: "2 hours ago", lecturesCompleted: 12, quizzesAttempted: 4 },
+  { id: "2", name: "Priya Patel", email: "priya@example.com", courses: ["1", "2"], avgScore: 91, lastActive: "1 hour ago", lecturesCompleted: 18, quizzesAttempted: 6 },
+  { id: "3", name: "Rohan Kumar", email: "rohan@example.com", courses: ["1", "2", "3"], avgScore: 74, lastActive: "5 hours ago", lecturesCompleted: 8, quizzesAttempted: 3 },
+  { id: "4", name: "Ananya Singh", email: "ananya@example.com", courses: ["1"], avgScore: 88, lastActive: "1 day ago", lecturesCompleted: 15, quizzesAttempted: 5 },
+  { id: "5", name: "Vikram Mehta", email: "vikram@example.com", courses: ["1", "2"], avgScore: 67, lastActive: "3 hours ago", lecturesCompleted: 6, quizzesAttempted: 2 },
 ];
 
 export const performanceData = [
@@ -142,4 +154,83 @@ export const performanceData = [
   { month: "Apr", score: 82 },
   { month: "May", score: 90 },
   { month: "Jun", score: 88 },
+];
+
+export const liveClasses = [
+  {
+    id: "1",
+    title: "Algebra Doubt Clearing Session",
+    courseId: "1",
+    chapter: "Algebra",
+    scheduledAt: "2026-03-08T17:00:00",
+    duration: "60 min",
+    meetingLink: "https://meet.google.com/demo-abc-xyz",
+    status: "upcoming" as const,
+    attendees: ["1", "2", "3"],
+  },
+  {
+    id: "2",
+    title: "Calculus Introduction - Live",
+    courseId: "1",
+    chapter: "Calculus",
+    scheduledAt: "2026-03-10T16:00:00",
+    duration: "45 min",
+    meetingLink: "https://zoom.us/j/demo123456",
+    status: "upcoming" as const,
+    attendees: [],
+  },
+  {
+    id: "3",
+    title: "Physics Problem Solving",
+    courseId: "2",
+    chapter: "Mechanics",
+    scheduledAt: "2026-03-05T14:00:00",
+    duration: "90 min",
+    meetingLink: "https://meet.google.com/demo-def-uvw",
+    status: "completed" as const,
+    attendees: ["1", "2", "4", "5"],
+  },
+];
+
+export const doubts = [
+  {
+    id: "1",
+    lectureId: "1",
+    courseId: "1",
+    studentId: "1",
+    studentName: "Aarav Sharma",
+    question: "Can you explain the difference between linear and non-linear equations with more examples?",
+    createdAt: "2026-03-04T10:30:00",
+    reply: "Sure! A linear equation has variables only to the power of 1 (e.g., 2x + 3 = 7). Non-linear equations have higher powers (e.g., x² + 2x = 5). I'll cover more examples in the next live session.",
+    repliedAt: "2026-03-04T14:15:00",
+  },
+  {
+    id: "2",
+    lectureId: "3",
+    courseId: "1",
+    studentId: "2",
+    studentName: "Priya Patel",
+    question: "How do we determine the degree of a polynomial with multiple variables?",
+    createdAt: "2026-03-05T09:00:00",
+    reply: null,
+    repliedAt: null,
+  },
+  {
+    id: "3",
+    lectureId: "1",
+    courseId: "1",
+    studentId: "3",
+    studentName: "Rohan Kumar",
+    question: "Is there a shortcut to solve simultaneous linear equations quickly?",
+    createdAt: "2026-03-03T16:45:00",
+    reply: "Yes! You can use Cramer's Rule or the elimination method for faster solutions. Check the notes PDF for a quick reference sheet.",
+    repliedAt: "2026-03-03T18:00:00",
+  },
+];
+
+export const attendance = [
+  { liveClassId: "3", studentId: "1", studentName: "Aarav Sharma", joinedAt: "2026-03-05T14:02:00" },
+  { liveClassId: "3", studentId: "2", studentName: "Priya Patel", joinedAt: "2026-03-05T14:00:00" },
+  { liveClassId: "3", studentId: "4", studentName: "Ananya Singh", joinedAt: "2026-03-05T14:05:00" },
+  { liveClassId: "3", studentId: "5", studentName: "Vikram Mehta", joinedAt: "2026-03-05T14:10:00" },
 ];
