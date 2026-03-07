@@ -2,14 +2,16 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { quizQuestions } from "@/lib/mock-data";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, CheckCircle, XCircle, Trophy } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 const QuizPlayPage = () => {
   const navigate = useNavigate();
+  const { quizId } = useParams();
+  const questions = quizQuestions[quizId || "1"] || [];
   const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState<(number | null)[]>(new Array(quizQuestions.length).fill(null));
+  const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
   const [submitted, setSubmitted] = useState(false);
 
   const handleSelect = (optionIndex: number) => {
@@ -21,8 +23,17 @@ const QuizPlayPage = () => {
 
   const handleSubmit = () => setSubmitted(true);
 
-  const score = answers.reduce((acc, a, i) => acc + (a === quizQuestions[i].correct ? 1 : 0), 0);
-  const percentage = Math.round((score / quizQuestions.length) * 100);
+  const score = answers.reduce((acc, a, i) => acc + (a === questions[i]?.correct ? 1 : 0), 0);
+  const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+
+  if (questions.length === 0) {
+    return (
+      <div className="space-y-4 animate-slide-up text-center py-12">
+        <p className="text-muted-foreground">No questions available for this quiz.</p>
+        <Button onClick={() => navigate("/quizzes")}>Back to Quizzes</Button>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -32,12 +43,12 @@ const QuizPlayPage = () => {
             <Trophy className="w-8 h-8 text-primary" />
           </div>
           <h2 className="text-2xl font-bold">{percentage}%</h2>
-          <p className="text-muted-foreground text-sm mt-1">You scored {score} out of {quizQuestions.length}</p>
+          <p className="text-muted-foreground text-sm mt-1">You scored {score} out of {questions.length}</p>
           <Progress value={percentage} className="h-2 mt-4" />
         </Card>
 
         <div className="space-y-3">
-          {quizQuestions.map((q, qi) => (
+          {questions.map((q, qi) => (
             <Card key={q.id} className="p-4">
               <p className="font-medium text-sm mb-2">Q{qi + 1}. {q.question}</p>
               <div className="space-y-1.5">
@@ -68,7 +79,7 @@ const QuizPlayPage = () => {
     );
   }
 
-  const q = quizQuestions[currentQ];
+  const q = questions[currentQ];
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -76,10 +87,10 @@ const QuizPlayPage = () => {
         <button onClick={() => navigate("/quizzes")} className="flex items-center gap-1 text-sm text-muted-foreground">
           <ChevronLeft className="w-4 h-4" /> Exit
         </button>
-        <span className="text-sm font-medium">{currentQ + 1}/{quizQuestions.length}</span>
+        <span className="text-sm font-medium">{currentQ + 1}/{questions.length}</span>
       </div>
 
-      <Progress value={((currentQ + 1) / quizQuestions.length) * 100} className="h-1.5" />
+      <Progress value={((currentQ + 1) / questions.length) * 100} className="h-1.5" />
 
       <Card className="p-5">
         <p className="text-xs text-muted-foreground mb-2">Question {currentQ + 1}</p>
@@ -109,7 +120,7 @@ const QuizPlayPage = () => {
             Previous
           </Button>
         )}
-        {currentQ < quizQuestions.length - 1 ? (
+        {currentQ < questions.length - 1 ? (
           <Button onClick={() => setCurrentQ(currentQ + 1)} className="flex-1" disabled={answers[currentQ] === null}>
             Next
           </Button>

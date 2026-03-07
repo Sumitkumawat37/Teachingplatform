@@ -1,19 +1,21 @@
-import { Play, FileText, Trophy, Bell, BookOpen, TrendingUp, Star, Video, Lock } from "lucide-react";
+import { Play, FileText, Trophy, Bell, BookOpen, TrendingUp, Star, Video, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
+import { usePurchase } from "@/lib/purchase-context";
 import { announcements, liveClasses, courses } from "@/lib/mock-data";
 import teacherBanner from "@/assets/teacher-banner.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { hasPurchased } = usePurchase();
 
   const upcomingLive = liveClasses.filter((c) => c.status === "upcoming");
-  const unlockedCourses = courses.filter((c) => !c.locked);
-  const lockedCourses = courses.filter((c) => c.locked);
+  const purchasedCourses = courses.filter((c) => hasPurchased(c.id));
+  const lockedCourses = courses.filter((c) => !hasPurchased(c.id));
 
   return (
     <div className="space-y-5 animate-slide-up">
@@ -43,26 +45,28 @@ const HomePage = () => {
       </div>
 
       {/* Continue Learning */}
-      <Card
-        className="p-4 cursor-pointer hover:card-shadow-lg transition-shadow bg-gradient-to-r from-primary to-info overflow-hidden relative"
-        onClick={() => navigate("/courses/1/lecture/3")}
-      >
-        <div className="relative z-10">
-          <p className="text-primary-foreground/80 text-xs font-medium uppercase tracking-wide">Continue Learning</p>
-          <h3 className="text-primary-foreground font-bold text-lg mt-1">Polynomials</h3>
-          <p className="text-primary-foreground/70 text-sm">Complete Mathematics · Chapter: Algebra</p>
-          <div className="flex items-center gap-2 mt-3">
-            <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-              <Play className="w-4 h-4 text-primary-foreground" fill="currentColor" />
+      {purchasedCourses.length > 0 && (
+        <Card
+          className="p-4 cursor-pointer hover:card-shadow-lg transition-shadow bg-gradient-to-r from-primary to-info overflow-hidden relative"
+          onClick={() => navigate("/courses/1/lecture/3")}
+        >
+          <div className="relative z-10">
+            <p className="text-primary-foreground/80 text-xs font-medium uppercase tracking-wide">Continue Learning</p>
+            <h3 className="text-primary-foreground font-bold text-lg mt-1">Polynomials</h3>
+            <p className="text-primary-foreground/70 text-sm">Complete Mathematics · Chapter: Algebra</p>
+            <div className="flex items-center gap-2 mt-3">
+              <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <Play className="w-4 h-4 text-primary-foreground" fill="currentColor" />
+              </div>
+              <div className="flex-1">
+                <Progress value={65} className="h-1.5 bg-primary-foreground/20" />
+              </div>
+              <span className="text-primary-foreground text-xs font-medium">65%</span>
             </div>
-            <div className="flex-1">
-              <Progress value={65} className="h-1.5 bg-primary-foreground/20" />
-            </div>
-            <span className="text-primary-foreground text-xs font-medium">65%</span>
           </div>
-        </div>
-        <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary-foreground/10" />
-      </Card>
+          <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary-foreground/10" />
+        </Card>
+      )}
 
       {/* Live Class Alert */}
       {upcomingLive.length > 0 && (
@@ -96,7 +100,7 @@ const HomePage = () => {
             <Trophy className="w-5 h-5 text-warning" />
           </div>
           <h4 className="font-semibold text-sm">Today's Quiz</h4>
-          <p className="text-muted-foreground text-xs mt-0.5">Algebra Basics · 10 Qs</p>
+          <p className="text-muted-foreground text-xs mt-0.5">Algebra Basics · 5 Qs</p>
         </Card>
 
         <Card
@@ -118,7 +122,7 @@ const HomePage = () => {
             <BookOpen className="w-5 h-5 text-primary" />
           </div>
           <h4 className="font-semibold text-sm">My Courses</h4>
-          <p className="text-muted-foreground text-xs mt-0.5">{unlockedCourses.length} unlocked · {lockedCourses.length} locked</p>
+          <p className="text-muted-foreground text-xs mt-0.5">{purchasedCourses.length} enrolled · {lockedCourses.length} available</p>
         </Card>
 
         <Card
@@ -128,8 +132,8 @@ const HomePage = () => {
           <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center mb-2">
             <TrendingUp className="w-5 h-5 text-info" />
           </div>
-          <h4 className="font-semibold text-sm">Upcoming Test</h4>
-          <p className="text-muted-foreground text-xs mt-0.5">Chemical Bonding · Mar 10</p>
+          <h4 className="font-semibold text-sm">My Results</h4>
+          <p className="text-muted-foreground text-xs mt-0.5">View performance analytics</p>
         </Card>
       </div>
 

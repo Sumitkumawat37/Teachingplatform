@@ -6,17 +6,30 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"student" | "admin">("student");
+  const [email, setEmail] = useState("student@demo.com");
+  const [password, setPassword] = useState("123456");
+
+  const handleRoleSwitch = (r: "student" | "admin") => {
+    setRole(r);
+    setEmail(r === "admin" ? "teacher@demo.com" : "student@demo.com");
+    setPassword("123456");
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(role);
-    navigate(role === "admin" ? "/admin" : "/");
+    const success = login(email, password);
+    if (success) {
+      navigate(email.includes("teacher") ? "/admin" : "/");
+    } else {
+      toast.error("Invalid credentials");
+    }
   };
 
   return (
@@ -33,7 +46,7 @@ const LoginPage = () => {
         {/* Role Toggle */}
         <div className="flex gap-2 bg-muted p-1 rounded-xl">
           <button
-            onClick={() => setRole("student")}
+            onClick={() => handleRoleSwitch("student")}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
               role === "student" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
             }`}
@@ -41,7 +54,7 @@ const LoginPage = () => {
             Student
           </button>
           <button
-            onClick={() => setRole("admin")}
+            onClick={() => handleRoleSwitch("admin")}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
               role === "admin" ? "bg-card card-shadow text-foreground" : "text-muted-foreground"
             }`}
@@ -54,12 +67,12 @@ const LoginPage = () => {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm">Email</Label>
-              <Input id="email" type="email" placeholder="your@email.com" defaultValue={role === "admin" ? "teacher@edumaster.com" : "student@edumaster.com"} />
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm">Password</Label>
               <div className="relative">
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" defaultValue="demo1234" />
+                <Input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -69,6 +82,14 @@ const LoginPage = () => {
                 </button>
               </div>
             </div>
+
+            {/* Demo Credentials Info */}
+            <div className="bg-accent/50 rounded-lg p-3 text-xs">
+              <p className="font-semibold text-accent-foreground mb-1">Demo Credentials:</p>
+              <p className="text-muted-foreground">Student: student@demo.com / 123456</p>
+              <p className="text-muted-foreground">Teacher: teacher@demo.com / 123456</p>
+            </div>
+
             <Button type="submit" className="w-full" size="lg">Sign In</Button>
           </form>
         </Card>

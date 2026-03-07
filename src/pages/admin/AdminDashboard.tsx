@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { students, courses, quizzes, announcements, liveClasses, lectures, doubts } from "@/lib/mock-data";
-import { Users, BookOpen, Trophy, Megaphone, TrendingUp, Video, MessageCircle, Eye } from "lucide-react";
+import { Users, BookOpen, Trophy, Megaphone, TrendingUp, Video, MessageCircle, ShoppingCart } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 const studentActivityData = [
   { day: "Mon", active: 42 },
@@ -14,15 +15,16 @@ const studentActivityData = [
 ];
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const pendingDoubts = doubts.filter((d) => !d.reply).length;
 
   const stats = [
-    { icon: Users, label: "Students", value: students.length, color: "text-primary", bg: "bg-primary/10" },
-    { icon: BookOpen, label: "Courses", value: courses.length, color: "text-info", bg: "bg-info/10" },
-    { icon: Trophy, label: "Quizzes", value: quizzes.length, color: "text-warning", bg: "bg-warning/10" },
-    { icon: Video, label: "Lectures", value: lectures.length, color: "text-success", bg: "bg-success/10" },
-    { icon: Megaphone, label: "Announcements", value: announcements.length, color: "text-primary", bg: "bg-primary/10" },
-    { icon: MessageCircle, label: "Pending Doubts", value: pendingDoubts, color: "text-destructive", bg: "bg-destructive/10" },
+    { icon: Users, label: "Students", value: students.length, color: "text-primary", bg: "bg-primary/10", to: "/admin/students" },
+    { icon: BookOpen, label: "Courses", value: courses.length, color: "text-info", bg: "bg-info/10", to: "/admin/content" },
+    { icon: Trophy, label: "Quizzes", value: quizzes.length, color: "text-warning", bg: "bg-warning/10", to: "/admin/quizzes" },
+    { icon: Video, label: "Lectures", value: lectures.length, color: "text-success", bg: "bg-success/10", to: "/admin/content" },
+    { icon: Megaphone, label: "Announcements", value: announcements.length, color: "text-primary", bg: "bg-primary/10", to: "/admin/announcements" },
+    { icon: MessageCircle, label: "Pending Doubts", value: pendingDoubts, color: "text-destructive", bg: "bg-destructive/10", to: "/admin/doubts" },
   ];
 
   return (
@@ -34,7 +36,11 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-3 gap-3">
         {stats.map((s) => (
-          <Card key={s.label} className="p-3 text-center">
+          <Card
+            key={s.label}
+            className="p-3 text-center cursor-pointer hover:card-shadow-lg transition-shadow"
+            onClick={() => navigate(s.to)}
+          >
             <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mx-auto mb-1`}>
               <s.icon className={`w-4 h-4 ${s.color}`} />
             </div>
@@ -57,6 +63,24 @@ const AdminDashboard = () => {
           </BarChart>
         </ResponsiveContainer>
       </Card>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card
+          className="p-3 text-center cursor-pointer hover:card-shadow-lg transition-shadow"
+          onClick={() => navigate("/admin/access")}
+        >
+          <ShoppingCart className="w-5 h-5 text-primary mx-auto mb-1" />
+          <p className="text-xs font-medium">Course Access</p>
+        </Card>
+        <Card
+          className="p-3 text-center cursor-pointer hover:card-shadow-lg transition-shadow"
+          onClick={() => navigate("/admin/live")}
+        >
+          <Video className="w-5 h-5 text-success mx-auto mb-1" />
+          <p className="text-xs font-medium">Live Classes</p>
+        </Card>
+      </div>
 
       {/* Recent Students */}
       <Card className="p-4">

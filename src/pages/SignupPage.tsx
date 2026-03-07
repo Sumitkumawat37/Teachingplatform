@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +10,12 @@ import { GraduationCap } from "lucide-react";
 const SignupPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [email, setEmail] = useState("student@demo.com");
+  const [password, setPassword] = useState("123456");
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    login("student");
+    login(email, password);
     navigate("/");
   };
 
@@ -35,7 +38,7 @@ const SignupPage = () => {
             </div>
             <div className="space-y-2">
               <Label className="text-sm">Email</Label>
-              <Input type="email" placeholder="your@email.com" defaultValue="student@edumaster.com" />
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label className="text-sm">Phone</Label>
@@ -43,7 +46,7 @@ const SignupPage = () => {
             </div>
             <div className="space-y-2">
               <Label className="text-sm">Password</Label>
-              <Input type="password" placeholder="••••••••" defaultValue="demo1234" />
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
             <Button type="submit" className="w-full" size="lg">Create Account</Button>
           </form>

@@ -1,42 +1,49 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import { lectures, courses, doubts } from "@/lib/mock-data";
+import { usePurchase } from "@/lib/purchase-context";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Play, Send, MessageCircle } from "lucide-react";
+import { ChevronLeft, CheckCircle, Send, MessageCircle, Lock, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 const VideoPlayerPage = () => {
   const { courseId, lectureId } = useParams();
   const navigate = useNavigate();
+  const { hasPurchased } = usePurchase();
   const lecture = lectures.find((l) => l.id === lectureId);
   const course = courses.find((c) => c.id === courseId);
   const [completed, setCompleted] = useState(lecture?.completed ?? false);
   const [watchedPercent, setWatchedPercent] = useState(lecture?.watchedPercent ?? 0);
   const [newDoubt, setNewDoubt] = useState("");
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const lectureDoubts = doubts.filter((d) => d.lectureId === lectureId);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const handleTimeUpdate = () => {
-      const pct = Math.round((video.currentTime / video.duration) * 100);
-      setWatchedPercent(pct);
-      if (pct >= 80 && !completed) {
-        setCompleted(true);
-        toast.success("Lecture marked as completed! (80% watched)");
-      }
-    };
-    video.addEventListener("timeupdate", handleTimeUpdate);
-    return () => video.removeEventListener("timeupdate", handleTimeUpdate);
-  }, [completed]);
-
   if (!lecture || !course) return <div className="p-8 text-center text-muted-foreground">Lecture not found</div>;
+
+  const canAccess = lecture.freePreview || hasPurchased(courseId || "");
+
+  if (!canAccess) {
+    return (
+      <div className="space-y-4 animate-slide-up">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ChevronLeft className="w-4 h-4" /> Back
+        </button>
+        <Card className="p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-destructive" />
+          </div>
+          <h2 className="text-lg font-bold">Lecture Locked</h2>
+          <p className="text-muted-foreground text-sm mt-2">Purchase this course to unlock all lectures.</p>
+          <Button className="mt-4" onClick={() => navigate(`/courses/${courseId}`)}>
+            Go to Course
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -44,20 +51,24 @@ const VideoPlayerPage = () => {
         <ChevronLeft className="w-4 h-4" /> Back to {course.title}
       </button>
 
-      {/* Video Player */}
+      {/* YouTube Video Player */}
       <div className="relative rounded-2xl overflow-hidden bg-foreground/5">
-        <video
-          ref={videoRef}
-          className="w-full aspect-video"
-          controls
-          poster=""
-          src={lecture.videoUrl}
-        >
-          Your browser does not support the video tag.
-        </video>
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
-          <div className="h-full bg-primary rounded-r transition-all" style={{ width: `${watchedPercent}%` }} />
+        <div className="w-full aspect-video">
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube.com/embed/${lecture.youtubeId}?rel=0&modestbranding=1`}
+            title={lecture.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
         </div>
+        {lecture.freePreview && (
+          <div className="absolute top-2 left-2">
+            <Badge className="bg-success text-success-foreground text-[10px]">
+              <Eye className="w-3 h-3 mr-0.5" /> Free Preview
+            </Badge>
+          </div>
+        )}
       </div>
 
       <div>
@@ -68,7 +79,6 @@ const VideoPlayerPage = () => {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {completed && <Badge className="bg-success text-success-foreground">Completed</Badge>}
-            <span className="text-xs text-muted-foreground">{watchedPercent}% watched</span>
           </div>
         </div>
       </div>
@@ -82,7 +92,7 @@ const VideoPlayerPage = () => {
       </Card>
 
       {!completed && (
-        <Button onClick={() => setCompleted(true)} className="w-full" size="lg">
+        <Button onClick={() => { setCompleted(true); toast.success("Lecture marked as completed!"); }} className="w-full" size="lg">
           <CheckCircle className="w-4 h-4 mr-2" /> Mark as Completed
         </Button>
       )}

@@ -1,79 +1,95 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { courses } from "@/lib/mock-data";
+import { usePurchase } from "@/lib/purchase-context";
 import { useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { Lock, ShoppingCart, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 const CoursesPage = () => {
   const navigate = useNavigate();
+  const { hasPurchased, purchaseCourse } = usePurchase();
 
-  const handleCourseClick = (course: typeof courses[0]) => {
-    if (course.locked) {
-      toast.error("This course is locked. Contact your teacher to get access.");
-      return;
-    }
-    navigate(`/courses/${course.id}`);
+  const handleBuyCourse = (e: React.MouseEvent, courseId: string) => {
+    e.stopPropagation();
+    toast.info("Processing demo payment...", { duration: 1500 });
+    setTimeout(() => {
+      purchaseCourse(courseId);
+      toast.success("🎉 Course purchased successfully! All lectures are now unlocked.");
+    }, 1500);
   };
 
   return (
     <div className="space-y-4 animate-slide-up">
-      <h2 className="text-xl font-bold">My Courses</h2>
+      <h2 className="text-xl font-bold">Course Marketplace</h2>
       <div className="space-y-3">
-        {courses.map((course, i) => (
-          <Card
-            key={course.id}
-            className={`overflow-hidden transition-all ${
-              course.locked ? "opacity-80" : "cursor-pointer hover:card-shadow-lg hover:scale-[1.01] active:scale-[0.99]"
-            }`}
-            onClick={() => handleCourseClick(course)}
-            style={{ animationDelay: `${i * 80}ms` }}
-          >
-            <div className={`h-2 bg-gradient-to-r ${course.color}`} />
-            <div className="p-4">
-              <div className="flex items-start gap-3">
-                <div className="text-3xl">{course.thumbnail}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-sm">{course.title}</h3>
-                    {course.locked && (
-                      <Badge className="bg-destructive/10 text-destructive border-0 text-[10px] flex items-center gap-0.5">
-                        <Lock className="w-2.5 h-2.5" /> LOCKED
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground text-xs mt-0.5 line-clamp-2">{course.description}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                    <span>{course.chapters} chapters</span>
-                    <span>{course.lectures} lectures</span>
-                  </div>
-                  {course.locked ? (
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className="text-xs font-bold text-primary">₹{course.price}</span>
-                      <Button
-                        size="sm"
-                        className="text-xs h-7"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toast.info("Contact your teacher to unlock this course.");
-                        }}
-                      >
-                        Request Access
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 mt-2">
-                      <Progress value={course.progress} className="h-1.5 flex-1" />
-                      <span className="text-xs font-semibold text-primary">{course.progress}%</span>
-                    </div>
-                  )}
+        {courses.map((course, i) => {
+          const purchased = hasPurchased(course.id);
+          return (
+            <Card
+              key={course.id}
+              className="overflow-hidden transition-all cursor-pointer hover:card-shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+              onClick={() => navigate(`/courses/${course.id}`)}
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              {/* Thumbnail */}
+              <div className="relative">
+                <img
+                  src={course.thumbnailUrl}
+                  alt={course.title}
+                  className="w-full h-36 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
+                <div className="absolute bottom-2 left-3 right-3">
+                  <h3 className="font-bold text-sm text-primary-foreground">{course.title}</h3>
+                  <p className="text-primary-foreground/70 text-xs">{course.instructor}</p>
                 </div>
+                {!purchased && (
+                  <Badge className="absolute top-2 right-2 bg-destructive/90 text-destructive-foreground border-0 text-[10px] flex items-center gap-0.5">
+                    <Lock className="w-2.5 h-2.5" /> LOCKED
+                  </Badge>
+                )}
+                {purchased && (
+                  <Badge className="absolute top-2 right-2 bg-success/90 text-success-foreground border-0 text-[10px]">
+                    ENROLLED
+                  </Badge>
+                )}
               </div>
-            </div>
-          </Card>
-        ))}
+              <div className="p-3">
+                <p className="text-muted-foreground text-xs line-clamp-1">{course.description}</p>
+                <div className="flex items-center gap-4 mt-1.5 text-xs text-muted-foreground">
+                  <span>{course.chapters} chapters</span>
+                  <span>{course.lectures} lectures</span>
+                  <span className="text-[10px] bg-accent px-1.5 py-0.5 rounded">{course.category}</span>
+                </div>
+                {purchased ? (
+                  <div className="flex items-center gap-2 mt-2">
+                    <Progress value={course.progress} className="h-1.5 flex-1" />
+                    <span className="text-xs font-semibold text-primary">{course.progress}%</span>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-primary">₹{course.price}</span>
+                      <Badge variant="secondary" className="text-[10px]">
+                        <Eye className="w-2.5 h-2.5 mr-0.5" /> 2 Free Previews
+                      </Badge>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="text-xs h-7"
+                      onClick={(e) => handleBuyCourse(e, course.id)}
+                    >
+                      <ShoppingCart className="w-3 h-3 mr-1" /> Buy Course
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

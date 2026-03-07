@@ -1,11 +1,15 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { notes, courses } from "@/lib/mock-data";
-import { FileText, Download } from "lucide-react";
+import { usePurchase } from "@/lib/purchase-context";
+import { FileText, Download, Lock } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const NotesPage = () => {
   const [selectedCourse, setSelectedCourse] = useState<string>("all");
+  const { hasPurchased } = usePurchase();
 
   const filteredNotes = selectedCourse === "all" ? notes : notes.filter((n) => n.courseId === selectedCourse);
 
@@ -37,20 +41,36 @@ const NotesPage = () => {
       </div>
 
       <div className="space-y-2">
-        {filteredNotes.map((note, i) => (
-          <Card key={note.id} className="p-3 flex items-center gap-3" style={{ animationDelay: `${i * 60}ms` }}>
-            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5 text-destructive" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm truncate">{note.title}</h4>
-              <p className="text-muted-foreground text-xs">{note.chapter} · {note.pages} pages</p>
-            </div>
-            <Button size="sm" variant="ghost" className="shrink-0">
-              <Download className="w-4 h-4" />
-            </Button>
-          </Card>
-        ))}
+        {filteredNotes.map((note, i) => {
+          const purchased = hasPurchased(note.courseId);
+          return (
+            <Card key={note.id} className={`p-3 flex items-center gap-3 ${!purchased ? "opacity-70" : ""}`} style={{ animationDelay: `${i * 60}ms` }}>
+              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
+                {purchased ? (
+                  <FileText className="w-5 h-5 text-destructive" />
+                ) : (
+                  <Lock className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-sm truncate">{note.title}</h4>
+                <p className="text-muted-foreground text-xs">{note.chapter} · {note.pages} pages</p>
+                {!purchased && (
+                  <p className="text-[10px] text-destructive mt-0.5">Purchase course to access</p>
+                )}
+              </div>
+              {purchased ? (
+                <Button size="sm" variant="ghost" className="shrink-0" onClick={() => toast.success("Download started — demo only")}>
+                  <Download className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Badge variant="secondary" className="text-[10px]">
+                  <Lock className="w-2.5 h-2.5 mr-0.5" /> Locked
+                </Badge>
+              )}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
