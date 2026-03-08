@@ -51,19 +51,30 @@ const VideoPlayerPage = () => {
         <ChevronLeft className="w-4 h-4" /> Back to {course.title}
       </button>
 
-      {/* YouTube Video Player */}
-      <div className="relative rounded-2xl overflow-hidden bg-foreground/5">
+      {/* Native-style Video Player */}
+      <div
+        className="relative rounded-2xl overflow-hidden bg-foreground/5 shadow-lg border border-border"
+        onContextMenu={(e) => e.preventDefault()}
+      >
         <div className="w-full aspect-video">
           <iframe
             className="w-full h-full"
-            src={`https://www.youtube.com/embed/${lecture.youtubeId}?rel=0&modestbranding=1`}
+            src={`https://www.youtube-nocookie.com/embed/${lecture.youtubeId}?modestbranding=1&rel=0&controls=1&showinfo=0&disablekb=0&iv_load_policy=3&fs=1`}
             title={lecture.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            referrerPolicy="no-referrer"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
           />
         </div>
+        {/* EduMaster branding overlay */}
+        <div className="absolute top-2 right-2 pointer-events-none">
+          <Badge className="bg-primary/90 text-primary-foreground text-[10px] backdrop-blur-sm shadow-md">
+            EduMaster Lecture
+          </Badge>
+        </div>
         {lecture.freePreview && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-2 pointer-events-none">
             <Badge className="bg-success text-success-foreground text-[10px]">
               <Eye className="w-3 h-3 mr-0.5" /> Free Preview
             </Badge>
