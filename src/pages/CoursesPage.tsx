@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { courses } from "@/lib/mock-data";
+import { useCourses } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { useNavigate } from "react-router-dom";
 import { Lock, ShoppingCart, Eye } from "lucide-react";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 const CoursesPage = () => {
   const navigate = useNavigate();
   const { hasPurchased, purchaseCourse } = usePurchase();
+  const { data: courses = [], isLoading } = useCourses();
 
   const handleBuyCourse = (e: React.MouseEvent, courseId: string) => {
     e.stopPropagation();
@@ -20,6 +21,8 @@ const CoursesPage = () => {
       toast.success("🎉 Course purchased successfully! All lectures are now unlocked.");
     }, 1500);
   };
+
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading courses...</div>;
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -34,10 +37,9 @@ const CoursesPage = () => {
               onClick={() => navigate(`/courses/${course.id}`)}
               style={{ animationDelay: `${i * 80}ms` }}
             >
-              {/* Thumbnail */}
               <div className="relative">
                 <img
-                  src={course.thumbnailUrl}
+                  src={course.thumbnail_url || "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop"}
                   alt={course.title}
                   className="w-full h-36 object-cover"
                 />
@@ -60,16 +62,9 @@ const CoursesPage = () => {
               <div className="p-3">
                 <p className="text-muted-foreground text-xs line-clamp-1">{course.description}</p>
                 <div className="flex items-center gap-4 mt-1.5 text-xs text-muted-foreground">
-                  <span>{course.chapters} chapters</span>
-                  <span>{course.lectures} lectures</span>
                   <span className="text-[10px] bg-accent px-1.5 py-0.5 rounded">{course.category}</span>
                 </div>
-                {purchased ? (
-                  <div className="flex items-center gap-2 mt-2">
-                    <Progress value={course.progress} className="h-1.5 flex-1" />
-                    <span className="text-xs font-semibold text-primary">{course.progress}%</span>
-                  </div>
-                ) : (
+                {!purchased && (
                   <div className="mt-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-primary">₹{course.price}</span>
@@ -77,11 +72,7 @@ const CoursesPage = () => {
                         <Eye className="w-2.5 h-2.5 mr-0.5" /> 2 Free Previews
                       </Badge>
                     </div>
-                    <Button
-                      size="sm"
-                      className="text-xs h-7"
-                      onClick={(e) => handleBuyCourse(e, course.id)}
-                    >
+                    <Button size="sm" className="text-xs h-7" onClick={(e) => handleBuyCourse(e, course.id)}>
                       <ShoppingCart className="w-3 h-3 mr-1" /> Buy Course
                     </Button>
                   </div>

@@ -15,6 +15,7 @@ const LoginPage = () => {
   const [role, setRole] = useState<"student" | "admin">("student");
   const [email, setEmail] = useState("student@demo.com");
   const [password, setPassword] = useState("123456");
+  const [loading, setLoading] = useState(false);
 
   const handleRoleSwitch = (r: "student" | "admin") => {
     setRole(r);
@@ -22,13 +23,15 @@ const LoginPage = () => {
     setPassword("123456");
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(email, password);
+    setLoading(true);
+    const success = await login(email, password);
+    setLoading(false);
     if (success) {
-      navigate(email.includes("teacher") ? "/admin" : "/");
+      // Navigation handled by auth state change
     } else {
-      toast.error("Invalid credentials");
+      toast.error("Invalid credentials. Please check email and password.");
     }
   };
 
@@ -90,7 +93,9 @@ const LoginPage = () => {
               <p className="text-muted-foreground">Teacher: teacher@demo.com / 123456</p>
             </div>
 
-            <Button type="submit" className="w-full" size="lg">Sign In</Button>
+            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
         </Card>
 

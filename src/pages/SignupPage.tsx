@@ -6,17 +6,28 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap } from "lucide-react";
+import { toast } from "sonner";
 
 const SignupPage = () => {
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("student@demo.com");
-  const [password, setPassword] = useState("123456");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password);
-    navigate("/");
+    if (!name || !email || !password) return toast.error("Please fill all fields");
+    if (password.length < 6) return toast.error("Password must be at least 6 characters");
+    setLoading(true);
+    const success = await signup(email, password, name);
+    setLoading(false);
+    if (success) {
+      toast.success("Account created successfully!");
+    } else {
+      toast.error("Signup failed. Email may already be in use.");
+    }
   };
 
   return (
@@ -34,21 +45,19 @@ const SignupPage = () => {
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm">Full Name</Label>
-              <Input placeholder="John Doe" defaultValue="Demo Student" />
+              <Input placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label className="text-sm">Email</Label>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-sm">Phone</Label>
-              <Input type="tel" placeholder="+91 9876543210" />
-            </div>
-            <div className="space-y-2">
               <Label className="text-sm">Password</Label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <Button type="submit" className="w-full" size="lg">Create Account</Button>
+            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              {loading ? "Creating Account..." : "Create Account"}
+            </Button>
           </form>
         </Card>
 

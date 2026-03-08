@@ -5,13 +5,16 @@ import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { usePurchase } from "@/lib/purchase-context";
-import { announcements, liveClasses, courses } from "@/lib/mock-data";
+import { useCourses, useAnnouncements, useLiveClasses } from "@/lib/supabase-data";
 import teacherBanner from "@/assets/teacher-banner.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hasPurchased } = usePurchase();
+  const { data: courses = [] } = useCourses();
+  const { data: announcements = [] } = useAnnouncements();
+  const { data: liveClasses = [] } = useLiveClasses();
 
   const upcomingLive = liveClasses.filter((c) => c.status === "upcoming");
   const purchasedCourses = courses.filter((c) => hasPurchased(c.id));
@@ -48,20 +51,16 @@ const HomePage = () => {
       {purchasedCourses.length > 0 && (
         <Card
           className="p-4 cursor-pointer hover:card-shadow-lg transition-shadow bg-gradient-to-r from-primary to-info overflow-hidden relative"
-          onClick={() => navigate("/courses/1/lecture/3")}
+          onClick={() => navigate("/courses")}
         >
           <div className="relative z-10">
             <p className="text-primary-foreground/80 text-xs font-medium uppercase tracking-wide">Continue Learning</p>
-            <h3 className="text-primary-foreground font-bold text-lg mt-1">Polynomials</h3>
-            <p className="text-primary-foreground/70 text-sm">Complete Mathematics · Chapter: Algebra</p>
+            <h3 className="text-primary-foreground font-bold text-lg mt-1">{purchasedCourses[0].title}</h3>
+            <p className="text-primary-foreground/70 text-sm">{purchasedCourses[0].category}</p>
             <div className="flex items-center gap-2 mt-3">
               <div className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center">
                 <Play className="w-4 h-4 text-primary-foreground" fill="currentColor" />
               </div>
-              <div className="flex-1">
-                <Progress value={65} className="h-1.5 bg-primary-foreground/20" />
-              </div>
-              <span className="text-primary-foreground text-xs font-medium">65%</span>
             </div>
           </div>
           <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-primary-foreground/10" />
@@ -92,32 +91,23 @@ const HomePage = () => {
 
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <Card
-          className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-          onClick={() => navigate("/quizzes")}
-        >
+        <Card className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]" onClick={() => navigate("/quizzes")}>
           <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center mb-2">
             <Trophy className="w-5 h-5 text-warning" />
           </div>
           <h4 className="font-semibold text-sm">Today's Quiz</h4>
-          <p className="text-muted-foreground text-xs mt-0.5">Algebra Basics · 5 Qs</p>
+          <p className="text-muted-foreground text-xs mt-0.5">Take a quiz</p>
         </Card>
 
-        <Card
-          className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-          onClick={() => navigate("/notes")}
-        >
+        <Card className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]" onClick={() => navigate("/notes")}>
           <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center mb-2">
             <FileText className="w-5 h-5 text-success" />
           </div>
           <h4 className="font-semibold text-sm">Latest Notes</h4>
-          <p className="text-muted-foreground text-xs mt-0.5">Differentiation Rules</p>
+          <p className="text-muted-foreground text-xs mt-0.5">Study materials</p>
         </Card>
 
-        <Card
-          className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-          onClick={() => navigate("/courses")}
-        >
+        <Card className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]" onClick={() => navigate("/courses")}>
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
             <BookOpen className="w-5 h-5 text-primary" />
           </div>
@@ -125,10 +115,7 @@ const HomePage = () => {
           <p className="text-muted-foreground text-xs mt-0.5">{purchasedCourses.length} enrolled · {lockedCourses.length} available</p>
         </Card>
 
-        <Card
-          className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-          onClick={() => navigate("/results")}
-        >
+        <Card className="p-4 cursor-pointer hover:card-shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]" onClick={() => navigate("/results")}>
           <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center mb-2">
             <TrendingUp className="w-5 h-5 text-info" />
           </div>

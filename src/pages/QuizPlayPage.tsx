@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { quizQuestions } from "@/lib/mock-data";
+import { useQuizQuestions, useSubmitQuizAttempt } from "@/lib/supabase-data";
+import { useAuth } from "@/lib/auth-context";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, CheckCircle, XCircle, Trophy } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -9,10 +10,17 @@ import { Progress } from "@/components/ui/progress";
 const QuizPlayPage = () => {
   const navigate = useNavigate();
   const { quizId } = useParams();
-  const questions = quizQuestions[quizId || "1"] || [];
+  const { user } = useAuth();
+  const { data: questions = [], isLoading } = useQuizQuestions(quizId);
+  const submitAttempt = useSubmitQuizAttempt();
   const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [submitted, setSubmitted] = useState(false);
+
+  // Initialize answers when questions load
+  if (questions.length > 0 && answers.length === 0) {
+    setAnswers(new Array(questions.length).fill(null));
+  }
 
   const handleSelect = (optionIndex: number) => {
     if (submitted) return;
@@ -21,10 +29,24 @@ const QuizPlayPage = () => {
     setAnswers(newAnswers);
   };
 
-  const handleSubmit = () => setSubmitted(true);
+  const handleSubmit = () => {
+    setSubmitted(true);
+    if (user && quizId) {
+      const s = answers.reduce((acc, a, i) => acc + (a === questions[i]?.correct_index ? 1 : 0), 0);
+      submitAttempt.mutate({
+        quiz_id: quizId,
+        user_id: user.id,
+        score: s,
+        total: questions.length,
+        answers: answers.map((a) => a ?? -1),
+      });
+    }
+  };
 
-  const score = answers.reduce((acc, a, i) => acc + (a === questions[i]?.correct ? 1 : 0), 0);
+  const score = answers.reduce((acc, a, i) => acc + (a === questions[i]?.correct_index ? 1 : 0), 0);
   const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground">Loading quiz...</div>;
 
   if (questions.length === 0) {
     return (
@@ -36,6 +58,7 @@ const QuizPlayPage = () => {
   }
 
   if (submitted) {
+    const opts = (q: typeof questions[0]) => (q.options as any as string[]);
     return (
       <div className="space-y-4 animate-slide-up">
         <Card className="p-6 text-center">
@@ -52,8 +75,8 @@ const QuizPlayPage = () => {
             <Card key={q.id} className="p-4">
               <p className="font-medium text-sm mb-2">Q{qi + 1}. {q.question}</p>
               <div className="space-y-1.5">
-                {q.options.map((opt, oi) => {
-                  const isCorrect = oi === q.correct;
+                {opts(q).map((opt: string, oi: number) => {
+                  const isCorrect = oi === q.correct_index;
                   const isSelected = answers[qi] === oi;
                   return (
                     <div
@@ -80,6 +103,7 @@ const QuizPlayPage = () => {
   }
 
   const q = questions[currentQ];
+  const opts = q.options as any as string[];
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -97,7 +121,7 @@ const QuizPlayPage = () => {
         <h3 className="font-bold text-base mb-4">{q.question}</h3>
 
         <div className="space-y-2">
-          {q.options.map((opt, i) => (
+          {opts.map((opt: string, i: number) => (
             <button
               key={i}
               onClick={() => handleSelect(i)}
