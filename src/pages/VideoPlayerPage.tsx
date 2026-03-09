@@ -225,14 +225,19 @@ const VideoPlayerPage = () => {
               Your browser does not support the video tag.
             </video>
           ) : hasYoutubeVideo ? (
-            // Privacy-enhanced YouTube embed
-            <iframe
-              src={getYoutubeEmbedUrl()}
-              title={lecture.title}
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            // Privacy-enhanced YouTube embed with overlay to hide YouTube branding
+            <>
+              <iframe
+                ref={iframeRef}
+                src={getYoutubeEmbedUrl()}
+                title={lecture.title}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+              {/* Overlay to hide "Watch on YouTube" button at bottom-right */}
+              <div className="absolute bottom-0 right-0 w-36 h-12 bg-black/90 pointer-events-auto z-[5]" />
+            </>
           ) : (
             // No video placeholder
             <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground">
