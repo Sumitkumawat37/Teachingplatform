@@ -10,6 +10,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, CheckCircle, Send, MessageCircle, Lock, Eye, Play } from "lucide-react";
 import { toast } from "sonner";
 
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
+
 const VideoPlayerPage = () => {
   const { courseId, lectureId } = useParams();
   const navigate = useNavigate();
@@ -24,6 +31,8 @@ const VideoPlayerPage = () => {
   const [newDoubt, setNewDoubt] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const autoCompletedRef = useRef(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const ytIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const course = courses.find((c) => c.id === courseId);
   const myProgress = progressData.find((p) => p.lecture_id === lectureId);
@@ -89,6 +98,42 @@ const VideoPlayerPage = () => {
     return () => video.removeEventListener("timeupdate", handleTimeUpdate);
   }, [hasUploadedVideo, completed, handleAutoComplete]);
 
+  // Track YouTube iframe progress via postMessage API
+  useEffect(() => {
+    if (!hasYoutubeVideo || completed) return;
+    autoCompletedRef.current = completed;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.origin.includes("youtube")) return;
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data?.event === "infoDelivery" && data?.info?.currentTime != null && data?.info?.duration) {
+          const pct = (data.info.currentTime / data.info.duration) * 100;
+          if (pct >= 80 && !autoCompletedRef.current) {
+            handleAutoComplete();
+          }
+        }
+      } catch { /* ignore non-JSON messages */ }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    // Kick off listening by sending "listening" command to iframe
+    const kickstart = setInterval(() => {
+      const iframe = iframeRef.current;
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage('{"event":"listening"}', "*");
+        iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: "addEventListener", args: ["onStateChange"] }), "*");
+      }
+    }, 2000);
+    ytIntervalRef.current = kickstart;
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      if (ytIntervalRef.current) clearInterval(ytIntervalRef.current);
+    };
+  }, [hasYoutubeVideo, completed, handleAutoComplete]);
+
   if (!lecture || !course) return <div className="p-8 text-center text-muted-foreground">Lecture not found</div>;
 
   if (!canAccess) {
@@ -139,14 +184,17 @@ const VideoPlayerPage = () => {
   const getYoutubeEmbedUrl = () => {
     if (!hasYoutubeVideo) return "";
     const params = new URLSearchParams({
-      rel: "0",
       modestbranding: "1",
+      rel: "0",
+      controls: "1",
+      playsinline: "1",
       showinfo: "0",
       iv_load_policy: "3",
       fs: "1",
       cc_load_policy: "0",
       disablekb: "0",
-      enablejsapi: "0",
+      enablejsapi: "1",
+      origin: window.location.origin,
     });
     return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
   };
@@ -177,14 +225,19 @@ const VideoPlayerPage = () => {
               Your browser does not support the video tag.
             </video>
           ) : hasYoutubeVideo ? (
-            // Privacy-enhanced YouTube embed
-            <iframe
-              src={getYoutubeEmbedUrl()}
-              title={lecture.title}
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            // Privacy-enhanced YouTube embed with overlay to hide YouTube branding
+            <>
+              <iframe
+                ref={iframeRef}
+                src={getYoutubeEmbedUrl()}
+                title={lecture.title}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+              {/* Overlay to hide "Watch on YouTube" button at bottom-right */}
+              <div className="absolute bottom-0 right-0 w-36 h-12 bg-black/90 pointer-events-auto z-[5]" />
+            </>
           ) : (
             // No video placeholder
             <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground">
