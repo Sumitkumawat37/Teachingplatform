@@ -139,14 +139,17 @@ const VideoPlayerPage = () => {
   const getYoutubeEmbedUrl = () => {
     if (!hasYoutubeVideo) return "";
     const params = new URLSearchParams({
-      rel: "0",
       modestbranding: "1",
+      rel: "0",
+      controls: "1",
+      playsinline: "1",
       showinfo: "0",
       iv_load_policy: "3",
       fs: "1",
       cc_load_policy: "0",
       disablekb: "0",
-      enablejsapi: "0",
+      enablejsapi: "1",
+      origin: window.location.origin,
     });
     return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
   };
