@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useCourses, useLectures, useNotes, useChapters } from "@/lib/supabase-data";
-import { useCreateCourse, useDeleteCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
+import { useCreateCourse, useDeleteCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useUpdateLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus, ImagePlus } from "lucide-react";
