@@ -32,13 +32,7 @@ const VideoPlayerPage = () => {
   const completed = myProgress?.completed ?? false;
   const canAccess = lecture ? (lecture.free_preview || hasPurchased(courseId || "")) : false;
 
-  // Load YouTube IFrame API
-  useEffect(() => {
-    if ((window as any).YT) return;
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-  }, []);
+  // Script loading is now handled in the player init effect
 
   const handleAutoComplete = useCallback(() => {
     if (!user || completed || autoCompletedRef.current) return;
