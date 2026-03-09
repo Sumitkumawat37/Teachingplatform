@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,12 @@ import { useCourses, useLectures, useNotes, useChapters } from "@/lib/supabase-d
 import { useCreateCourse, useDeleteCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus } from "lucide-react";
+import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus, ImagePlus } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminContent = () => {
   // Course form
@@ -24,6 +25,10 @@ const AdminContent = () => {
   const [courseInstructor, setCourseInstructor] = useState("");
   const [courseEmoji, setCourseEmoji] = useState("📚");
   const [courseThumbnailUrl, setCourseThumbnailUrl] = useState("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Chapter form
   const [showChapterForm, setShowChapterForm] = useState(false);
@@ -65,17 +70,41 @@ const AdminContent = () => {
   const filteredChaptersForLecture = chapters.filter((c) => c.course_id === lecCourseId);
   const filteredChaptersForNote = chapters.filter((c) => c.course_id === noteCourseId);
 
-  const handleCreateCourse = () => {
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+    setCourseThumbnailUrl("");
+  };
+
+  const uploadThumbnail = async (): Promise<string | undefined> => {
+    if (!thumbnailFile) return courseThumbnailUrl || undefined;
+    setUploading(true);
+    const ext = thumbnailFile.name.split(".").pop();
+    const path = `courses/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("thumbnails").upload(path, thumbnailFile);
+    setUploading(false);
+    if (error) { toast.error("Upload failed: " + error.message); return undefined; }
+    const { data: urlData } = supabase.storage.from("thumbnails").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleCreateCourse = async () => {
     if (!courseTitle) return toast.error("Course title is required");
+    const thumbUrl = await uploadThumbnail();
     createCourse.mutate({
       title: courseTitle, description: courseDesc, price: parseInt(coursePrice) || 0,
       category: courseCategory, instructor: courseInstructor || "Rajesh Kumar",
-      thumbnail_emoji: courseEmoji, thumbnail_url: courseThumbnailUrl || undefined,
+      thumbnail_emoji: courseEmoji, thumbnail_url: thumbUrl,
     }, {
       onSuccess: () => {
         toast.success("Course created!");
         setShowCourseForm(false);
         setCourseTitle(""); setCourseDesc(""); setCoursePrice(""); setCourseCategory(""); setCourseInstructor(""); setCourseThumbnailUrl("");
+        setThumbnailFile(null); setThumbnailPreview("");
       },
     });
   };
@@ -147,9 +176,28 @@ const AdminContent = () => {
                     <div className="space-y-1"><Label className="text-xs">Instructor</Label><Input placeholder="Rajesh Kumar" value={courseInstructor} onChange={(e) => setCourseInstructor(e.target.value)} /></div>
                     <div className="space-y-1"><Label className="text-xs">Emoji Icon</Label><Input placeholder="📚" value={courseEmoji} onChange={(e) => setCourseEmoji(e.target.value)} /></div>
                   </div>
-                  <div className="space-y-1"><Label className="text-xs">Thumbnail URL</Label><Input placeholder="https://..." value={courseThumbnailUrl} onChange={(e) => setCourseThumbnailUrl(e.target.value)} /></div>
-                  <Button className="w-full" onClick={handleCreateCourse} disabled={createCourse.isPending}>
-                    {createCourse.isPending ? "Creating..." : "Create Course"}
+                  <div className="space-y-1">
+                    <Label className="text-xs">Course Thumbnail</Label>
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbnailSelect} />
+                    {thumbnailPreview ? (
+                      <div className="relative">
+                        <img src={thumbnailPreview} alt="Preview" className="w-full h-28 object-cover rounded-lg border border-border" />
+                        <Button size="sm" variant="secondary" className="absolute top-1 right-1 h-6 text-[10px]" onClick={() => { setThumbnailFile(null); setThumbnailPreview(""); }}>Remove</Button>
+                      </div>
+                    ) : (
+                      <div
+                        className="w-full h-28 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <ImagePlus className="w-6 h-6 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">Click to upload image</span>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-muted-foreground">Or paste a URL:</p>
+                    <Input placeholder="https://..." value={courseThumbnailUrl} onChange={(e) => { setCourseThumbnailUrl(e.target.value); setThumbnailFile(null); setThumbnailPreview(""); }} />
+                  </div>
+                  <Button className="w-full" onClick={handleCreateCourse} disabled={createCourse.isPending || uploading}>
+                    {uploading ? "Uploading image..." : createCourse.isPending ? "Creating..." : "Create Course"}
                   </Button>
                 </div>
               </DialogContent>
