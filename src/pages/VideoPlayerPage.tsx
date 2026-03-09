@@ -179,15 +179,14 @@ const VideoPlayerPage = () => {
           ) : hasYoutubeVideo ? (
             // Privacy-enhanced YouTube embed
             <div className="relative w-full h-full">
-              <iframe
-                src={getYoutubeEmbedUrl()}
-                title={lecture.title}
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                frameBorder="0"
-                sandbox="allow-same-origin allow-scripts allow-presentation allow-popups"
-              />
+                <iframe
+                  src={getYoutubeEmbedUrl()}
+                  title={lecture.title}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  frameBorder="0"
+                />
               {/* Overlay to block YouTube logo clicks */}
               <div className="absolute bottom-0 right-0 w-24 h-10 bg-transparent" />
             </div>
