@@ -263,13 +263,30 @@ const VideoPlayerPage = () => {
               {/* Top overlay */}
               <div className="absolute top-0 left-0 right-0 h-12 z-[5] pointer-events-auto" style={{ background: 'linear-gradient(to bottom, #000 60%, transparent)' }} />
               {/* Bottom overlay */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 z-[5] pointer-events-none" style={{ background: 'linear-gradient(to top, #000 40%, transparent)' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-20 z-[5] pointer-events-none" style={{ background: 'linear-gradient(to top, #000 50%, transparent)' }} />
               {/* Bottom-right - blocks Watch on YouTube */}
               <div className="absolute bottom-0 right-0 w-44 h-16 bg-black z-[6] pointer-events-auto" />
               {/* Top-right - blocks menu */}
               <div className="absolute top-0 right-0 w-16 h-12 bg-black z-[6] pointer-events-auto" />
               {/* Top-left - blocks logo */}
               <div className="absolute top-0 left-0 w-12 h-12 bg-black z-[6] pointer-events-auto" />
+              
+              {/* Custom Progress Bar */}
+              <div className="absolute bottom-0 left-0 right-0 z-[8] px-3 pb-2 pointer-events-none">
+                <div className="flex items-center gap-2">
+                  {/* Time display */}
+                  <span className="text-[10px] text-white/90 font-medium min-w-[70px]">
+                    {formatTime(ytProgress.currentTime)} / {formatTime(ytProgress.duration)}
+                  </span>
+                  {/* Progress bar */}
+                  <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
+                      style={{ width: `${ytProgressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground">
