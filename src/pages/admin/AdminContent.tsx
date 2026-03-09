@@ -39,12 +39,16 @@ const AdminContent = () => {
   const [showLectureForm, setShowLectureForm] = useState(false);
   const [lecTitle, setLecTitle] = useState("");
   const [lecYoutubeUrl, setLecYoutubeUrl] = useState("");
+  const [lecVideoUrl, setLecVideoUrl] = useState("");
   const [lecDuration, setLecDuration] = useState("10:00");
   const [lecCourseId, setLecCourseId] = useState("");
   const [lecChapterId, setLecChapterId] = useState("");
   const [lecFreePreview, setLecFreePreview] = useState(false);
   const [lecThumbnailFile, setLecThumbnailFile] = useState<File | null>(null);
   const [lecThumbnailPreview, setLecThumbnailPreview] = useState("");
+  const [lecVideoFile, setLecVideoFile] = useState<File | null>(null);
+  const [lecVideoUploading, setLecVideoUploading] = useState(false);
+  const videoFileInputRef = useRef<HTMLInputElement>(null);
   const [lecUploading, setLecUploading] = useState(false);
   const lecFileInputRef = useRef<HTMLInputElement>(null);
 
