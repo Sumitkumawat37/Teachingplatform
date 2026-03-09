@@ -22,10 +22,87 @@ const VideoPlayerPage = () => {
   const createDoubt = useCreateDoubt();
   const upsertProgress = useUpsertLectureProgress();
   const [newDoubt, setNewDoubt] = useState("");
+  const playerRef = useRef<YT.Player | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoCompletedRef = useRef(false);
 
   const course = courses.find((c) => c.id === courseId);
   const myProgress = progressData.find((p) => p.lecture_id === lectureId);
   const completed = myProgress?.completed ?? false;
+
+  // Load YouTube IFrame API
+  useEffect(() => {
+    if ((window as any).YT) return;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  }, []);
+
+  const handleAutoComplete = useCallback(() => {
+    if (!user || completed || autoCompletedRef.current) return;
+    autoCompletedRef.current = true;
+    upsertProgress.mutate({
+      user_id: user.id,
+      lecture_id: lectureId!,
+      watched_percent: 100,
+      completed: true,
+    });
+    toast.success("Lecture automatically marked as completed!");
+  }, [user, completed, lectureId, upsertProgress]);
+
+  // Initialize YT player and track progress
+  useEffect(() => {
+    if (!lecture?.youtube_id || !canAccess) return;
+    autoCompletedRef.current = completed;
+
+    const initPlayer = () => {
+      if (playerRef.current) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+      playerRef.current = new (window as any).YT.Player("yt-player", {
+        videoId: lecture.youtube_id,
+        playerVars: {
+          modestbranding: 1, rel: 0, controls: 1, showinfo: 0,
+          disablekb: 0, iv_load_policy: 3, fs: 1,
+          origin: window.location.origin,
+        },
+        events: {
+          onStateChange: (event: any) => {
+            if (event.data === 1) {
+              // Playing - start tracking
+              if (intervalRef.current) clearInterval(intervalRef.current);
+              intervalRef.current = setInterval(() => {
+                if (!playerRef.current) return;
+                const current = playerRef.current.getCurrentTime?.();
+                const duration = playerRef.current.getDuration?.();
+                if (current && duration && duration > 0) {
+                  const percent = (current / duration) * 100;
+                  if (percent >= 80 && !autoCompletedRef.current) {
+                    handleAutoComplete();
+                  }
+                }
+              }, 3000);
+            } else {
+              if (intervalRef.current) clearInterval(intervalRef.current);
+            }
+          },
+        },
+      });
+    };
+
+    if ((window as any).YT?.Player) {
+      initPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = initPlayer;
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (playerRef.current) { try { playerRef.current.destroy(); } catch {} }
+      playerRef.current = null;
+    };
+  }, [lecture?.youtube_id, canAccess, completed, handleAutoComplete]);
 
   if (!lecture || !course) return <div className="p-8 text-center text-muted-foreground">Lecture not found</div>;
 
