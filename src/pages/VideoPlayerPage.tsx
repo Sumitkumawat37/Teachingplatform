@@ -235,8 +235,9 @@ const VideoPlayerPage = () => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
-              {/* Overlay to hide "Watch on YouTube" button at bottom-right */}
-              <div className="absolute bottom-0 right-0 w-36 h-12 bg-black/90 pointer-events-auto z-[5]" />
+              {/* Overlays to hide YouTube branding - "Watch on YouTube" button and logo */}
+              <div className="absolute bottom-0 right-0 w-40 h-14 bg-black pointer-events-auto z-[5]" />
+              <div className="absolute top-0 left-0 w-full h-10 pointer-events-auto z-[5]" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)' }} />
             </>
           ) : (
             // No video placeholder
