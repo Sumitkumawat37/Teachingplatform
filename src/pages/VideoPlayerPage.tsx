@@ -53,7 +53,7 @@ const VideoPlayerPage = () => {
 
   // Initialize YT player and track progress
   useEffect(() => {
-    if (!lecture?.youtube_id || !canAccess) return;
+    if (!lecture?.youtube_id || !lecture.youtube_id.trim() || !canAccess) return;
     autoCompletedRef.current = completed;
 
     const initPlayer = () => {
