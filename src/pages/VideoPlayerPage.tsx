@@ -7,7 +7,7 @@ import { useLecture, useCourses, useDoubts, useCreateDoubt, useLectureProgress, 
 import { usePurchase } from "@/lib/purchase-context";
 import { useAuth } from "@/lib/auth-context";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Send, MessageCircle, Lock, Eye } from "lucide-react";
+import { ChevronLeft, CheckCircle, Send, MessageCircle, Lock, Eye, Play } from "lucide-react";
 import { toast } from "sonner";
 
 const VideoPlayerPage = () => {
@@ -22,9 +22,7 @@ const VideoPlayerPage = () => {
   const createDoubt = useCreateDoubt();
   const upsertProgress = useUpsertLectureProgress();
   const [newDoubt, setNewDoubt] = useState("");
-  const playerRef = useRef<any>(null);
-  const playerContainerRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const autoCompletedRef = useRef(false);
 
   const course = courses.find((c) => c.id === courseId);
@@ -32,8 +30,14 @@ const VideoPlayerPage = () => {
   const completed = myProgress?.completed ?? false;
   const canAccess = lecture ? (lecture.free_preview || hasPurchased(courseId || "")) : false;
 
-  // Script loading is now handled in the player init effect
+  // Check if it's a YouTube video or uploaded video
+  const isValidYoutubeId = (id: string) => /^[a-zA-Z0-9_-]{11}$/.test(id?.trim());
+  const youtubeId = lecture?.youtube_id?.trim();
+  const videoUrl = (lecture as any)?.video_url;
+  const hasYoutubeVideo = youtubeId && isValidYoutubeId(youtubeId);
+  const hasUploadedVideo = videoUrl && videoUrl.trim().length > 0;
 
+  // Auto-complete when 80% watched
   const handleAutoComplete = useCallback(() => {
     if (!user || completed || autoCompletedRef.current) return;
     autoCompletedRef.current = true;
@@ -46,86 +50,24 @@ const VideoPlayerPage = () => {
     toast.success("Lecture automatically marked as completed!");
   }, [user, completed, lectureId, upsertProgress]);
 
-  // Initialize YT player and track progress
-  const isValidYoutubeId = (id: string) => /^[a-zA-Z0-9_-]{11}$/.test(id?.trim());
-
+  // Track progress for uploaded videos
   useEffect(() => {
-    const videoId = lecture?.youtube_id?.trim();
-    if (!videoId || !isValidYoutubeId(videoId) || !canAccess) return;
     autoCompletedRef.current = completed;
+    const video = videoRef.current;
+    if (!video || !hasUploadedVideo) return;
 
-    const createPlayer = (container: HTMLDivElement) => {
-      // Destroy previous player if any
-      if (playerRef.current) {
-        try { playerRef.current.destroy(); } catch {}
-        playerRef.current = null;
-      }
-      // Clear container and re-add a fresh div for YT to attach to
-      container.innerHTML = "";
-      const div = document.createElement("div");
-      container.appendChild(div);
-
-      try {
-        playerRef.current = new (window as any).YT.Player(div, {
-          videoId,
-          width: "100%",
-          height: "100%",
-          playerVars: {
-            modestbranding: 1, rel: 0, controls: 1, showinfo: 0,
-            iv_load_policy: 3, fs: 1, origin: window.location.origin,
-          },
-          events: {
-            onStateChange: (event: any) => {
-              if (event.data === 1) {
-                if (intervalRef.current) clearInterval(intervalRef.current);
-                intervalRef.current = setInterval(() => {
-                  if (!playerRef.current) return;
-                  const current = playerRef.current.getCurrentTime?.();
-                  const duration = playerRef.current.getDuration?.();
-                  if (current && duration && duration > 0) {
-                    const pct = (current / duration) * 100;
-                    if (pct >= 80 && !autoCompletedRef.current) handleAutoComplete();
-                  }
-                }, 3000);
-              } else {
-                if (intervalRef.current) clearInterval(intervalRef.current);
-              }
-            },
-          },
-        });
-      } catch (e) {
-        console.warn("YT Player init failed:", e);
+    const handleTimeUpdate = () => {
+      if (video.duration > 0) {
+        const pct = (video.currentTime / video.duration) * 100;
+        if (pct >= 80 && !autoCompletedRef.current) {
+          handleAutoComplete();
+        }
       }
     };
 
-    const waitForYT = (container: HTMLDivElement) => {
-      if ((window as any).YT?.Player) {
-        createPlayer(container);
-      } else {
-        // Script not ready yet — poll until it is
-        const prev = (window as any).onYouTubeIframeAPIReady;
-        (window as any).onYouTubeIframeAPIReady = () => {
-          if (prev) prev();
-          if (playerContainerRef.current) createPlayer(playerContainerRef.current);
-        };
-      }
-    };
-
-    // Load script if not present
-    if (!(window as any).YT) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-    }
-
-    if (playerContainerRef.current) waitForYT(playerContainerRef.current);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (playerRef.current) { try { playerRef.current.destroy(); } catch {} }
-      playerRef.current = null;
-    };
-  }, [lecture?.youtube_id, canAccess, completed, handleAutoComplete]);
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    return () => video.removeEventListener("timeupdate", handleTimeUpdate);
+  }, [hasUploadedVideo, completed, handleAutoComplete]);
 
   if (!lecture || !course) return <div className="p-8 text-center text-muted-foreground">Lecture not found</div>;
 
@@ -173,6 +115,22 @@ const VideoPlayerPage = () => {
     setNewDoubt("");
   };
 
+  // Build YouTube embed URL with privacy-enhanced mode
+  const getYoutubeEmbedUrl = () => {
+    if (!hasYoutubeVideo) return "";
+    const params = new URLSearchParams({
+      rel: "0",
+      modestbranding: "1",
+      showinfo: "0",
+      iv_load_policy: "3",
+      fs: "1",
+      cc_load_policy: "0",
+      disablekb: "0",
+      enablejsapi: "0",
+    });
+    return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
+  };
+
   return (
     <div className="space-y-4 animate-slide-up">
       <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -184,23 +142,57 @@ const VideoPlayerPage = () => {
         className="relative rounded-2xl overflow-hidden bg-foreground/5 shadow-lg border border-border"
         onContextMenu={(e) => e.preventDefault()}
       >
-        <div className="w-full aspect-video bg-black">
-          {/^[a-zA-Z0-9_-]{11}$/.test(lecture.youtube_id?.trim() ?? "") ? (
-            <div ref={playerContainerRef} key={lecture.youtube_id} className="w-full h-full" />
+        <div className="w-full aspect-video bg-black relative">
+          {hasUploadedVideo ? (
+            // Native HTML5 Video Player for uploaded videos
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              className="w-full h-full object-contain"
+              controls
+              controlsList="nodownload"
+              playsInline
+              poster={lecture.thumbnail_url || undefined}
+            >
+              Your browser does not support the video tag.
+            </video>
+          ) : hasYoutubeVideo ? (
+            // Privacy-enhanced YouTube embed
+            <div className="relative w-full h-full">
+              <iframe
+                src={getYoutubeEmbedUrl()}
+                title={lecture.title}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                frameBorder="0"
+                sandbox="allow-same-origin allow-scripts allow-presentation allow-popups"
+              />
+              {/* Overlay to block YouTube logo clicks */}
+              <div className="absolute bottom-0 right-0 w-24 h-10 bg-transparent" />
+            </div>
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-              <span className="text-2xl">🎬</span>
+            // No video placeholder
+            <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Play className="w-8 h-8 text-primary" />
+              </div>
               <span className="text-sm">No video added yet for this lecture</span>
+              <span className="text-xs text-muted-foreground/70">Add a YouTube ID or upload a video in admin</span>
             </div>
           )}
         </div>
-        <div className="absolute top-2 right-2 pointer-events-none">
+
+        {/* EduMaster Badge */}
+        <div className="absolute top-2 right-2 pointer-events-none z-10">
           <Badge className="bg-primary/90 text-primary-foreground text-[10px] backdrop-blur-sm shadow-md">
             EduMaster Lecture
           </Badge>
         </div>
+
+        {/* Free Preview Badge */}
         {lecture.free_preview && (
-          <div className="absolute top-2 left-2 pointer-events-none">
+          <div className="absolute top-2 left-2 pointer-events-none z-10">
             <Badge className="bg-success text-success-foreground text-[10px]">
               <Eye className="w-3 h-3 mr-0.5" /> Free Preview
             </Badge>
@@ -208,6 +200,7 @@ const VideoPlayerPage = () => {
         )}
       </div>
 
+      {/* Lecture Info */}
       <div>
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -220,6 +213,7 @@ const VideoPlayerPage = () => {
         </div>
       </div>
 
+      {/* About Section */}
       <Card className="p-4">
         <h3 className="font-semibold text-sm mb-2">About this lecture</h3>
         <p className="text-muted-foreground text-sm">
@@ -228,6 +222,7 @@ const VideoPlayerPage = () => {
         </p>
       </Card>
 
+      {/* Mark Complete Button */}
       {!completed && (
         <Button onClick={handleMarkComplete} className="w-full" size="lg">
           <CheckCircle className="w-4 h-4 mr-2" /> Mark as Completed

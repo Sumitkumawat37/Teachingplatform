@@ -241,6 +241,7 @@ export type Database = {
           sort_order: number
           thumbnail_url: string | null
           title: string
+          video_url: string | null
           youtube_id: string
         }
         Insert: {
@@ -253,6 +254,7 @@ export type Database = {
           sort_order?: number
           thumbnail_url?: string | null
           title: string
+          video_url?: string | null
           youtube_id?: string
         }
         Update: {
@@ -265,6 +267,7 @@ export type Database = {
           sort_order?: number
           thumbnail_url?: string | null
           title?: string
+          video_url?: string | null
           youtube_id?: string
         }
         Relationships: [

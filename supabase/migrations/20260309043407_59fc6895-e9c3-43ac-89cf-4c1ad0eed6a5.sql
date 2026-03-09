@@ -1,0 +1,1 @@
+ALTER TABLE public.lectures ADD COLUMN IF NOT EXISTS video_url TEXT;

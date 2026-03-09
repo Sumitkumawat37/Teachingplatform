@@ -39,12 +39,16 @@ const AdminContent = () => {
   const [showLectureForm, setShowLectureForm] = useState(false);
   const [lecTitle, setLecTitle] = useState("");
   const [lecYoutubeUrl, setLecYoutubeUrl] = useState("");
+  const [lecVideoUrl, setLecVideoUrl] = useState("");
   const [lecDuration, setLecDuration] = useState("10:00");
   const [lecCourseId, setLecCourseId] = useState("");
   const [lecChapterId, setLecChapterId] = useState("");
   const [lecFreePreview, setLecFreePreview] = useState(false);
   const [lecThumbnailFile, setLecThumbnailFile] = useState<File | null>(null);
   const [lecThumbnailPreview, setLecThumbnailPreview] = useState("");
+  const [lecVideoFile, setLecVideoFile] = useState<File | null>(null);
+  const [lecVideoUploading, setLecVideoUploading] = useState(false);
+  const videoFileInputRef = useRef<HTMLInputElement>(null);
   const [lecUploading, setLecUploading] = useState(false);
   const lecFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -143,20 +147,47 @@ const AdminContent = () => {
     return urlData.publicUrl;
   };
 
+  const handleVideoFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("video/")) { toast.error("Please select a video file"); return; }
+    if (file.size > 500 * 1024 * 1024) { toast.error("Video must be under 500MB"); return; }
+    setLecVideoFile(file);
+    setLecYoutubeUrl(""); // Clear YouTube URL when uploading video
+  };
+
+  const uploadVideoFile = async (): Promise<string | undefined> => {
+    if (!lecVideoFile) return lecVideoUrl || undefined;
+    setLecVideoUploading(true);
+    const ext = lecVideoFile.name.split(".").pop();
+    const path = `videos/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("videos").upload(path, lecVideoFile);
+    setLecVideoUploading(false);
+    if (error) { toast.error("Video upload failed: " + error.message); return undefined; }
+    const { data: urlData } = supabase.storage.from("videos").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
   const handleCreateLecture = async () => {
-    if (!lecTitle || !lecYoutubeUrl || !lecCourseId || !lecChapterId) return toast.error("Fill all fields");
+    if (!lecTitle || !lecCourseId || !lecChapterId) return toast.error("Fill required fields");
+    if (!lecYoutubeUrl && !lecVideoUrl && !lecVideoFile) return toast.error("Add a YouTube link or upload a video");
+    
     const thumbUrl = await uploadLecThumbnail();
+    const videoUrl = await uploadVideoFile();
     const sortOrder = lectures.filter((l) => l.chapter_id === lecChapterId).length;
+    
     createLecture.mutate({
       course_id: lecCourseId, chapter_id: lecChapterId, title: lecTitle,
-      youtube_id: lecYoutubeUrl, duration: lecDuration, free_preview: lecFreePreview, sort_order: sortOrder,
+      youtube_id: lecYoutubeUrl || "", duration: lecDuration, free_preview: lecFreePreview, sort_order: sortOrder,
       ...(thumbUrl ? { thumbnail_url: thumbUrl } : {}),
+      ...(videoUrl ? { video_url: videoUrl } : {}),
     } as any, {
       onSuccess: () => {
         toast.success("Lecture added!");
         setShowLectureForm(false);
-        setLecTitle(""); setLecYoutubeUrl(""); setLecFreePreview(false);
+        setLecTitle(""); setLecYoutubeUrl(""); setLecVideoUrl(""); setLecFreePreview(false);
         setLecThumbnailFile(null); setLecThumbnailPreview("");
+        setLecVideoFile(null);
       },
     });
   };
@@ -315,10 +346,61 @@ const AdminContent = () => {
                   </div>
                 )}
                 <div className="space-y-1"><Label className="text-xs">Lecture Title *</Label><Input placeholder="e.g. Introduction to Algebra" value={lecTitle} onChange={(e) => setLecTitle(e.target.value)} /></div>
-                <div className="space-y-1">
-                  <Label className="text-xs">YouTube Video Link *</Label>
-                  <Input placeholder="https://youtube.com/watch?v=..." value={lecYoutubeUrl} onChange={(e) => setLecYoutubeUrl(e.target.value)} />
-                  <p className="text-[10px] text-muted-foreground">Paste full YouTube URL. It will be auto-embedded in privacy mode.</p>
+                
+                {/* Video Source Options */}
+                <div className="space-y-2 p-3 bg-accent/30 rounded-lg">
+                  <p className="text-xs font-medium">Video Source (choose one)</p>
+                  
+                  {/* Option 1: YouTube URL */}
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Option 1: YouTube Link</Label>
+                    <Input 
+                      placeholder="https://youtube.com/watch?v=..." 
+                      value={lecYoutubeUrl} 
+                      onChange={(e) => { setLecYoutubeUrl(e.target.value); setLecVideoUrl(""); setLecVideoFile(null); }}
+                      disabled={!!lecVideoFile || !!lecVideoUrl}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2 py-1">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[10px] text-muted-foreground">OR</span>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+                  
+                  {/* Option 2: Upload Video */}
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Option 2: Upload Video</Label>
+                    <input ref={videoFileInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoFileSelect} />
+                    {lecVideoFile ? (
+                      <div className="flex items-center gap-2 p-2 bg-success/10 rounded-lg">
+                        <Video className="w-4 h-4 text-success" />
+                        <span className="text-xs flex-1 truncate">{lecVideoFile.name}</span>
+                        <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setLecVideoFile(null)}>Remove</Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        variant="outline" 
+                        className="w-full h-9 text-xs" 
+                        onClick={() => videoFileInputRef.current?.click()}
+                        disabled={!!lecYoutubeUrl}
+                      >
+                        <Upload className="w-3 h-3 mr-1" /> Select Video File
+                      </Button>
+                    )}
+                    <p className="text-[10px] text-muted-foreground">Max 500MB. MP4, WebM, MOV supported.</p>
+                  </div>
+                  
+                  {/* Option 3: Video URL */}
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Or paste video URL</Label>
+                    <Input 
+                      placeholder="https://your-video-host.com/video.mp4" 
+                      value={lecVideoUrl} 
+                      onChange={(e) => { setLecVideoUrl(e.target.value); setLecYoutubeUrl(""); setLecVideoFile(null); }}
+                      disabled={!!lecVideoFile || !!lecYoutubeUrl}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs">Video Thumbnail</Label>
@@ -342,8 +424,8 @@ const AdminContent = () => {
                     <Label className="text-xs">Free Preview</Label>
                   </div>
                 </div>
-                <Button className="w-full" onClick={handleCreateLecture} disabled={createLecture.isPending || lecUploading}>
-                  {lecUploading ? "Uploading thumbnail..." : createLecture.isPending ? "Adding..." : "Add Lecture"}
+                <Button className="w-full" onClick={handleCreateLecture} disabled={createLecture.isPending || lecUploading || lecVideoUploading}>
+                  {lecVideoUploading ? "Uploading video..." : lecUploading ? "Uploading thumbnail..." : createLecture.isPending ? "Adding..." : "Add Lecture"}
                 </Button>
               </div>
             </DialogContent>
