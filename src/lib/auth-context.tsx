@@ -69,15 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const name = email === "teacher@demo.com" ? "Teacher Admin" : "Demo Student";
         const { error: signUpError } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
         if (signUpError) return false;
-        // If teacher, add admin role after a brief delay for the trigger
-        if (email === "teacher@demo.com") {
-          setTimeout(async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-              await supabase.from("user_roles").insert({ user_id: user.id, role: "admin" as any });
-            }
-          }, 500);
-        }
+        // Admin role is now handled by the database trigger for teacher@demo.com
         return true;
       }
       return false;
