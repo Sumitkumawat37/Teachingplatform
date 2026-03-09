@@ -29,10 +29,12 @@ const VideoPlayerPage = () => {
   const createDoubt = useCreateDoubt();
   const upsertProgress = useUpsertLectureProgress();
   const [newDoubt, setNewDoubt] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const autoCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const ytIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const course = courses.find((c) => c.id === courseId);
   const myProgress = progressData.find((p) => p.lecture_id === lectureId);
