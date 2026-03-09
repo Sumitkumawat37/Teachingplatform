@@ -2,37 +2,74 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useLiveClasses, useCourses, useAttendance } from "@/lib/supabase-data";
-import { Video, Plus, Calendar, Clock, Eye } from "lucide-react";
+import { useLiveClasses, useCourses, useChapters, useAttendance } from "@/lib/supabase-data";
+import { useCreateLiveClass, useDeleteLiveClass } from "@/lib/supabase-mutations";
+import { Video, Calendar, Clock, Eye, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 const AdminLiveClasses = () => {
   const [title, setTitle] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedChapter, setSelectedChapter] = useState("");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [duration, setDuration] = useState("60 min");
   const [viewAttendanceId, setViewAttendanceId] = useState<string | null>(null);
+
   const { data: liveClasses = [] } = useLiveClasses();
   const { data: courses = [] } = useCourses();
+  const { data: chapters = [] } = useChapters();
   const { data: classAttendance = [] } = useAttendance(viewAttendanceId || undefined);
 
+  const createLiveClass = useCreateLiveClass();
+  const deleteLiveClass = useDeleteLiveClass();
+
+  const filteredChapters = chapters.filter((c) => c.course_id === selectedCourse);
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+
+  const handleSchedule = () => {
+    if (!title || !selectedCourse || !selectedChapter || !scheduledDate || !meetingLink) return toast.error("Fill all fields");
+    createLiveClass.mutate({
+      course_id: selectedCourse, chapter_id: selectedChapter, title,
+      scheduled_at: new Date(scheduledDate).toISOString(), meeting_link: meetingLink, duration,
+    }, {
+      onSuccess: () => { toast.success("Live class scheduled!"); setTitle(""); setMeetingLink(""); setScheduledDate(""); },
+    });
+  };
 
   return (
     <div className="space-y-4 animate-slide-up">
       <h2 className="text-xl font-bold">Live Classes</h2>
       <Card className="p-4 space-y-3">
-        <h3 className="font-semibold text-sm flex items-center gap-2"><Plus className="w-4 h-4 text-primary" /> Schedule New Class</h3>
+        <h3 className="font-semibold text-sm flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Schedule New Class</h3>
         <Input placeholder="Class title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+        <Select value={selectedCourse} onValueChange={(v) => { setSelectedCourse(v); setSelectedChapter(""); }}>
           <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
           <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.thumbnail_emoji} {c.title}</SelectItem>)}</SelectContent>
         </Select>
+        {selectedCourse && (
+          <Select value={selectedChapter} onValueChange={setSelectedChapter}>
+            <SelectTrigger><SelectValue placeholder="Select chapter" /></SelectTrigger>
+            <SelectContent>{filteredChapters.map((ch) => <SelectItem key={ch.id} value={ch.id}>{ch.title}</SelectItem>)}</SelectContent>
+          </Select>
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Date & Time *</Label>
+            <Input type="datetime-local" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Duration</Label>
+            <Input placeholder="60 min" value={duration} onChange={(e) => setDuration(e.target.value)} />
+          </div>
+        </div>
         <Input placeholder="Meeting link (Zoom/Google Meet)" value={meetingLink} onChange={(e) => setMeetingLink(e.target.value)} />
-        <Button className="w-full" onClick={() => { toast.success("Live class scheduled"); setTitle(""); setMeetingLink(""); }}>
-          <Calendar className="w-4 h-4 mr-2" /> Schedule Live Class
+        <Button className="w-full" onClick={handleSchedule} disabled={createLiveClass.isPending}>
+          <Calendar className="w-4 h-4 mr-2" /> {createLiveClass.isPending ? "Scheduling..." : "Schedule Live Class"}
         </Button>
       </Card>
       <div className="space-y-3">
@@ -50,6 +87,7 @@ const AdminLiveClasses = () => {
                 <p className="text-xs text-muted-foreground mt-0.5">{(cls as any).courses?.title} · {cls.duration}</p>
                 <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> {formatDate(cls.scheduled_at)}</p>
               </div>
+              <Button size="sm" variant="ghost" className="text-destructive shrink-0" onClick={() => deleteLiveClass.mutate(cls.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
             </div>
             <div className="flex gap-2 mt-3">
               <Dialog>
