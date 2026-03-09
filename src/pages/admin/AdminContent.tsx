@@ -424,8 +424,8 @@ const AdminContent = () => {
                     <Label className="text-xs">Free Preview</Label>
                   </div>
                 </div>
-                <Button className="w-full" onClick={handleCreateLecture} disabled={createLecture.isPending || lecUploading}>
-                  {lecUploading ? "Uploading thumbnail..." : createLecture.isPending ? "Adding..." : "Add Lecture"}
+                <Button className="w-full" onClick={handleCreateLecture} disabled={createLecture.isPending || lecUploading || lecVideoUploading}>
+                  {lecVideoUploading ? "Uploading video..." : lecUploading ? "Uploading thumbnail..." : createLecture.isPending ? "Adding..." : "Add Lecture"}
                 </Button>
               </div>
             </DialogContent>
