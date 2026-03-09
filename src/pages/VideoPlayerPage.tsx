@@ -53,16 +53,18 @@ const VideoPlayerPage = () => {
 
   // Initialize YT player and track progress
   useEffect(() => {
-    if (!lecture?.youtube_id || !canAccess) return;
+    if (!lecture?.youtube_id || !lecture.youtube_id.trim() || !canAccess) return;
     autoCompletedRef.current = completed;
 
     const initPlayer = () => {
+      const videoId = lecture.youtube_id?.trim();
+      if (!videoId || videoId.length < 5) return;
       if (playerRef.current) {
-        playerRef.current.destroy();
+        try { playerRef.current.destroy(); } catch {}
         playerRef.current = null;
       }
       playerRef.current = new (window as any).YT.Player("yt-player", {
-        videoId: lecture.youtube_id,
+        videoId,
         playerVars: {
           modestbranding: 1, rel: 0, controls: 1, showinfo: 0,
           disablekb: 0, iv_load_policy: 3, fs: 1,
@@ -162,7 +164,13 @@ const VideoPlayerPage = () => {
         onContextMenu={(e) => e.preventDefault()}
       >
         <div className="w-full aspect-video bg-black">
-          <div id="yt-player" className="w-full h-full" />
+          {lecture.youtube_id?.trim() ? (
+            <div id="yt-player" className="w-full h-full" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+              No video available for this lecture
+            </div>
+          )}
         </div>
         <div className="absolute top-2 right-2 pointer-events-none">
           <Badge className="bg-primary/90 text-primary-foreground text-[10px] backdrop-blur-sm shadow-md">
