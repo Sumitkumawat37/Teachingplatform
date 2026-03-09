@@ -31,6 +31,8 @@ const VideoPlayerPage = () => {
   const [newDoubt, setNewDoubt] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const autoCompletedRef = useRef(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const ytIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const course = courses.find((c) => c.id === courseId);
   const myProgress = progressData.find((p) => p.lecture_id === lectureId);
