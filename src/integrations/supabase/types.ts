@@ -239,6 +239,7 @@ export type Database = {
           free_preview: boolean
           id: string
           sort_order: number
+          thumbnail_url: string | null
           title: string
           youtube_id: string
         }
@@ -250,6 +251,7 @@ export type Database = {
           free_preview?: boolean
           id?: string
           sort_order?: number
+          thumbnail_url?: string | null
           title: string
           youtube_id?: string
         }
@@ -261,6 +263,7 @@ export type Database = {
           free_preview?: boolean
           id?: string
           sort_order?: number
+          thumbnail_url?: string | null
           title?: string
           youtube_id?: string
         }
