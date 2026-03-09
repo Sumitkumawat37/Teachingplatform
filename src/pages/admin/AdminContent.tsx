@@ -70,17 +70,41 @@ const AdminContent = () => {
   const filteredChaptersForLecture = chapters.filter((c) => c.course_id === lecCourseId);
   const filteredChaptersForNote = chapters.filter((c) => c.course_id === noteCourseId);
 
-  const handleCreateCourse = () => {
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+    setCourseThumbnailUrl("");
+  };
+
+  const uploadThumbnail = async (): Promise<string | undefined> => {
+    if (!thumbnailFile) return courseThumbnailUrl || undefined;
+    setUploading(true);
+    const ext = thumbnailFile.name.split(".").pop();
+    const path = `courses/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("thumbnails").upload(path, thumbnailFile);
+    setUploading(false);
+    if (error) { toast.error("Upload failed: " + error.message); return undefined; }
+    const { data: urlData } = supabase.storage.from("thumbnails").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleCreateCourse = async () => {
     if (!courseTitle) return toast.error("Course title is required");
+    const thumbUrl = await uploadThumbnail();
     createCourse.mutate({
       title: courseTitle, description: courseDesc, price: parseInt(coursePrice) || 0,
       category: courseCategory, instructor: courseInstructor || "Rajesh Kumar",
-      thumbnail_emoji: courseEmoji, thumbnail_url: courseThumbnailUrl || undefined,
+      thumbnail_emoji: courseEmoji, thumbnail_url: thumbUrl,
     }, {
       onSuccess: () => {
         toast.success("Course created!");
         setShowCourseForm(false);
         setCourseTitle(""); setCourseDesc(""); setCoursePrice(""); setCourseCategory(""); setCourseInstructor(""); setCourseThumbnailUrl("");
+        setThumbnailFile(null); setThumbnailPreview("");
       },
     });
   };
