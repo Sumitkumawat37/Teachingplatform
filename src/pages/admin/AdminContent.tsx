@@ -176,9 +176,28 @@ const AdminContent = () => {
                     <div className="space-y-1"><Label className="text-xs">Instructor</Label><Input placeholder="Rajesh Kumar" value={courseInstructor} onChange={(e) => setCourseInstructor(e.target.value)} /></div>
                     <div className="space-y-1"><Label className="text-xs">Emoji Icon</Label><Input placeholder="📚" value={courseEmoji} onChange={(e) => setCourseEmoji(e.target.value)} /></div>
                   </div>
-                  <div className="space-y-1"><Label className="text-xs">Thumbnail URL</Label><Input placeholder="https://..." value={courseThumbnailUrl} onChange={(e) => setCourseThumbnailUrl(e.target.value)} /></div>
-                  <Button className="w-full" onClick={handleCreateCourse} disabled={createCourse.isPending}>
-                    {createCourse.isPending ? "Creating..." : "Create Course"}
+                  <div className="space-y-1">
+                    <Label className="text-xs">Course Thumbnail</Label>
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbnailSelect} />
+                    {thumbnailPreview ? (
+                      <div className="relative">
+                        <img src={thumbnailPreview} alt="Preview" className="w-full h-28 object-cover rounded-lg border border-border" />
+                        <Button size="sm" variant="secondary" className="absolute top-1 right-1 h-6 text-[10px]" onClick={() => { setThumbnailFile(null); setThumbnailPreview(""); }}>Remove</Button>
+                      </div>
+                    ) : (
+                      <div
+                        className="w-full h-28 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <ImagePlus className="w-6 h-6 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">Click to upload image</span>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-muted-foreground">Or paste a URL:</p>
+                    <Input placeholder="https://..." value={courseThumbnailUrl} onChange={(e) => { setCourseThumbnailUrl(e.target.value); setThumbnailFile(null); setThumbnailPreview(""); }} />
+                  </div>
+                  <Button className="w-full" onClick={handleCreateCourse} disabled={createCourse.isPending || uploading}>
+                    {uploading ? "Uploading image..." : createCourse.isPending ? "Creating..." : "Create Course"}
                   </Button>
                 </div>
               </DialogContent>
