@@ -93,21 +93,8 @@ const LiveClassesPage = () => {
             </Button>
           </DialogHeader>
           {activeClass && (
-            <div className="flex-1 w-full h-full bg-black">
-              <iframe
-                src={buildLink(activeClass.meeting_link)}
-                className="w-full h-full border-0"
-                allow="camera; microphone; fullscreen; display-capture; autoplay"
-                title={activeClass.title}
-              />
-            </div>
+            <LiveMeetingFrame url={buildLink(activeClass.meeting_link)} title={activeClass.title} />
           )}
-          <div className="px-4 py-2 border-t text-[11px] text-muted-foreground flex items-center justify-between gap-2">
-            <span className="truncate">If the meeting doesn't load, your provider may block embedding.</span>
-            <Button size="sm" variant="secondary" onClick={() => activeClass && window.open(buildLink(activeClass.meeting_link), "_blank", "noopener,noreferrer")}>
-              Open externally
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
     </div>
