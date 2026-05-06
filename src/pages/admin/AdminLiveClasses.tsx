@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useLiveClasses, useCourses, useChapters, useAttendance } from "@/lib/supabase-data";
 import { useCreateLiveClass, useDeleteLiveClass } from "@/lib/supabase-mutations";
-import { Video, Calendar, Clock, Eye, Trash2 } from "lucide-react";
+import { Video, Calendar, Clock, Eye, Trash2, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,6 +19,8 @@ const AdminLiveClasses = () => {
   const [scheduledDate, setScheduledDate] = useState("");
   const [duration, setDuration] = useState("60 min");
   const [viewAttendanceId, setViewAttendanceId] = useState<string | null>(null);
+  const [activeClass, setActiveClass] = useState<any | null>(null);
+  const buildLink = (raw: string) => !raw ? "" : raw.startsWith("http") ? raw : `https://${raw}`;
 
   const { data: liveClasses = [] } = useLiveClasses();
   const { data: courses = [] } = useCourses();
@@ -90,6 +92,11 @@ const AdminLiveClasses = () => {
               <Button size="sm" variant="ghost" className="text-destructive shrink-0" onClick={() => deleteLiveClass.mutate(cls.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
             </div>
             <div className="flex gap-2 mt-3">
+              {cls.status !== "completed" && (
+                <Button size="sm" className="flex-1" onClick={() => setActiveClass(cls)}>
+                  <ExternalLink className="w-3 h-3 mr-1" /> Join
+                </Button>
+              )}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="secondary" className="flex-1" onClick={() => setViewAttendanceId(cls.id)}>
@@ -118,6 +125,31 @@ const AdminLiveClasses = () => {
           </Card>
         ))}
       </div>
+
+      <Dialog open={!!activeClass} onOpenChange={(o) => !o && setActiveClass(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-hidden">
+          <DialogHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
+            <DialogTitle className="text-sm truncate">{activeClass?.title}</DialogTitle>
+            <Button size="sm" variant="ghost" onClick={() => setActiveClass(null)}><X className="w-4 h-4" /></Button>
+          </DialogHeader>
+          {activeClass && (
+            <div className="flex-1 w-full h-full bg-black">
+              <iframe
+                src={buildLink(activeClass.meeting_link)}
+                className="w-full h-full border-0"
+                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                title={activeClass.title}
+              />
+            </div>
+          )}
+          <div className="px-4 py-2 border-t text-[11px] text-muted-foreground flex items-center justify-between gap-2">
+            <span className="truncate">If the meeting doesn't load, the provider may block embedding.</span>
+            <Button size="sm" variant="secondary" onClick={() => activeClass && window.open(buildLink(activeClass.meeting_link), "_blank", "noopener,noreferrer")}>
+              Open externally
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
