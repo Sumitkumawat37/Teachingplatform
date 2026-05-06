@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useLiveClasses, useCourses } from "@/lib/supabase-data";
-import { Video, Calendar, Clock, ExternalLink, CheckCircle } from "lucide-react";
+import { Video, Calendar, Clock, ExternalLink, CheckCircle, X } from "lucide-react";
+import { useState } from "react";
 
 const LiveClassesPage = () => {
   const { data: liveClasses = [] } = useLiveClasses();
