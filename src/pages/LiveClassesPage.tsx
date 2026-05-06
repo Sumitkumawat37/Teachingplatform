@@ -83,6 +83,33 @@ const LiveClassesPage = () => {
           </div>
         </div>
       )}
+
+      <Dialog open={!!activeClass} onOpenChange={(o) => !o && setActiveClass(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[85vh] p-0 overflow-hidden">
+          <DialogHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
+            <DialogTitle className="text-sm truncate">{activeClass?.title}</DialogTitle>
+            <Button size="sm" variant="ghost" onClick={() => setActiveClass(null)}>
+              <X className="w-4 h-4" />
+            </Button>
+          </DialogHeader>
+          {activeClass && (
+            <div className="flex-1 w-full h-full bg-black">
+              <iframe
+                src={buildLink(activeClass.meeting_link)}
+                className="w-full h-full border-0"
+                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                title={activeClass.title}
+              />
+            </div>
+          )}
+          <div className="px-4 py-2 border-t text-[11px] text-muted-foreground flex items-center justify-between gap-2">
+            <span className="truncate">If the meeting doesn't load, your provider may block embedding.</span>
+            <Button size="sm" variant="secondary" onClick={() => activeClass && window.open(buildLink(activeClass.meeting_link), "_blank", "noopener,noreferrer")}>
+              Open externally
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
