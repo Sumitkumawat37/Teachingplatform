@@ -146,6 +146,7 @@ const AdminLiveClasses = () => {
           )}
         </DialogContent>
       </Dialog>
+      <LiveDiagnostic open={!!diagUrl} url={diagUrl || ""} onClose={() => setDiagUrl(null)} />
     </div>
   );
 };
