@@ -38,7 +38,7 @@ const NotificationsPage = () => {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="font-semibold text-sm">{a.title}</h4>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{new Date(a.created_at).toLocaleDateString()}</span>
+                    <span className="text-[10px] text-muted-foreground shrink-0">{new Date(a.created_at).toLocaleString()}</span>
                   </div>
                   <p className="text-muted-foreground text-xs mt-1">{a.message}</p>
                 </div>
