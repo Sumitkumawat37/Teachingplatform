@@ -72,7 +72,10 @@ const AdminLiveClasses = () => {
             <Input placeholder="60 min" value={duration} onChange={(e) => setDuration(e.target.value)} />
           </div>
         </div>
-        <Input placeholder="Meeting link (Zoom/Google Meet)" value={meetingLink} onChange={(e) => setMeetingLink(e.target.value)} />
+        <Input placeholder="Meeting link (Jitsi, Google Meet, Zoom, YouTube Live…)" value={meetingLink} onChange={(e) => setMeetingLink(e.target.value)} />
+        <p className="text-[11px] text-muted-foreground -mt-1">
+          Tip: Jitsi & YouTube Live play in-app. Google Meet / Zoom open in a new tab automatically.
+        </p>
         <Button className="w-full" onClick={handleSchedule} disabled={createLiveClass.isPending}>
           <Calendar className="w-4 h-4 mr-2" /> {createLiveClass.isPending ? "Scheduling..." : "Schedule Live Class"}
         </Button>
