@@ -130,9 +130,9 @@ export function LiveMeetingFrame({ url, title }: LiveMeetingFrameProps) {
       {!error && (
         <iframe
           key={attempt}
-          src={url}
+          src={effectiveUrl}
           className="w-full h-full border-0"
-          allow="camera; microphone; fullscreen; display-capture; autoplay"
+          allow={youtubeEmbed ? "autoplay; encrypted-media; fullscreen; picture-in-picture" : "camera; microphone; fullscreen; display-capture; autoplay"}
           title={title}
           onLoad={handleLoad}
         />
