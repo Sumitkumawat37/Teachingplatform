@@ -287,6 +287,36 @@ export type Database = {
           },
         ]
       }
+      live_chat: {
+        Row: {
+          created_at: string
+          id: string
+          is_teacher: boolean
+          live_class_id: string
+          message: string
+          sender_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_teacher?: boolean
+          live_class_id: string
+          message: string
+          sender_name?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_teacher?: boolean
+          live_class_id?: string
+          message?: string
+          sender_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       live_classes: {
         Row: {
           chapter_id: string
