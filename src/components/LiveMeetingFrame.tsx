@@ -27,17 +27,18 @@ function toYoutubeEmbed(url: string): string | null {
   try {
     const u = new URL(url);
     const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0";
     if (host === "youtu.be") {
       const id = u.pathname.slice(1);
-      if (id) return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+      if (id) return `https://www.youtube-nocookie.com/embed/${id}?${ytParams}`;
     }
     if (host.endsWith("youtube.com") || host === "youtube-nocookie.com") {
       const v = u.searchParams.get("v");
-      if (v) return `https://www.youtube-nocookie.com/embed/${v}?autoplay=1`;
+      if (v) return `https://www.youtube-nocookie.com/embed/${v}?${ytParams}`;
       const m = u.pathname.match(/\/(?:live|embed|shorts)\/([a-zA-Z0-9_-]{11})/);
-      if (m) return `https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1`;
+      if (m) return `https://www.youtube-nocookie.com/embed/${m[1]}?${ytParams}`;
       const channelLive = u.pathname.match(/\/channel\/([^/]+)\/live/);
-      if (channelLive) return `https://www.youtube-nocookie.com/embed/live_stream?channel=${channelLive[1]}&autoplay=1`;
+      if (channelLive) return `https://www.youtube-nocookie.com/embed/live_stream?channel=${channelLive[1]}&${ytParams}`;
     }
     return null;
   } catch {
