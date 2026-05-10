@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const LAST_SEEN_KEY = "edumaster.notifications.lastSeen";
 
 export function AppHeader() {
-  const { role, logout } = useAuth();
+  const { role, logout, user } = useAuth();
   const navigate = useNavigate();
   const { data: announcements = [] } = useAnnouncements();
   const qc = useQueryClient();
@@ -73,6 +73,32 @@ export function AppHeader() {
       supabase.removeChannel(channel);
     };
   }, [role, qc, navigate]);
+
+  // Realtime: notify student when their doubt receives a teacher reply
+  useEffect(() => {
+    if (role === "admin" || !user?.id) return;
+    const channel = supabase
+      .channel(`doubt-replies-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "doubts", filter: `user_id=eq.${user.id}` },
+        (payload: any) => {
+          const before = payload.old?.reply;
+          const after = payload.new?.reply;
+          if (after && after !== before) {
+            qc.invalidateQueries({ queryKey: ["doubts"] });
+            toast.success("Teacher replied to your doubt", {
+              description: after,
+              action: { label: "View", onClick: () => navigate("/doubts") },
+            });
+          }
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [role, user?.id, qc, navigate]);
 
   // Reset unread count when on the notifications page
   useEffect(() => {
