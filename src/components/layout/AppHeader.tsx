@@ -42,6 +42,38 @@ export function AppHeader() {
     };
   }, [qc, role]);
 
+  // Realtime: notify teacher of new student questions (doubts + live chat)
+  useEffect(() => {
+    if (role !== "admin") return;
+    const channel = supabase
+      .channel("teacher-questions-feed")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "doubts" },
+        (payload: any) => {
+          qc.invalidateQueries({ queryKey: ["doubts"] });
+          toast.message(`New doubt from ${payload.new?.student_name || "a student"}`, {
+            description: payload.new?.question,
+            action: { label: "View", onClick: () => navigate("/admin/doubts") },
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "live_chat" },
+        (payload: any) => {
+          if (payload.new?.is_teacher) return;
+          toast.message(`Live question from ${payload.new?.sender_name || "a student"}`, {
+            description: payload.new?.message,
+          });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [role, qc, navigate]);
+
   // Reset unread count when on the notifications page
   useEffect(() => {
     const onRouteChange = () => {
