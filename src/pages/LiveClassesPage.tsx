@@ -65,7 +65,7 @@ const LiveClassesPage = () => {
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {formatDate(cls.scheduled_at)}</span>
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {formatTime(cls.scheduled_at)}</span>
                     </div>
-                    <Button size="sm" className="mt-3 w-full" onClick={() => setActiveClass(cls)}>
+                    <Button size="sm" className="mt-3 w-full" onClick={() => handleJoin(cls)}>
                       <ExternalLink className="w-3 h-3 mr-1" /> Join Live Class
                     </Button>
                   </div>
