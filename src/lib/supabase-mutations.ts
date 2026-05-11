@@ -240,6 +240,34 @@ export function useDeleteLiveClass() {
   });
 }
 
+// Attendance
+export function useMarkAttendance() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ live_class_id, student_name }: { live_class_id: string; student_name: string }) => {
+      const { data: userRes } = await supabase.auth.getUser();
+      const user_id = userRes.user?.id;
+      if (!user_id) return;
+      // Avoid duplicate join rows for same user+class
+      const { data: existing } = await supabase
+        .from("attendance")
+        .select("id")
+        .eq("live_class_id", live_class_id)
+        .eq("user_id", user_id)
+        .maybeSingle();
+      if (existing) return existing;
+      const { data, error } = await supabase
+        .from("attendance")
+        .insert({ live_class_id, user_id, student_name })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_d, vars) => qc.invalidateQueries({ queryKey: ["attendance", vars.live_class_id] }),
+  });
+}
+
 // Announcements
 export function useDeleteAnnouncement() {
   const qc = useQueryClient();
