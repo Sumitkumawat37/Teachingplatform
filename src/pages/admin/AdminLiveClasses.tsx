@@ -127,9 +127,15 @@ const AdminLiveClasses = () => {
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
-                  <DialogHeader><DialogTitle>Attendance — {cls.title}</DialogTitle></DialogHeader>
+                  <DialogHeader>
+                    <DialogTitle>Attendance — {cls.title}</DialogTitle>
+                  </DialogHeader>
+                  <div className="flex items-center justify-between bg-primary/5 rounded-lg px-3 py-2">
+                    <span className="text-xs font-medium text-muted-foreground">Present</span>
+                    <Badge className="bg-success/15 text-success border-0">{classAttendance.length} student{classAttendance.length === 1 ? "" : "s"}</Badge>
+                  </div>
                   {classAttendance.length > 0 ? (
-                    <div className="space-y-2">
+                    <div className="space-y-2 max-h-[50vh] overflow-y-auto">
                       {classAttendance.map((a) => (
                         <div key={a.id} className="flex items-center gap-3 p-2 rounded-lg bg-accent/50">
                           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
