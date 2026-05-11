@@ -35,6 +35,17 @@ const AdminLiveClasses = () => {
 
   const createLiveClass = useCreateLiveClass();
   const deleteLiveClass = useDeleteLiveClass();
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("attendance-feed")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "attendance" }, (payload: any) => {
+        qc.invalidateQueries({ queryKey: ["attendance", payload.new?.live_class_id] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [qc]);
 
   const filteredChapters = chapters.filter((c) => c.course_id === selectedCourse);
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
