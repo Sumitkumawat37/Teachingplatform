@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { usePurchase } from "@/lib/purchase-context";
 import { useCourses, useAnnouncements, useLiveClasses } from "@/lib/supabase-data";
-import teacherBanner from "@/assets/teacher-banner.jpg";
+// import teacherBanner from "@/assets/teacher-banner.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -25,11 +25,11 @@ const HomePage = () => {
       {/* Teacher Banner */}
       <Card className="overflow-hidden relative">
         <div className="relative h-40 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-          <img 
+          {/* <img 
             src={teacherBanner} 
             alt="Teacher Banner" 
             className="absolute right-4 top-0 h-full w-auto object-contain opacity-90" 
-          />
+          /> */}
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-800/80 to-transparent" />
           <div className="absolute inset-0 p-4 flex flex-col justify-center">
             <p className="text-white/90 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
