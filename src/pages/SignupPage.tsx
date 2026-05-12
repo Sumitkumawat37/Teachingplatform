@@ -41,7 +41,7 @@ const SignupPage = () => {
           <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-3">
             <GraduationCap className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">Join EduMaster</h1>
+          <h1 className="text-2xl font-bold">Join UPSC by Nadiya Ma'am</h1>
           <p className="text-muted-foreground text-sm mt-1">Create your student account</p>
         </div>
 
