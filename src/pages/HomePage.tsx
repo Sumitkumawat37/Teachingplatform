@@ -29,13 +29,13 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
           <div className="absolute inset-0 p-4 flex flex-col justify-center">
             <p className="text-primary-foreground/80 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
-            <h3 className="text-primary-foreground font-bold text-xl mt-1">Rajesh Kumar Sir</h3>
-            <p className="text-primary-foreground/70 text-xs mt-0.5">Mathematics & Physics Expert</p>
+            <h3 className="text-primary-foreground font-bold text-xl mt-1">Nadiya Ma'am</h3>
+            <p className="text-primary-foreground/70 text-xs mt-0.5">UPSC CSE Mentor · Polity, History & GS</p>
             <div className="flex items-center gap-1 mt-2">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-3.5 h-3.5 text-warning fill-warning" />
               ))}
-              <span className="text-primary-foreground/70 text-[10px] ml-1">4.9 (2.3k reviews)</span>
+              <span className="text-primary-foreground/70 text-[10px] ml-1">4.9 (3.1k aspirants)</span>
             </div>
           </div>
         </div>
