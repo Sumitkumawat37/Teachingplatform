@@ -24,22 +24,26 @@ const HomePage = () => {
     <div className="space-y-5 animate-slide-up">
       {/* Teacher Banner */}
       <Card className="overflow-hidden relative">
-        <div className="relative h-40">
+        <div className="relative h-40 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
           <img 
             src={teacherBanner} 
             alt="Teacher Banner" 
-            className="absolute inset-0 w-full h-full object-cover object-right-bottom" 
+            className="absolute right-0 top-0 h-full w-auto object-cover opacity-90" 
+            style={{
+              maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 35%, rgba(0,0,0,0.7) 65%, rgba(0,0,0,0) 100%)',
+              WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 35%, rgba(0,0,0,0.7) 65%, rgba(0,0,0,0) 100%)'
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-800/80 to-transparent" />
           <div className="absolute inset-0 p-4 flex flex-col justify-center">
-            <p className="text-primary-foreground/80 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
-            <h3 className="text-primary-foreground font-bold text-xl mt-1">Nadiya Ma'am</h3>
-            <p className="text-primary-foreground/70 text-xs mt-0.5">UPSC CSE Mentor · Polity, History & GS</p>
+            <p className="text-white/90 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
+            <h3 className="text-white font-bold text-xl mt-1">Nadiya Ma'am</h3>
+            <p className="text-white/80 text-xs mt-0.5">UPSC CSE Mentor · Polity, History & GS</p>
             <div className="flex items-center gap-1 mt-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 text-warning fill-warning" />
+                <Star key={i} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
               ))}
-              <span className="text-primary-foreground/70 text-[10px] ml-1">4.9 (3.1k aspirants)</span>
+              <span className="text-white/70 text-[10px] ml-1">4.9 (3.1k aspirants)</span>
             </div>
           </div>
         </div>
