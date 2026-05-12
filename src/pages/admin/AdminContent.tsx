@@ -8,7 +8,7 @@ import { useCourses, useLectures, useNotes, useChapters } from "@/lib/supabase-d
 import { useCreateCourse, useDeleteCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useUpdateLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus, ImagePlus } from "lucide-react";
+import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus, ImagePlus, ListVideo, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -51,6 +51,17 @@ const AdminContent = () => {
   const videoFileInputRef = useRef<HTMLInputElement>(null);
   const [lecUploading, setLecUploading] = useState(false);
   const lecFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Playlist import state
+  const [showPlaylistForm, setShowPlaylistForm] = useState(false);
+  const [plCourseId, setPlCourseId] = useState("");
+  const [plChapterId, setPlChapterId] = useState("");
+  const [plUrl, setPlUrl] = useState("");
+  const [plFirstTwoFree, setPlFirstTwoFree] = useState(true);
+  const [plImporting, setPlImporting] = useState(false);
+  const [plPreview, setPlPreview] = useState<{ videoId: string; title: string; duration: string }[]>([]);
+  const [plPlaylistTitle, setPlPlaylistTitle] = useState("");
+  const filteredChaptersForPlaylist = useRef<any[]>([]);
 
   // Note form
   const [showNoteForm, setShowNoteForm] = useState(false);
