@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { usePurchase } from "@/lib/purchase-context";
 import { useCourses, useAnnouncements, useLiveClasses } from "@/lib/supabase-data";
-import teacherBanner from "@/assets/teacher-banner.jpg";
+import teacherBanner from "@/assets/teacher-banner-new.jpg";
 
 const HomePage = () => {
   const navigate = useNavigate();
