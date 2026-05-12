@@ -28,7 +28,7 @@ const HomePage = () => {
           <img 
             src={teacherBanner} 
             alt="Teacher Banner" 
-            className="absolute right-4 top-0 h-full w-auto object-contain opacity-90" 
+            className="absolute right-4 top-0 h-full w-auto object-contain opacity-95 mix-blend-multiply" 
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-800/80 to-transparent" />
           <div className="absolute inset-0 p-4 flex flex-col justify-center">
