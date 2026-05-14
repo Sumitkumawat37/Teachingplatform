@@ -136,7 +136,7 @@ export function AppHeader() {
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-foreground leading-tight">EduMaster</h1>
+              <h1 className="text-lg font-bold text-foreground leading-tight">UPSC by Nadiya Ma'am</h1>
               <Badge variant="secondary" className="text-[10px] px-2 py-0 h-4 font-medium">
                 {role === "admin" ? "Teacher" : "Student"}
               </Badge>

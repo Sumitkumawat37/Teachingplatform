@@ -1,11 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useCourses } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { useNavigate } from "react-router-dom";
-import { Lock, ShoppingCart, Eye } from "lucide-react";
+import { Lock, ShoppingCart, Eye, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 const CoursesPage = () => {
@@ -18,7 +17,7 @@ const CoursesPage = () => {
     toast.info("Processing demo payment...", { duration: 1500 });
     setTimeout(() => {
       purchaseCourse(courseId);
-      toast.success("🎉 Course purchased successfully! All lectures are now unlocked.");
+      toast.success("🎉 Course purchased! All lectures unlocked.");
     }, 1500);
   };
 
@@ -26,62 +25,94 @@ const CoursesPage = () => {
 
   return (
     <div className="space-y-4 animate-slide-up">
-      <h2 className="text-xl font-bold">Course Marketplace</h2>
-      <div className="space-y-3">
+      <div>
+        <h2 className="text-xl font-bold">Course Marketplace</h2>
+        <p className="text-xs text-muted-foreground mt-0.5">Tap any course to preview · 2 free lectures included</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
         {courses.map((course, i) => {
           const purchased = hasPurchased(course.id);
           return (
             <Card
               key={course.id}
-              className="overflow-hidden transition-all cursor-pointer hover:card-shadow-lg hover:scale-[1.01] active:scale-[0.99]"
+              className="overflow-hidden cursor-pointer transition-all hover:card-shadow-lg hover:scale-[1.02] active:scale-[0.98] flex flex-col"
               onClick={() => navigate(`/courses/${course.id}`)}
-              style={{ animationDelay: `${i * 80}ms` }}
+              style={{ animationDelay: `${i * 60}ms` }}
             >
-              <div className="relative">
-                <img
-                  src={course.thumbnail_url || "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop"}
-                  alt={course.title}
-                  className="w-full h-36 object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-                <div className="absolute bottom-2 left-3 right-3">
-                  <h3 className="font-bold text-sm text-primary-foreground">{course.title}</h3>
-                  <p className="text-primary-foreground/70 text-xs">{course.instructor}</p>
-                </div>
-                {!purchased && (
-                  <Badge className="absolute top-2 right-2 bg-destructive/90 text-destructive-foreground border-0 text-[10px] flex items-center gap-0.5">
-                    <Lock className="w-2.5 h-2.5" /> LOCKED
-                  </Badge>
-                )}
-                {purchased && (
-                  <Badge className="absolute top-2 right-2 bg-success/90 text-success-foreground border-0 text-[10px]">
-                    ENROLLED
-                  </Badge>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-muted-foreground text-xs line-clamp-1">{course.description}</p>
-                <div className="flex items-center gap-4 mt-1.5 text-xs text-muted-foreground">
-                  <span className="text-[10px] bg-accent px-1.5 py-0.5 rounded">{course.category}</span>
-                </div>
-                {!purchased && (
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-primary">₹{course.price}</span>
-                      <Badge variant="secondary" className="text-[10px]">
-                        <Eye className="w-2.5 h-2.5 mr-0.5" /> 2 Free Previews
-                      </Badge>
-                    </div>
-                    <Button size="sm" className="text-xs h-7" onClick={(e) => handleBuyCourse(e, course.id)}>
-                      <ShoppingCart className="w-3 h-3 mr-1" /> Buy Course
-                    </Button>
+              {/* Square thumbnail */}
+              <div className="relative aspect-square w-full overflow-hidden bg-muted">
+                {course.thumbnail_url ? (
+                  <img
+                    src={course.thumbnail_url}
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-5xl bg-primary/10">
+                    {course.thumbnail_emoji || "📚"}
                   </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-transparent to-transparent" />
+
+                {/* Status badge */}
+                {purchased ? (
+                  <Badge className="absolute top-2 right-2 bg-success text-success-foreground border-0 text-[9px] gap-0.5">
+                    <CheckCircle2 className="w-2.5 h-2.5" /> ENROLLED
+                  </Badge>
+                ) : (
+                  <Badge className="absolute top-2 right-2 bg-background/90 text-foreground border-0 text-[9px] gap-0.5">
+                    <Eye className="w-2.5 h-2.5" /> 2 FREE
+                  </Badge>
+                )}
+
+                {/* Category */}
+                {course.category && (
+                  <Badge className="absolute top-2 left-2 bg-primary/90 text-primary-foreground border-0 text-[9px]">
+                    {course.category}
+                  </Badge>
+                )}
+
+                {/* Title overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-2">
+                  <h3 className="font-bold text-xs text-primary-foreground line-clamp-2 leading-tight">
+                    {course.title}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="p-2.5 flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  {!purchased ? (
+                    <p className="text-sm font-bold text-primary">₹{course.price}</p>
+                  ) : (
+                    <p className="text-[10px] text-success font-semibold">Continue learning</p>
+                  )}
+                  <p className="text-[10px] text-muted-foreground truncate">{course.instructor}</p>
+                </div>
+                {!purchased ? (
+                  <Button
+                    size="sm"
+                    className="h-7 px-2 text-[10px] shrink-0"
+                    onClick={(e) => handleBuyCourse(e, course.id)}
+                  >
+                    <ShoppingCart className="w-3 h-3" />
+                  </Button>
+                ) : (
+                  <Lock className="w-4 h-4 text-success shrink-0" style={{ transform: "none" }} />
                 )}
               </div>
             </Card>
           );
         })}
       </div>
+
+      {courses.length === 0 && (
+        <Card className="p-8 text-center text-muted-foreground text-sm">
+          No courses yet. Check back soon!
+        </Card>
+      )}
     </div>
   );
 };

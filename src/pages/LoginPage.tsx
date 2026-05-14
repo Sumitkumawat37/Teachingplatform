@@ -42,8 +42,8 @@ const LoginPage = () => {
           <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-3">
             <GraduationCap className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold">EduMaster</h1>
-          <p className="text-muted-foreground text-sm mt-1">Sign in to continue learning</p>
+          <h1 className="text-2xl font-bold">UPSC by Nadiya Ma'am</h1>
+          <p className="text-muted-foreground text-sm mt-1">Sign in to continue your UPSC prep</p>
         </div>
 
         {/* Role Toggle */}

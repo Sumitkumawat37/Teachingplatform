@@ -24,18 +24,26 @@ const HomePage = () => {
     <div className="space-y-5 animate-slide-up">
       {/* Teacher Banner */}
       <Card className="overflow-hidden relative">
-        <div className="relative">
-          <img src={teacherBanner} alt="Teacher Banner" className="w-full h-40 object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+        <div className="relative h-40 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+          <img 
+            src={teacherBanner} 
+            alt="Teacher Banner"
+            className="absolute right-4 top-0 h-full w-auto object-contain opacity-90"
+            style={{
+              maskImage: 'radial-gradient(circle at 30% 50%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)',
+              WebkitMaskImage: 'radial-gradient(circle at 30% 50%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-800/80 to-transparent" />
           <div className="absolute inset-0 p-4 flex flex-col justify-center">
-            <p className="text-primary-foreground/80 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
-            <h3 className="text-primary-foreground font-bold text-xl mt-1">Rajesh Kumar Sir</h3>
-            <p className="text-primary-foreground/70 text-xs mt-0.5">Mathematics & Physics Expert</p>
+            <p className="text-white/90 text-[10px] font-semibold uppercase tracking-widest">Your Mentor</p>
+            <h3 className="text-white font-bold text-xl mt-1">Nadiya Ma'am</h3>
+            <p className="text-white/80 text-xs mt-0.5">UPSC CSE Mentor · Polity, History & GS</p>
             <div className="flex items-center gap-1 mt-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 text-warning fill-warning" />
+                <Star key={i} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
               ))}
-              <span className="text-primary-foreground/70 text-[10px] ml-1">4.9 (2.3k reviews)</span>
+              <span className="text-white/70 text-[10px] ml-1">4.9 (3.1k aspirants)</span>
             </div>
           </div>
         </div>
@@ -144,6 +152,43 @@ const HomePage = () => {
                 <h4 className="font-semibold text-sm">{a.title}</h4>
                 <p className="text-muted-foreground text-xs line-clamp-1">{a.message}</p>
               </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+      {/* Student Reviews */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-base">What Students Say</h3>
+          <div className="flex items-center gap-1">
+            <Star className="w-3.5 h-3.5 text-warning fill-warning" />
+            <span className="text-xs font-semibold">4.9</span>
+            <span className="text-xs text-muted-foreground">/ 5</span>
+          </div>
+        </div>
+        <div className="flex gap-3 overflow-x-auto -mx-4 px-4 pb-2 snap-x snap-mandatory scrollbar-hide">
+          {[
+            { name: "Ananya Sharma", role: "UPSC Aspirant · Prelims 2025", text: "Nadiya Ma'am's polity classes made the constitution feel simple. I scored 130+ in GS-1 mock!", rating: 5 },
+            { name: "Rahul Verma", role: "Mains Qualified 2024", text: "Best mentor I've found online. Doubt replies are super fast and live classes are gold.", rating: 5 },
+            { name: "Priya Singh", role: "Optional: PSIR", text: "The notes + quiz combo is brilliant. Cracked my prelims in the first attempt itself.", rating: 5 },
+            { name: "Mohammed Aslam", role: "UPSC Aspirant", text: "Affordable, structured, and the live tests keep me on track. Highly recommend!", rating: 5 },
+          ].map((r, i) => (
+            <Card key={i} className="p-4 min-w-[260px] snap-start shrink-0" style={{ animationDelay: `${i * 80}ms` }}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                  {r.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold truncate">{r.name}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">{r.role}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-0.5 mb-1.5">
+                {[...Array(r.rating)].map((_, j) => (
+                  <Star key={j} className="w-3 h-3 text-warning fill-warning" />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">"{r.text}"</p>
             </Card>
           ))}
         </div>
