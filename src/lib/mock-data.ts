@@ -1,0 +1,252 @@
+export const courses = [
+  {
+    id: "1",
+    title: "Complete Mathematics",
+    description: "Master algebra, calculus, and geometry with interactive lessons",
+    chapters: 3,
+    lectures: 6,
+    progress: 65,
+    thumbnail: "📐",
+    color: "from-primary to-info",
+    locked: false,
+    price: 999,
+    category: "Mathematics",
+    instructor: "Rajesh Kumar",
+    thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=250&fit=crop",
+  },
+  {
+    id: "2",
+    title: "Physics Fundamentals",
+    description: "Mechanics, thermodynamics, and optics explained simply",
+    chapters: 2,
+    lectures: 5,
+    progress: 0,
+    thumbnail: "⚛️",
+    color: "from-info to-success",
+    locked: true,
+    price: 1299,
+    category: "Physics",
+    instructor: "Rajesh Kumar",
+    thumbnailUrl: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=400&h=250&fit=crop",
+  },
+  {
+    id: "3",
+    title: "Chemistry Mastery",
+    description: "Organic, inorganic and physical chemistry complete course",
+    chapters: 2,
+    lectures: 5,
+    progress: 0,
+    thumbnail: "🧪",
+    color: "from-warning to-destructive",
+    locked: true,
+    price: 1199,
+    category: "Chemistry",
+    instructor: "Rajesh Kumar",
+    thumbnailUrl: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&h=250&fit=crop",
+  },
+];
+
+// YouTube video IDs for demo lectures
+export const lectures = [
+  // Course 1 - Mathematics
+  { id: "1", courseId: "1", chapter: "Algebra", title: "Linear Equations", duration: "18:30", completed: true, youtubeId: "MHKiCDSkQKE", freePreview: true, watchedPercent: 100 },
+  { id: "2", courseId: "1", chapter: "Algebra", title: "Quadratic Equations", duration: "22:15", completed: true, youtubeId: "i7idZfS8t8w", freePreview: true, watchedPercent: 100 },
+  { id: "3", courseId: "1", chapter: "Algebra", title: "Polynomials", duration: "25:00", completed: false, youtubeId: "ffLLmV4mZwU", freePreview: false, watchedPercent: 35 },
+  { id: "4", courseId: "1", chapter: "Calculus", title: "Limits & Continuity", duration: "30:45", completed: false, youtubeId: "riXcZT2ICjA", freePreview: false, watchedPercent: 0 },
+  { id: "5", courseId: "1", chapter: "Calculus", title: "Differentiation", duration: "28:20", completed: false, youtubeId: "rAof9Ld5sOg", freePreview: false, watchedPercent: 0 },
+  { id: "6", courseId: "1", chapter: "Geometry", title: "Triangles", duration: "20:10", completed: false, youtubeId: "mLeNaZcy1hE", freePreview: false, watchedPercent: 0 },
+
+  // Course 2 - Physics
+  { id: "7", courseId: "2", chapter: "Mechanics", title: "Newton's Laws of Motion", duration: "24:00", completed: false, youtubeId: "kKKM8Y-u7ds", freePreview: true, watchedPercent: 0 },
+  { id: "8", courseId: "2", chapter: "Mechanics", title: "Work, Energy & Power", duration: "26:30", completed: false, youtubeId: "w4QFJb9a8vo", freePreview: true, watchedPercent: 0 },
+  { id: "9", courseId: "2", chapter: "Mechanics", title: "Projectile Motion", duration: "22:00", completed: false, youtubeId: "V-hKMKBGpJA", freePreview: false, watchedPercent: 0 },
+  { id: "10", courseId: "2", chapter: "Thermodynamics", title: "Laws of Thermodynamics", duration: "30:00", completed: false, youtubeId: "brN9citLcRA", freePreview: false, watchedPercent: 0 },
+  { id: "11", courseId: "2", chapter: "Thermodynamics", title: "Heat Transfer", duration: "25:00", completed: false, youtubeId: "xBMPP-HC4uQ", freePreview: false, watchedPercent: 0 },
+];
+
+export const notes = [
+  { id: "1", courseId: "1", chapter: "Algebra", title: "Linear Equations Formula Sheet", type: "PDF", pages: 12, description: "Complete formulas and shortcuts for linear equations" },
+  { id: "2", courseId: "1", chapter: "Algebra", title: "Practice Problems Set 1", type: "PDF", pages: 8, description: "50+ practice problems with solutions" },
+  { id: "3", courseId: "1", chapter: "Calculus", title: "Differentiation Rules", type: "PDF", pages: 15, description: "All differentiation rules with examples" },
+  { id: "4", courseId: "2", chapter: "Mechanics", title: "Newton's Laws Summary", type: "PDF", pages: 10, description: "Summary of all Newton's laws with diagrams" },
+  { id: "5", courseId: "2", chapter: "Mechanics", title: "Kinematics Formulas", type: "PDF", pages: 6, description: "Quick reference for kinematics formulas" },
+];
+
+export const quizzes = [
+  {
+    id: "1",
+    title: "Algebra Basics Quiz",
+    courseId: "1",
+    chapter: "Algebra",
+    questions: 5,
+    duration: "10 min",
+    status: "available" as const,
+    score: null,
+  },
+  {
+    id: "2",
+    title: "Quadratic Equations Test",
+    courseId: "1",
+    chapter: "Algebra",
+    questions: 5,
+    duration: "10 min",
+    status: "completed" as const,
+    score: 85,
+  },
+  {
+    id: "3",
+    title: "Physics: Newton's Laws",
+    courseId: "2",
+    chapter: "Mechanics",
+    questions: 5,
+    duration: "10 min",
+    status: "available" as const,
+    score: null,
+  },
+  {
+    id: "4",
+    title: "Chemical Bonding Quiz",
+    courseId: "3",
+    chapter: "Chemical Bonding",
+    questions: 5,
+    duration: "10 min",
+    status: "upcoming" as const,
+    score: null,
+  },
+];
+
+export const quizQuestions: Record<string, Array<{ id: number; question: string; options: string[]; correct: number }>> = {
+  "1": [
+    { id: 1, question: "What is the solution of 2x + 6 = 14?", options: ["x = 2", "x = 4", "x = 6", "x = 8"], correct: 1 },
+    { id: 2, question: "Which of the following is a quadratic equation?", options: ["2x + 3 = 0", "x² + 5x + 6 = 0", "x³ = 27", "1/x = 5"], correct: 1 },
+    { id: 3, question: "The discriminant of x² - 4x + 4 = 0 is:", options: ["0", "4", "8", "-4"], correct: 0 },
+    { id: 4, question: "What is the sum of roots of x² - 7x + 12 = 0?", options: ["5", "7", "12", "-7"], correct: 1 },
+    { id: 5, question: "If f(x) = 3x² + 2x + 1, then f(1) = ?", options: ["4", "5", "6", "7"], correct: 2 },
+  ],
+  "2": [
+    { id: 1, question: "What are the roots of x² - 5x + 6 = 0?", options: ["2, 3", "1, 6", "-2, -3", "3, 4"], correct: 0 },
+    { id: 2, question: "Nature of roots when discriminant < 0?", options: ["Real & equal", "Real & distinct", "Complex/Imaginary", "Zero"], correct: 2 },
+    { id: 3, question: "Product of roots of 2x² - 3x + 1 = 0?", options: ["1/2", "3/2", "2", "1"], correct: 0 },
+    { id: 4, question: "Which is the quadratic formula?", options: ["x = -b/2a", "x = (-b ± √(b²-4ac))/2a", "x = b²-4ac", "x = -b ± √b"], correct: 1 },
+    { id: 5, question: "If one root of x² - 6x + k = 0 is 2, find k.", options: ["4", "6", "8", "10"], correct: 2 },
+  ],
+  "3": [
+    { id: 1, question: "Newton's First Law is also known as?", options: ["Law of Acceleration", "Law of Inertia", "Law of Action-Reaction", "Law of Gravity"], correct: 1 },
+    { id: 2, question: "F = ma represents which law?", options: ["First Law", "Second Law", "Third Law", "Law of Gravitation"], correct: 1 },
+    { id: 3, question: "Unit of force in SI system?", options: ["Dyne", "Newton", "Pound", "Joule"], correct: 1 },
+    { id: 4, question: "Action and reaction forces act on?", options: ["Same body", "Different bodies", "Only on Earth", "Only in vacuum"], correct: 1 },
+    { id: 5, question: "If mass doubles and acceleration halves, force?", options: ["Doubles", "Halves", "Remains same", "Quadruples"], correct: 2 },
+  ],
+  "4": [
+    { id: 1, question: "What type of bond is formed between Na and Cl?", options: ["Covalent", "Ionic", "Metallic", "Hydrogen"], correct: 1 },
+    { id: 2, question: "How many covalent bonds can Carbon form?", options: ["2", "3", "4", "6"], correct: 2 },
+    { id: 3, question: "Which bond involves sharing of electrons?", options: ["Ionic", "Covalent", "Metallic", "Electrostatic"], correct: 1 },
+    { id: 4, question: "Electronegativity difference for ionic bond?", options: ["< 0.5", "0.5 - 1.7", "> 1.7", "= 0"], correct: 2 },
+    { id: 5, question: "Shape of water molecule (H₂O)?", options: ["Linear", "Bent/V-shaped", "Tetrahedral", "Trigonal"], correct: 1 },
+  ],
+};
+
+export const announcements = [
+  { id: "1", title: "New Mathematics Course Launched!", message: "Check out our comprehensive algebra course with 48 video lectures.", date: "2026-03-04", type: "info" as const },
+  { id: "2", title: "Quiz Results Published", message: "Quadratic Equations test results are now available. Check your scores!", date: "2026-03-03", type: "success" as const },
+  { id: "3", title: "Holiday Schedule", message: "No classes on March 10th due to national holiday.", date: "2026-03-02", type: "warning" as const },
+  { id: "4", title: "Study Material Updated", message: "New practice problems added for Physics mechanics chapter.", date: "2026-03-01", type: "info" as const },
+  { id: "5", title: "Live Class Scheduled", message: "Doubt clearing session for Algebra on March 8th at 5:00 PM.", date: "2026-03-05", type: "info" as const },
+  { id: "6", title: "New Notes Uploaded", message: "Differentiation Rules PDF has been added to Calculus chapter.", date: "2026-03-04", type: "success" as const },
+];
+
+export const students = [
+  { id: "1", name: "Aarav Sharma", email: "aarav@example.com", courses: ["1", "2", "3"], avgScore: 82, lastActive: "2 hours ago", lecturesCompleted: 12, quizzesAttempted: 4 },
+  { id: "2", name: "Priya Patel", email: "priya@example.com", courses: ["1", "2"], avgScore: 91, lastActive: "1 hour ago", lecturesCompleted: 18, quizzesAttempted: 6 },
+  { id: "3", name: "Rohan Kumar", email: "rohan@example.com", courses: ["1", "2", "3"], avgScore: 74, lastActive: "5 hours ago", lecturesCompleted: 8, quizzesAttempted: 3 },
+  { id: "4", name: "Ananya Singh", email: "ananya@example.com", courses: ["1"], avgScore: 88, lastActive: "1 day ago", lecturesCompleted: 15, quizzesAttempted: 5 },
+  { id: "5", name: "Vikram Mehta", email: "vikram@example.com", courses: ["1", "2"], avgScore: 67, lastActive: "3 hours ago", lecturesCompleted: 6, quizzesAttempted: 2 },
+];
+
+export const performanceData = [
+  { month: "Jan", score: 72 },
+  { month: "Feb", score: 78 },
+  { month: "Mar", score: 85 },
+  { month: "Apr", score: 82 },
+  { month: "May", score: 90 },
+  { month: "Jun", score: 88 },
+];
+
+export const liveClasses = [
+  {
+    id: "1",
+    title: "Algebra Doubt Clearing Session",
+    courseId: "1",
+    chapter: "Algebra",
+    scheduledAt: "2026-03-08T17:00:00",
+    duration: "60 min",
+    meetingLink: "https://meet.google.com/demo-abc-xyz",
+    status: "upcoming" as const,
+    attendees: ["1", "2", "3"],
+  },
+  {
+    id: "2",
+    title: "Calculus Introduction - Live",
+    courseId: "1",
+    chapter: "Calculus",
+    scheduledAt: "2026-03-10T16:00:00",
+    duration: "45 min",
+    meetingLink: "https://zoom.us/j/demo123456",
+    status: "upcoming" as const,
+    attendees: [],
+  },
+  {
+    id: "3",
+    title: "Physics Problem Solving",
+    courseId: "2",
+    chapter: "Mechanics",
+    scheduledAt: "2026-03-05T14:00:00",
+    duration: "90 min",
+    meetingLink: "https://meet.google.com/demo-def-uvw",
+    status: "completed" as const,
+    attendees: ["1", "2", "4", "5"],
+  },
+];
+
+export const doubts = [
+  {
+    id: "1",
+    lectureId: "1",
+    courseId: "1",
+    studentId: "1",
+    studentName: "Aarav Sharma",
+    question: "Can you explain the difference between linear and non-linear equations with more examples?",
+    createdAt: "2026-03-04T10:30:00",
+    reply: "Sure! A linear equation has variables only to the power of 1 (e.g., 2x + 3 = 7). Non-linear equations have higher powers (e.g., x² + 2x = 5). I'll cover more examples in the next live session.",
+    repliedAt: "2026-03-04T14:15:00",
+  },
+  {
+    id: "2",
+    lectureId: "3",
+    courseId: "1",
+    studentId: "2",
+    studentName: "Priya Patel",
+    question: "How do we determine the degree of a polynomial with multiple variables?",
+    createdAt: "2026-03-05T09:00:00",
+    reply: null,
+    repliedAt: null,
+  },
+  {
+    id: "3",
+    lectureId: "1",
+    courseId: "1",
+    studentId: "3",
+    studentName: "Rohan Kumar",
+    question: "Is there a shortcut to solve simultaneous linear equations quickly?",
+    createdAt: "2026-03-03T16:45:00",
+    reply: "Yes! You can use Cramer's Rule or the elimination method for faster solutions. Check the notes PDF for a quick reference sheet.",
+    repliedAt: "2026-03-03T18:00:00",
+  },
+];
+
+export const attendance = [
+  { liveClassId: "3", studentId: "1", studentName: "Aarav Sharma", joinedAt: "2026-03-05T14:02:00" },
+  { liveClassId: "3", studentId: "2", studentName: "Priya Patel", joinedAt: "2026-03-05T14:00:00" },
+  { liveClassId: "3", studentId: "4", studentName: "Ananya Singh", joinedAt: "2026-03-05T14:05:00" },
+  { liveClassId: "3", studentId: "5", studentName: "Vikram Mehta", joinedAt: "2026-03-05T14:10:00" },
+];
