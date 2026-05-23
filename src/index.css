@@ -642,29 +642,29 @@
 }
 
 @keyframes pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.7; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0%   { transform: scale3d(1, 1, 1);   opacity: 0.7; }
+  100% { transform: scale3d(2.2, 2.2, 2.2); opacity: 0; }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from { transform: rotateZ(0deg); }
+  to   { transform: rotateZ(360deg); }
 }
 
 @keyframes slide-in-left {
-  from { opacity: 0; transform: translateX(-20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translate3d(-20px, 0, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translate3d(20px, 0, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes pop-in {
-  0%   { opacity: 0; transform: scale(0.5); }
-  70%  { transform: scale(1.08); }
-  100% { opacity: 1; transform: scale(1); }
+  0%   { opacity: 0; transform: scale3d(0.5, 0.5, 0.5); }
+  70%  { transform: scale3d(1.08, 1.08, 1.08); }
+  100% { opacity: 1; transform: scale3d(1, 1, 1); }
 }
 
 /* ── Animation classes (Design System) ── */
@@ -736,6 +736,95 @@
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
   }
+}
+
+/* ── Prefers Reduced Motion Support ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-blob,
+  .animate-blob-2,
+  .animate-shimmer,
+  .animate-pulse-ring,
+  .animate-spin-slow,
+  .animate-float,
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-bounce-subtle,
+  .icon-animated-bounce,
+  .icon-animated-pulse,
+  .icon-animated-rotate,
+  .icon-animated-shimmer {
+    animation: none !important;
+  }
+}
+
+/* ── Touch Optimization for Mobile ── */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Improve button tap response */
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(168, 85, 247, 0.1);
+  }
+
+  /* Faster transitions on touch */
+  .glass-card,
+  button,
+  a {
+    transition-duration: 150ms !important;
+  }
+
+  /* Remove complex shadows on touch for performance */
+  .glass-card,
+  .neon-border {
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.08) !important;
+  }
+}
+
+/* ── Smooth Scrolling with Performance ── */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── Will Change Optimization ── */
+.animate-slide-up,
+.animate-fade-in,
+.animate-scale-in,
+.animate-pop-in,
+.animate-slide-in-left,
+.animate-slide-in-right {
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes */
+.animate-slide-up,
+.animate-fade-in,
+.animate-scale-in,
+.animate-pop-in,
+.animate-slide-in-left,
+.animate-slide-in-right {
+  animation-fill-mode: both;
 }
 
 /* Hardware acceleration for all animated elements */

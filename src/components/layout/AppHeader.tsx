@@ -2,7 +2,7 @@ import { Bell, GraduationCap, LogOut, User, Search } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate } from "react-router-dom";
 import { useAnnouncements } from "@/lib/supabase-data";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -18,6 +18,11 @@ export function AppHeader() {
     const v = localStorage.getItem(LAST_SEEN_KEY);
     return v ? parseInt(v, 10) : 0;
   });
+
+  const handleLogout = useCallback(() => {
+    logout();
+    navigate("/login");
+  }, [logout, navigate]);
 
   // Realtime: refetch announcements + toast on new one
   useEffect(() => {
@@ -109,7 +114,7 @@ export function AppHeader() {
       }
     };
     onRouteChange();
-    window.addEventListener("popstate", onRouteChange);
+    window.addEventListener("popstate", onRouteChange, { passive: true });
     return () => window.removeEventListener("popstate", onRouteChange);
   }, []);
 
@@ -118,12 +123,15 @@ export function AppHeader() {
     [announcements, lastSeen]
   );
 
-  const handleBellClick = () => {
+  const handleBellClick = useCallback(() => {
     const now = Date.now();
     localStorage.setItem(LAST_SEEN_KEY, String(now));
     setLastSeen(now);
-    navigate("/notifications");
-  };
+  }, []);
+
+  const handleProfileClick = useCallback(() => {
+    navigate("/profile");
+  }, [navigate]);
 
   return (
     <header className="sticky top-0 z-30 bg-[#050505]/90 backdrop-blur-xl border-b border-[#A855F7]/20 shadow-[0_0_30px_rgba(168,85,247,0.1)]">
@@ -182,7 +190,7 @@ export function AppHeader() {
 
             {/* Profile — mobile only (sidebar handles it on desktop) */}
             <button
-              onClick={() => navigate("/profile")}
+              onClick={handleProfileClick}
               className="md:hidden w-10 h-10 rounded-xl bg-[#0D0D0D] hover:bg-[#121212] border border-[#A855F7]/20 hover:border-[#A855F7]/40 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_25px_rgba(168,85,247,0.2)]"
             >
               <User className="w-5 h-5 text-[#B3B3B3]" />
@@ -190,7 +198,7 @@ export function AppHeader() {
 
             {/* Logout — mobile only */}
             <button
-              onClick={() => { logout(); navigate("/login"); }}
+              onClick={handleLogout}
               className="md:hidden w-10 h-10 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.2)] hover:shadow-[0_0_25px_rgba(239,68,68,0.3)]"
             >
               <LogOut className="w-5 h-5 text-red-400" />

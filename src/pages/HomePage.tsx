@@ -106,7 +106,7 @@ const HomePage = () => {
           {/* Teacher photo + floating doodles */}
           <div className="relative shrink-0 animate-slide-in-right mt-1 hidden sm:block">
             <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-[#A855F7]/40 shadow-[0_0_30px_rgba(168,85,247,0.3)] animate-float-slow">
-              <img src={teacherBanner} alt="Nadiya Ma'am" className="w-full h-full object-cover object-top scale-110" />
+              <img src={teacherBanner} alt="Nadiya Ma'am" className="w-full h-full object-cover object-top scale-110" loading="lazy" />
             </div>
             {/* Floating doodles */}
             <div className="absolute -top-1 -left-28 glass-dark rounded-2xl px-3 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-1.5 animate-float" style={{ animationDelay: '0.6s' }}>
@@ -324,7 +324,7 @@ const HomePage = () => {
                   <div className="relative shrink-0">
                     <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#A855F7]/40 shadow-[0_0_25px_rgba(168,85,247,0.3)] animate-float-slow bg-gradient-to-br from-[#A855F7]/20 to-[#EC4899]/20 flex items-center justify-center">
                       {teacher.image ? (
-                        <img src={teacher.image} alt={teacher.name} className="w-full h-full object-cover object-top scale-110" />
+                        <img src={teacher.image} alt={teacher.name} className="w-full h-full object-cover object-top scale-110" loading="lazy" />
                       ) : (
                         <span className="text-2xl">{teacher.name.charAt(0)}</span>
                       )}
