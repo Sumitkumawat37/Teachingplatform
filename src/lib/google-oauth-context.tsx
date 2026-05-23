@@ -33,10 +33,10 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     const loadGapi = async () => {
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-      
+
       if (!clientId) {
-        console.warn('Google Client ID not found in environment variables');
-        setGapiError('Google Client ID not configured');
+        console.warn('Google Client ID not found in environment variables - Google Drive features will be disabled');
+        // Don't set error, just skip loading - app should work without Google Auth
         return;
       }
 
@@ -47,7 +47,7 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         gapiScript.defer = true;
         gapiScript.onload = () => {
           if (typeof window.gapi === 'undefined') {
-            setGapiError('Failed to load Google API script');
+            console.warn('Failed to load Google API script - Google Drive features will be disabled');
             return;
           }
           window.gapi.load('client:auth2', async () => {
@@ -59,7 +59,7 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               });
               setGapi(window.gapi);
               setGapiLoaded(true);
-              
+
               const authInstance = window.gapi.auth2.getAuthInstance();
               if (authInstance && authInstance.isSignedIn.get()) {
                 const user = authInstance.currentUser.get();
@@ -68,19 +68,16 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 setIsSignedIn(true);
               }
             } catch (error: any) {
-              console.error('GAPI client init error:', error);
-              console.error('Error details:', JSON.stringify(error));
-              setGapiError(error.message || 'Failed to initialize Google API client');
+              console.warn('GAPI client init error - Google Drive features will be disabled:', error.message);
             }
           });
         };
         gapiScript.onerror = () => {
-          setGapiError('Failed to load Google API script');
+          console.warn('Failed to load Google API script - Google Drive features will be disabled');
         };
         document.body.appendChild(gapiScript);
       } catch (error: any) {
-        console.error('GAPI load error:', error);
-        setGapiError(error.message || 'Failed to load Google API');
+        console.warn('GAPI load error - Google Drive features will be disabled:', error.message);
       }
     };
 
@@ -168,16 +165,6 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return null;
     }
   };
-
-  if (gapiError) {
-    console.warn('Google Auth error:', gapiError);
-    // Return children without Google Auth functionality if it fails
-    return (
-      <GoogleAuthContext.Provider value={{ isSignedIn: false, accessToken: null, signIn: async () => {}, signOut: async () => {}, listDriveFiles: async () => [], getDriveFile: async () => null }}>
-        {children}
-      </GoogleAuthContext.Provider>
-    );
-  }
 
   return (
     <GoogleAuthContext.Provider value={{ isSignedIn, accessToken, signIn, signOut, listDriveFiles, getDriveFile }}>
