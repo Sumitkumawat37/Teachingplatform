@@ -129,7 +129,6 @@ const NotesPage = () => {
                   <div>
                     <p className="text-white text-lg font-semibold">Content Protected</p>
                     <p className="text-gray-400 text-sm mt-2">Return to this tab to view the content</p>
-                    <p className="text-gray-500 text-xs mt-1">Screenshots and screen recording are disabled</p>
                   </div>
                 </div>
               </div>

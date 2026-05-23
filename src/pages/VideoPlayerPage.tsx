@@ -158,11 +158,6 @@ const VideoPlayerPage = () => {
     const video = videoRef.current;
     if (!video || !hasUploadedVideo) return;
 
-    // Resume from last position if available
-    if (myProgress?.watched_seconds && myProgress.watched_seconds > 0) {
-      video.currentTime = myProgress.watched_seconds;
-    }
-
     // Apply playback speed
     video.playbackRate = playbackSpeed;
 
@@ -178,8 +173,7 @@ const VideoPlayerPage = () => {
             user_id: user.id,
             lecture_id: lectureId!,
             watched_percent: pct,
-            completed: completed,
-            watched_seconds: video.currentTime
+            completed: completed
           });
         }
       }
@@ -375,14 +369,6 @@ const VideoPlayerPage = () => {
         </div>
       )}
 
-      {/* Screen recording notice - technical limitation */}
-      {!isFullscreen && (
-        <div className="flex items-center gap-3 bg-rose-500/10 border border-rose-500/20 rounded-2xl px-4 py-3 animate-slide-up">
-          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-          <p className="text-rose-300 text-xs font-semibold">Screen recording cannot be prevented in web browsers due to technical limitations. Watermark and tab protection are active.</p>
-        </div>
-      )}
-
       {/* Desktop 2-col: player area left, doubts right */}
       <div className="md:grid md:grid-cols-[1.6fr_1fr] md:gap-6 md:items-start">
       <div className="space-y-4">
@@ -555,23 +541,6 @@ const VideoPlayerPage = () => {
           visible={(isTabHidden && !tabResumed) || isScreenProtected}
           onResume={() => setTabResumed(true)}
         />
-
-        {/* Screen recording warning overlay */}
-        {showRecordingWarning && (
-          <div className="absolute inset-0 z-[50] bg-black/90 flex items-center justify-center p-6">
-            <div className="bg-[#12122a] rounded-2xl p-6 max-w-md w-full text-center border border-purple-500/15">
-              <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-white mb-2">Screen Recording Detected</h3>
-              <p className="text-sm text-gray-400 mb-4">For security reasons, please stop screen recording to continue watching this video.</p>
-              <button
-                onClick={() => setShowRecordingWarning(false)}
-                className="btn-primary w-full py-2.5 rounded-xl text-sm font-bold"
-              >
-                I've Stopped Recording
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Branding badge */}
         {!isFullscreen && (
