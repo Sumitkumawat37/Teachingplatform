@@ -10,7 +10,7 @@ interface Particle {
   color: string;
 }
 
-export function FloatingParticles({ count = 20 }: { count?: number }) {
+export function FloatingParticles({ count = 20, className }: { count?: number; className?: string }) {
   const particles = useMemo<Particle[]>(() => {
     const colors = [
       "rgba(168,85,247,0.3)",
@@ -31,7 +31,7 @@ export function FloatingParticles({ count = 20 }: { count?: number }) {
   }, [count]);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div className={`fixed inset-0 pointer-events-none z-0 overflow-hidden ${className || ''}`} aria-hidden="true">
       {particles.map((p) => (
         <div
           key={p.id}

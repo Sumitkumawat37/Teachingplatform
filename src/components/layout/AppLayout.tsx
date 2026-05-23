@@ -7,14 +7,15 @@ import { FloatingParticles } from "@/components/FloatingParticles";
 export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-[#050505] relative overflow-hidden">
-      {/* Animated floating particles background */}
-      <FloatingParticles count={18} />
+      {/* Animated floating particles background - reduced on mobile */}
+      <FloatingParticles count={18} className="hidden md:block" />
+      <FloatingParticles count={6} className="md:hidden" />
 
-      {/* Decorative neon glow blobs - enhanced cinematic lighting */}
-      <div className="fixed top-20 -right-32 w-96 h-96 bg-[#A855F7]/15 rounded-full blur-3xl pointer-events-none animate-blob" style={{ zIndex: 0 }} />
-      <div className="fixed top-1/2 -left-32 w-80 h-80 bg-[#EC4899]/15 rounded-full blur-3xl pointer-events-none animate-blob-2" style={{ zIndex: 0 }} />
-      <div className="fixed bottom-32 right-16 w-64 h-64 bg-[#C084FC]/12 rounded-full blur-3xl pointer-events-none animate-float-slow" style={{ zIndex: 0 }} />
-      <div className="fixed top-1/3 left-1/4 w-72 h-72 bg-[#D946EF]/8 rounded-full blur-3xl pointer-events-none animate-float" style={{ zIndex: 0, animationDelay: '1s' }} />
+      {/* Decorative neon glow blobs - hidden on mobile for performance */}
+      <div className="hidden md:block fixed top-20 -right-32 w-96 h-96 bg-[#A855F7]/15 rounded-full blur-3xl pointer-events-none animate-blob" style={{ zIndex: 0 }} />
+      <div className="hidden md:block fixed top-1/2 -left-32 w-80 h-80 bg-[#EC4899]/15 rounded-full blur-3xl pointer-events-none animate-blob-2" style={{ zIndex: 0 }} />
+      <div className="hidden md:block fixed bottom-32 right-16 w-64 h-64 bg-[#C084FC]/12 rounded-full blur-3xl pointer-events-none animate-float-slow" style={{ zIndex: 0 }} />
+      <div className="hidden md:block fixed top-1/3 left-1/4 w-72 h-72 bg-[#D946EF]/8 rounded-full blur-3xl pointer-events-none animate-float" style={{ zIndex: 0, animationDelay: '1s' }} />
 
       {/* Desktop sidebar */}
       <SidebarNav />

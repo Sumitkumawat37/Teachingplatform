@@ -685,6 +685,75 @@
 .animate-pop-in          { animation: pop-in          var(--transition-fast) cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .animate-bounce-icon     { animation: bounce-icon     var(--transition-fast) cubic-bezier(0.34, 1.56, 0.64, 1); }
 
+/* ── Mobile Performance Optimizations ── */
+@media (max-width: 768px) {
+  /* Disable heavy animations on mobile for better performance */
+  .animate-blob,
+  .animate-blob-2,
+  .animate-shimmer,
+  .animate-pulse-ring,
+  .animate-spin-slow,
+  .animate-float,
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-bounce-subtle,
+  .icon-animated-bounce,
+  .icon-animated-pulse,
+  .icon-animated-rotate,
+  .icon-animated-shimmer {
+    animation: none !important;
+  }
+
+  /* Simplify animations that are essential */
+  .animate-slide-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-pop-in {
+    animation-duration: 150ms;
+  }
+
+  /* Reduce blur effects on mobile */
+  .glass-card,
+  [class*="backdrop-blur"] {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+
+  /* Reduce shadow complexity */
+  .glass-card,
+  .neon-border {
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.1) !important;
+  }
+
+  /* Hardware acceleration for smooth animations */
+  .animate-slide-up,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-pop-in {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* Hardware acceleration for all animated elements */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px) translateZ(0); }
+  to   { opacity: 1; transform: translateY(0) translateZ(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92) translateZ(0); }
+  to   { opacity: 1; transform: scale(1) translateZ(0); }
+}
+
 /* ──────────────────────────────────────────
    INTERACTIVE / MICRO-ANIMATION UTILITIES
 ──────────────────────────────────────────── */
