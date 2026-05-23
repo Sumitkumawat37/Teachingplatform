@@ -37,10 +37,6 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('@supabase')) {
             return 'supabase';
           }
-          // Charts
-          if (id.includes('recharts')) {
-            return 'charts';
-          }
           // Framer Motion
           if (id.includes('framer-motion')) {
             return 'framer';
