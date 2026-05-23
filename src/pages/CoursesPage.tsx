@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { Lock, ShoppingCart, Eye, CheckCircle2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { memo } from "react";
 
-const CoursesPage = () => {
+const CoursesPage = memo(() => {
   const navigate = useNavigate();
   const { hasPurchased, purchaseCourse } = usePurchase();
   const { data: courses = [], isLoading } = useCourses();
@@ -72,6 +73,7 @@ const CoursesPage = () => {
                     src={course.thumbnail_url}
                     alt={course.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-item:hover:scale-110"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-[#A855F7]/60 to-[#EC4899]/40 opacity-90 animate-float-slow">
@@ -141,6 +143,6 @@ const CoursesPage = () => {
       )}
     </div>
   );
-};
+});
 
 export default CoursesPage;

@@ -104,8 +104,8 @@ const HomePage = () => {
           </div>
 
           {/* Teacher photo + floating doodles */}
-          <div className="relative shrink-0 animate-slide-in-right mt-1 hidden sm:block">
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-[#A855F7]/40 shadow-[0_0_30px_rgba(168,85,247,0.3)] animate-float-slow">
+          <div className="relative shrink-0 animate-slide-in-right mt-1">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-[#A855F7]/40 shadow-[0_0_30px_rgba(168,85,247,0.3)] animate-float-slow">
               <img src={teacherBanner} alt="Nadiya Ma'am" className="w-full h-full object-cover object-top scale-110" loading="lazy" />
             </div>
             {/* Floating doodles */}

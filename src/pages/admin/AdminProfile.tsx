@@ -75,7 +75,7 @@ const AdminProfile = () => {
           <div className="flex-shrink-0">
             <div className="relative">
               <div className="w-48 h-48 rounded-2xl overflow-hidden border-2 border-border shadow-sm">
-                <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" loading="lazy" />
               </div>
               {isEditing && (
                 <div className="absolute -bottom-2 -right-2">

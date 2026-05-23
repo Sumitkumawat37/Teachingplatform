@@ -58,7 +58,7 @@ const AdminDashboard = () => {
             <h1 className="text-2xl font-bold text-foreground mb-1">Teacher Dashboard</h1>
             <p className="text-muted-foreground">Manage your courses and track student progress</p>
           </div>
-          <div className="hidden sm:block">
+          <div>
             <BarChart3 className="w-12 h-12 text-primary" />
           </div>
         </div>
@@ -69,7 +69,7 @@ const AdminDashboard = () => {
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-shrink-0">
             <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-primary/30 shadow-lg shadow-primary/20 mx-auto sm:mx-0">
-              <img src="/shivam-sir.jpg" alt="Shivam Sir" className="w-full h-full object-cover" />
+              <img src="/shivam-sir.jpg" alt="Shivam Sir" className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
           <div className="flex-1 space-y-3">

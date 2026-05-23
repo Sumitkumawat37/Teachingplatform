@@ -3,8 +3,9 @@ import { usePurchase } from "@/lib/purchase-context";
 import { useParams, useNavigate } from "react-router-dom";
 import { Play, ChevronLeft, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star } from "lucide-react";
 import { toast } from "sonner";
+import { memo } from "react";
 
-const CourseDetailPage = () => {
+const CourseDetailPage = memo(() => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { hasPurchased, purchaseCourse } = usePurchase();
@@ -59,7 +60,7 @@ const CourseDetailPage = () => {
       {/* Hero card */}
       <div className="rounded-3xl overflow-hidden relative shadow-xl shadow-purple-900/30 neon-border">
         {course.thumbnail_url ? (
-          <img src={course.thumbnail_url} alt={course.title} className="w-full h-48 object-cover" />
+          <img src={course.thumbnail_url} alt={course.title} className="w-full h-48 object-cover" loading="lazy" />
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-purple-900/60 to-pink-900/40 flex items-center justify-center text-7xl">
             {course.thumbnail_emoji || "📚"}
@@ -204,6 +205,6 @@ const CourseDetailPage = () => {
       </div>{/* end 2-col grid */}
     </div>
   );
-};
+});
 
 export default CourseDetailPage;
