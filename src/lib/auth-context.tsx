@@ -68,14 +68,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let mounted = true;
+    let timeoutId: NodeJS.Timeout;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserFromSession(session);
+      if (mounted) setUserFromSession(session);
     });
+
     // getSession covers the case where onAuthStateChange hasn't fired yet
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserFromSession(session);
+      if (mounted) setUserFromSession(session);
+    }).catch((err) => {
+      console.error('Auth session error:', err);
+      if (mounted) {
+        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
+      }
     });
-    return () => subscription.unsubscribe();
+
+    // Timeout to prevent infinite loading if Supabase fails
+    timeoutId = setTimeout(() => {
+      if (mounted && auth.loading) {
+        console.warn('Auth initialization timeout - forcing render');
+        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
+      }
+    }, 5000);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {

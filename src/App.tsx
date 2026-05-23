@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { PurchaseProvider } from "@/lib/purchase-context";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GoogleAuthProvider } from "@/lib/google-oauth-context";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { lazy, Suspense } from "react";
 
 // Lazy load all pages for better performance
@@ -130,23 +131,23 @@ function AppRoutes() {
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <AuthProvider>
-          <PurchaseProvider>
-            <GoogleAuthProvider>
-              <BrowserRouter>
-                <Suspense fallback={<PageLoader />}>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AuthProvider>
+            <PurchaseProvider>
+              <GoogleAuthProvider>
+                <BrowserRouter>
                   <AppRoutes />
-                </Suspense>
-              </BrowserRouter>
-            </GoogleAuthProvider>
-        </PurchaseProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+                </BrowserRouter>
+              </GoogleAuthProvider>
+            </PurchaseProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
