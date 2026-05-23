@@ -1,24 +1,5 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    }
-  ],
-  "env": {
-    "VITE_SUPABASE_URL": {
-      "description": "Supabase project URL"
-    },
-    "VITE_SUPABASE_PUBLISHABLE_KEY": {
-      "description": "Supabase anon/public key"
-    },
-    "EMAIL_PASSWORD": {
-      "description": "Gmail app-specific password for nodemailer"
-    }
-  }
+  "framework": "vite"
 }
