@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 // Store verification tokens in memory (in production, use Vercel KV or a database)
 const resetTokens = new Map();
@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,6 +25,13 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
+  }
+
+  // Check if email service is configured
+  if (!process.env.EMAIL_PASSWORD) {
+    return res.status(503).json({ 
+      message: 'Email service not configured. Please add EMAIL_PASSWORD environment variable.' 
+    });
   }
 
   try {
@@ -68,4 +75,4 @@ export default async function handler(req, res) {
     console.error('Error sending verification email:', error);
     res.status(500).json({ message: 'Failed to send verification email' });
   }
-}
+};

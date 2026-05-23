@@ -1,9 +1,9 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 // Store reset tokens in memory (in production, use Vercel KV or a database)
 const resetTokens = new Map();
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -46,4 +46,4 @@ export default async function handler(req, res) {
     console.error('Error resetting password:', error);
     res.status(500).json({ message: 'Failed to reset password' });
   }
-}
+};
