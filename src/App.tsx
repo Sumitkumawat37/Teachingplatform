@@ -7,44 +7,53 @@ import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { PurchaseProvider } from "@/lib/purchase-context";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GoogleAuthProvider } from "@/lib/google-oauth-context";
+import { lazy, Suspense } from "react";
 
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import HomePage from "./pages/HomePage";
-import StudentDashboard from "./pages/StudentDashboard";
-import CoursesPage from "./pages/CoursesPage";
-import CourseDetailPage from "./pages/CourseDetailPage";
-import VideoPlayerPage from "./pages/VideoPlayerPage";
-import NotesPage from "./pages/NotesPage";
-import PersonalNotesPage from "./pages/PersonalNotesPage";
-import QuizzesPage from "./pages/QuizzesPage";
-import QuizPlayPage from "./pages/QuizPlayPage";
-import ResultsPage from "./pages/ResultsPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import ProfilePage from "./pages/ProfilePage";
-import LiveClassesPage from "./pages/LiveClassesPage";
-import DoubtsPage from "./pages/DoubtsPage";
-import PYQsPage from "./pages/PYQsPage";
-import CurrentAffairsPage from "./pages/CurrentAffairsPage";
-import MainsWritingPage from "./pages/MainsWritingPage";
-import StudyPlannerPage from "./pages/StudyPlannerPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminProfile from "./pages/admin/AdminProfile";
-import AdminContent from "./pages/admin/AdminContent";
-import AdminQuizzes from "./pages/admin/AdminQuizzes";
-import AdminStudents from "./pages/admin/AdminStudents";
-import AdminAnnouncements from "./pages/admin/AdminAnnouncements";
-import AdminLiveClasses from "./pages/admin/AdminLiveClasses";
-import AdminDoubts from "./pages/admin/AdminDoubts";
-import AdminCourseAccess from "./pages/admin/AdminCourseAccess";
-import AdminEmailCenter from "./pages/admin/AdminEmailCenter";
-import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
-import SuperAdminUsers from "./pages/superadmin/SuperAdminUsers";
-import CheckEmailPage from "./pages/CheckEmailPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import NotFound from "./pages/NotFound";
+// Lazy load all pages for better performance
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const SignupPage = lazy(() => import("./pages/SignupPage"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
+const CoursesPage = lazy(() => import("./pages/CoursesPage"));
+const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
+const VideoPlayerPage = lazy(() => import("./pages/VideoPlayerPage"));
+const NotesPage = lazy(() => import("./pages/NotesPage"));
+const PersonalNotesPage = lazy(() => import("./pages/PersonalNotesPage"));
+const QuizzesPage = lazy(() => import("./pages/QuizzesPage"));
+const QuizPlayPage = lazy(() => import("./pages/QuizPlayPage"));
+const ResultsPage = lazy(() => import("./pages/ResultsPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const LiveClassesPage = lazy(() => import("./pages/LiveClassesPage"));
+const DoubtsPage = lazy(() => import("./pages/DoubtsPage"));
+const PYQsPage = lazy(() => import("./pages/PYQsPage"));
+const CurrentAffairsPage = lazy(() => import("./pages/CurrentAffairsPage"));
+const MainsWritingPage = lazy(() => import("./pages/MainsWritingPage"));
+const StudyPlannerPage = lazy(() => import("./pages/StudyPlannerPage"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
+const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
+const AdminQuizzes = lazy(() => import("./pages/admin/AdminQuizzes"));
+const AdminStudents = lazy(() => import("./pages/admin/AdminStudents"));
+const AdminAnnouncements = lazy(() => import("./pages/admin/AdminAnnouncements"));
+const AdminLiveClasses = lazy(() => import("./pages/admin/AdminLiveClasses"));
+const AdminDoubts = lazy(() => import("./pages/admin/AdminDoubts"));
+const AdminCourseAccess = lazy(() => import("./pages/admin/AdminCourseAccess"));
+const AdminEmailCenter = lazy(() => import("./pages/admin/AdminEmailCenter"));
+const SuperAdminDashboard = lazy(() => import("./pages/superadmin/SuperAdminDashboard"));
+const SuperAdminUsers = lazy(() => import("./pages/superadmin/SuperAdminUsers"));
+const CheckEmailPage = lazy(() => import("./pages/CheckEmailPage"));
+const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Loading component for lazy loaded routes
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen bg-[#050505]">
+    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -54,12 +63,12 @@ function AppRoutes() {
   if (!isLoggedIn) {
     return (
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/check-email" element={<CheckEmailPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
+        <Route path="/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
+        <Route path="/check-email" element={<Suspense fallback={<PageLoader />}><CheckEmailPage /></Suspense>} />
+        <Route path="/verify-email" element={<Suspense fallback={<PageLoader />}><VerifyEmailPage /></Suspense>} />
+        <Route path="/forgot-password" element={<Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense>} />
+        <Route path="/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
@@ -76,44 +85,44 @@ function AppRoutes() {
     <AppLayout>
       <Routes>
         {/* Student Routes */}
-        <Route path="/" element={role === "super_admin" ? <Navigate to="/superadmin" replace /> : <HomePage />} />
-        <Route path="/dashboard" element={<StudentDashboard />} />
-        <Route path="/courses" element={<CoursesPage />} />
-        <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-        <Route path="/courses/:courseId/lecture/:lectureId" element={<VideoPlayerPage />} />
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/personal-notes" element={<PersonalNotesPage />} />
-        <Route path="/quizzes" element={<QuizzesPage />} />
-        <Route path="/quiz/:quizId" element={<QuizPlayPage />} />
-        <Route path="/results" element={<ResultsPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/live-classes" element={<LiveClassesPage />} />
-        <Route path="/doubts" element={<DoubtsPage />} />
-        <Route path="/pyqs" element={<PYQsPage />} />
-        <Route path="/current-affairs" element={<CurrentAffairsPage />} />
-        <Route path="/mains-writing" element={<MainsWritingPage />} />
-        <Route path="/study-planner" element={<StudyPlannerPage />} />
+        <Route path="/" element={role === "super_admin" ? <Navigate to="/superadmin" replace /> : <Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+        <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><StudentDashboard /></Suspense>} />
+        <Route path="/courses" element={<Suspense fallback={<PageLoader />}><CoursesPage /></Suspense>} />
+        <Route path="/courses/:courseId" element={<Suspense fallback={<PageLoader />}><CourseDetailPage /></Suspense>} />
+        <Route path="/courses/:courseId/lecture/:lectureId" element={<Suspense fallback={<PageLoader />}><VideoPlayerPage /></Suspense>} />
+        <Route path="/notes" element={<Suspense fallback={<PageLoader />}><NotesPage /></Suspense>} />
+        <Route path="/personal-notes" element={<Suspense fallback={<PageLoader />}><PersonalNotesPage /></Suspense>} />
+        <Route path="/quizzes" element={<Suspense fallback={<PageLoader />}><QuizzesPage /></Suspense>} />
+        <Route path="/quiz/:quizId" element={<Suspense fallback={<PageLoader />}><QuizPlayPage /></Suspense>} />
+        <Route path="/results" element={<Suspense fallback={<PageLoader />}><ResultsPage /></Suspense>} />
+        <Route path="/notifications" element={<Suspense fallback={<PageLoader />}><NotificationsPage /></Suspense>} />
+        <Route path="/profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
+        <Route path="/live-classes" element={<Suspense fallback={<PageLoader />}><LiveClassesPage /></Suspense>} />
+        <Route path="/doubts" element={<Suspense fallback={<PageLoader />}><DoubtsPage /></Suspense>} />
+        <Route path="/pyqs" element={<Suspense fallback={<PageLoader />}><PYQsPage /></Suspense>} />
+        <Route path="/current-affairs" element={<Suspense fallback={<PageLoader />}><CurrentAffairsPage /></Suspense>} />
+        <Route path="/mains-writing" element={<Suspense fallback={<PageLoader />}><MainsWritingPage /></Suspense>} />
+        <Route path="/study-planner" element={<Suspense fallback={<PageLoader />}><StudyPlannerPage /></Suspense>} />
 
         {/* Admin (Teacher) Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/profile" element={<AdminProfile />} />
-        <Route path="/admin/content" element={<AdminContent />} />
-        <Route path="/admin/quizzes" element={<AdminQuizzes />} />
-        <Route path="/admin/students" element={<AdminStudents />} />
-        <Route path="/admin/announcements" element={<AdminAnnouncements />} />
-        <Route path="/admin/live" element={<AdminLiveClasses />} />
-        <Route path="/admin/doubts" element={<AdminDoubts />} />
-        <Route path="/admin/access" element={<AdminCourseAccess />} />
-        <Route path="/admin/email-center" element={<AdminEmailCenter />} />
+        <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
+        <Route path="/admin/profile" element={<Suspense fallback={<PageLoader />}><AdminProfile /></Suspense>} />
+        <Route path="/admin/content" element={<Suspense fallback={<PageLoader />}><AdminContent /></Suspense>} />
+        <Route path="/admin/quizzes" element={<Suspense fallback={<PageLoader />}><AdminQuizzes /></Suspense>} />
+        <Route path="/admin/students" element={<Suspense fallback={<PageLoader />}><AdminStudents /></Suspense>} />
+        <Route path="/admin/announcements" element={<Suspense fallback={<PageLoader />}><AdminAnnouncements /></Suspense>} />
+        <Route path="/admin/live" element={<Suspense fallback={<PageLoader />}><AdminLiveClasses /></Suspense>} />
+        <Route path="/admin/doubts" element={<Suspense fallback={<PageLoader />}><AdminDoubts /></Suspense>} />
+        <Route path="/admin/access" element={<Suspense fallback={<PageLoader />}><AdminCourseAccess /></Suspense>} />
+        <Route path="/admin/email-center" element={<Suspense fallback={<PageLoader />}><AdminEmailCenter /></Suspense>} />
 
         {/* Super Admin Routes */}
-        <Route path="/superadmin" element={<SuperAdminDashboard />} />
-        <Route path="/superadmin/users" element={<SuperAdminUsers />} />
+        <Route path="/superadmin" element={<Suspense fallback={<PageLoader />}><SuperAdminDashboard /></Suspense>} />
+        <Route path="/superadmin/users" element={<Suspense fallback={<PageLoader />}><SuperAdminUsers /></Suspense>} />
 
         <Route path="/login" element={<Navigate to={rootRedirect} replace />} />
         <Route path="/signup" element={<Navigate to={rootRedirect} replace />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
       </Routes>
     </AppLayout>
   );

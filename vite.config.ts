@@ -21,16 +21,50 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
-          'supabase': ['@supabase/supabase-js'],
-          'charts': ['recharts'],
-          'framer': ['framer-motion'],
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            return 'react-vendor';
+          }
+          // Radix UI components
+          if (id.includes('@radix-ui')) {
+            return 'ui-vendor';
+          }
+          // Supabase
+          if (id.includes('@supabase')) {
+            return 'supabase';
+          }
+          // Charts
+          if (id.includes('recharts')) {
+            return 'charts';
+          }
+          // Framer Motion
+          if (id.includes('framer-motion')) {
+            return 'framer';
+          }
+          // React Query
+          if (id.includes('@tanstack/react-query')) {
+            return 'query';
+          }
+          // Forms
+          if (id.includes('react-hook-form') || id.includes('@hookform')) {
+            return 'forms';
+          }
+          // Date utilities
+          if (id.includes('date-fns')) {
+            return 'date';
+          }
+          // Lucide icons
+          if (id.includes('lucide-react')) {
+            return 'icons';
+          }
         },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
     cssCodeSplit: true,
