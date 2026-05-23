@@ -12,12 +12,17 @@ const ToonHubCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
 
-  // Preload images on mount
+  // Preload images on mount with error handling
   useEffect(() => {
-    IMAGES.forEach((img) => {
+    IMAGES.forEach((img, index) => {
       const image = new Image();
       image.src = img.src;
+      image.onerror = () => {
+        console.warn(`Failed to load ToonHub image ${index + 1}: 410 Gone`);
+        setImageErrors(prev => new Set(prev).add(index));
+      };
     });
   }, []);
 
@@ -184,19 +189,38 @@ const ToonHubCarousel = () => {
           {IMAGES.map((img, index) => {
             const role = getRole(index);
             const style = getItemStyle(role);
+            const hasError = imageErrors.has(index);
             return (
               <div key={index} style={style}>
-                <img
-                  src={img.src}
-                  alt={`Figurine ${index + 1}`}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    objectPosition: 'bottom center',
-                  }}
-                  draggable={false}
-                />
+                {hasError ? (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '14px',
+                      opacity: 0.5,
+                    }}
+                  >
+                    Image unavailable
+                  </div>
+                ) : (
+                  <img
+                    src={img.src}
+                    alt={`Figurine ${index + 1}`}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      objectPosition: 'bottom center',
+                    }}
+                    draggable={false}
+                    onError={() => setImageErrors(prev => new Set(prev).add(index))}
+                  />
+                )}
               </div>
             );
           })}
