@@ -8,6 +8,7 @@ import { PurchaseProvider } from "@/lib/purchase-context";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { GoogleAuthProvider } from "@/lib/google-oauth-context";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import ToonHubCarousel from "@/components/ToonHubCarousel";
 import { lazy, Suspense } from "react";
 
 // Lazy load all pages for better performance
@@ -61,71 +62,73 @@ const queryClient = new QueryClient();
 function AppRoutes() {
   const { isLoggedIn, role } = useAuth();
 
-  if (!isLoggedIn) {
-    return (
-      <Routes>
-        <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
-        <Route path="/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
-        <Route path="/check-email" element={<Suspense fallback={<PageLoader />}><CheckEmailPage /></Suspense>} />
-        <Route path="/verify-email" element={<Suspense fallback={<PageLoader />}><VerifyEmailPage /></Suspense>} />
-        <Route path="/forgot-password" element={<Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense>} />
-        <Route path="/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    );
-  }
-
-  // Role-based root redirect
-  const rootRedirect = role === "super_admin"
-    ? "/superadmin"
-    : role === "admin"
-    ? "/admin"
-    : "/";
-
   return (
-    <AppLayout>
-      <Routes>
-        {/* Student Routes */}
-        <Route path="/" element={role === "super_admin" ? <Navigate to="/superadmin" replace /> : <Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-        <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><StudentDashboard /></Suspense>} />
-        <Route path="/courses" element={<Suspense fallback={<PageLoader />}><CoursesPage /></Suspense>} />
-        <Route path="/courses/:courseId" element={<Suspense fallback={<PageLoader />}><CourseDetailPage /></Suspense>} />
-        <Route path="/courses/:courseId/lecture/:lectureId" element={<Suspense fallback={<PageLoader />}><VideoPlayerPage /></Suspense>} />
-        <Route path="/notes" element={<Suspense fallback={<PageLoader />}><NotesPage /></Suspense>} />
-        <Route path="/personal-notes" element={<Suspense fallback={<PageLoader />}><PersonalNotesPage /></Suspense>} />
-        <Route path="/quizzes" element={<Suspense fallback={<PageLoader />}><QuizzesPage /></Suspense>} />
-        <Route path="/quiz/:quizId" element={<Suspense fallback={<PageLoader />}><QuizPlayPage /></Suspense>} />
-        <Route path="/results" element={<Suspense fallback={<PageLoader />}><ResultsPage /></Suspense>} />
-        <Route path="/notifications" element={<Suspense fallback={<PageLoader />}><NotificationsPage /></Suspense>} />
-        <Route path="/profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
-        <Route path="/live-classes" element={<Suspense fallback={<PageLoader />}><LiveClassesPage /></Suspense>} />
-        <Route path="/doubts" element={<Suspense fallback={<PageLoader />}><DoubtsPage /></Suspense>} />
-        <Route path="/pyqs" element={<Suspense fallback={<PageLoader />}><PYQsPage /></Suspense>} />
-        <Route path="/current-affairs" element={<Suspense fallback={<PageLoader />}><CurrentAffairsPage /></Suspense>} />
-        <Route path="/mains-writing" element={<Suspense fallback={<PageLoader />}><MainsWritingPage /></Suspense>} />
-        <Route path="/study-planner" element={<Suspense fallback={<PageLoader />}><StudyPlannerPage /></Suspense>} />
+    <Routes>
+      {/* ToonHub Carousel - Public route, no auth required */}
+      <Route path="/toonhub" element={<ToonHubCarousel />} />
 
-        {/* Admin (Teacher) Routes */}
-        <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
-        <Route path="/admin/profile" element={<Suspense fallback={<PageLoader />}><AdminProfile /></Suspense>} />
-        <Route path="/admin/content" element={<Suspense fallback={<PageLoader />}><AdminContent /></Suspense>} />
-        <Route path="/admin/quizzes" element={<Suspense fallback={<PageLoader />}><AdminQuizzes /></Suspense>} />
-        <Route path="/admin/students" element={<Suspense fallback={<PageLoader />}><AdminStudents /></Suspense>} />
-        <Route path="/admin/announcements" element={<Suspense fallback={<PageLoader />}><AdminAnnouncements /></Suspense>} />
-        <Route path="/admin/live" element={<Suspense fallback={<PageLoader />}><AdminLiveClasses /></Suspense>} />
-        <Route path="/admin/doubts" element={<Suspense fallback={<PageLoader />}><AdminDoubts /></Suspense>} />
-        <Route path="/admin/access" element={<Suspense fallback={<PageLoader />}><AdminCourseAccess /></Suspense>} />
-        <Route path="/admin/email-center" element={<Suspense fallback={<PageLoader />}><AdminEmailCenter /></Suspense>} />
+      {!isLoggedIn ? (
+        <>
+          <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
+          <Route path="/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
+          <Route path="/check-email" element={<Suspense fallback={<PageLoader />}><CheckEmailPage /></Suspense>} />
+          <Route path="/verify-email" element={<Suspense fallback={<PageLoader />}><VerifyEmailPage /></Suspense>} />
+          <Route path="/forgot-password" element={<Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense>} />
+          <Route path="/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </>
+      ) : (
+        <AppLayout>
+          {/* Role-based root redirect */}
+          <Route path="/" element={
+            role === "super_admin" 
+              ? <Navigate to="/superadmin" replace /> 
+              : role === "admin" 
+              ? <Navigate to="/admin" replace />
+              : <Suspense fallback={<PageLoader />}><HomePage /></Suspense>
+          } />
+          
+          {/* Student Routes */}
+          <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><StudentDashboard /></Suspense>} />
+          <Route path="/courses" element={<Suspense fallback={<PageLoader />}><CoursesPage /></Suspense>} />
+          <Route path="/courses/:courseId" element={<Suspense fallback={<PageLoader />}><CourseDetailPage /></Suspense>} />
+          <Route path="/courses/:courseId/lecture/:lectureId" element={<Suspense fallback={<PageLoader />}><VideoPlayerPage /></Suspense>} />
+          <Route path="/notes" element={<Suspense fallback={<PageLoader />}><NotesPage /></Suspense>} />
+          <Route path="/personal-notes" element={<Suspense fallback={<PageLoader />}><PersonalNotesPage /></Suspense>} />
+          <Route path="/quizzes" element={<Suspense fallback={<PageLoader />}><QuizzesPage /></Suspense>} />
+          <Route path="/quiz/:quizId" element={<Suspense fallback={<PageLoader />}><QuizPlayPage /></Suspense>} />
+          <Route path="/results" element={<Suspense fallback={<PageLoader />}><ResultsPage /></Suspense>} />
+          <Route path="/notifications" element={<Suspense fallback={<PageLoader />}><NotificationsPage /></Suspense>} />
+          <Route path="/profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
+          <Route path="/live-classes" element={<Suspense fallback={<PageLoader />}><LiveClassesPage /></Suspense>} />
+          <Route path="/doubts" element={<Suspense fallback={<PageLoader />}><DoubtsPage /></Suspense>} />
+          <Route path="/pyqs" element={<Suspense fallback={<PageLoader />}><PYQsPage /></Suspense>} />
+          <Route path="/current-affairs" element={<Suspense fallback={<PageLoader />}><CurrentAffairsPage /></Suspense>} />
+          <Route path="/mains-writing" element={<Suspense fallback={<PageLoader />}><MainsWritingPage /></Suspense>} />
+          <Route path="/study-planner" element={<Suspense fallback={<PageLoader />}><StudyPlannerPage /></Suspense>} />
 
-        {/* Super Admin Routes */}
-        <Route path="/superadmin" element={<Suspense fallback={<PageLoader />}><SuperAdminDashboard /></Suspense>} />
-        <Route path="/superadmin/users" element={<Suspense fallback={<PageLoader />}><SuperAdminUsers /></Suspense>} />
+          {/* Admin (Teacher) Routes */}
+          <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
+          <Route path="/admin/profile" element={<Suspense fallback={<PageLoader />}><AdminProfile /></Suspense>} />
+          <Route path="/admin/content" element={<Suspense fallback={<PageLoader />}><AdminContent /></Suspense>} />
+          <Route path="/admin/quizzes" element={<Suspense fallback={<PageLoader />}><AdminQuizzes /></Suspense>} />
+          <Route path="/admin/students" element={<Suspense fallback={<PageLoader />}><AdminStudents /></Suspense>} />
+          <Route path="/admin/announcements" element={<Suspense fallback={<PageLoader />}><AdminAnnouncements /></Suspense>} />
+          <Route path="/admin/live" element={<Suspense fallback={<PageLoader />}><AdminLiveClasses /></Suspense>} />
+          <Route path="/admin/doubts" element={<Suspense fallback={<PageLoader />}><AdminDoubts /></Suspense>} />
+          <Route path="/admin/access" element={<Suspense fallback={<PageLoader />}><AdminCourseAccess /></Suspense>} />
+          <Route path="/admin/email-center" element={<Suspense fallback={<PageLoader />}><AdminEmailCenter /></Suspense>} />
 
-        <Route path="/login" element={<Navigate to={rootRedirect} replace />} />
-        <Route path="/signup" element={<Navigate to={rootRedirect} replace />} />
-        <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
-      </Routes>
-    </AppLayout>
+          {/* Super Admin Routes */}
+          <Route path="/superadmin" element={<Suspense fallback={<PageLoader />}><SuperAdminDashboard /></Suspense>} />
+          <Route path="/superadmin/users" element={<Suspense fallback={<PageLoader />}><SuperAdminUsers /></Suspense>} />
+
+          <Route path="/login" element={<Navigate to="/" replace />} />
+          <Route path="/signup" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
+        </AppLayout>
+      )}
+    </Routes>
   );
 }
 
