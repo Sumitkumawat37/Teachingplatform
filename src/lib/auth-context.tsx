@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     const u = session.user;
+    console.log('Setting user from session:', u.email, u.id);
 
     // Google OAuth users have name/avatar in user_metadata
     const googleName = u.user_metadata?.full_name || u.user_metadata?.name || "";
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ]);
       roleData = roleRes.data ?? [];
       profile = profileRes.data;
+      console.log('Fetched profile:', profile, 'roleData:', roleData);
     } catch (err) {
       console.error("Error fetching profile/role:", err);
     }
@@ -71,18 +73,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Auto-create profile for new users (e.g., Google OAuth first-timers)
     if (!profile) {
       const nameToUse = googleName || u.email?.split("@")[0] || "User";
+      console.log('Creating new profile for:', u.email, 'with name:', nameToUse);
       try {
-        const { data: newProfile } = await supabase
+        const { data: newProfile, error: profileError } = await supabase
           .from("profiles")
-          .upsert({
+          .insert({
             user_id: u.id,
             name: nameToUse,
             email: u.email,
             avatar_url: googleAvatar,
-          }, { onConflict: "user_id" })
+          })
           .select("name,avatar_url")
           .single();
-        profile = newProfile;
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Try upsert as fallback
+          const { data: upsertProfile } = await supabase
+            .from("profiles")
+            .upsert({
+              user_id: u.id,
+              name: nameToUse,
+              email: u.email,
+              avatar_url: googleAvatar,
+            }, { onConflict: "user_id" })
+            .select("name,avatar_url")
+            .single();
+          profile = upsertProfile;
+        } else {
+          profile = newProfile;
+          console.log('Profile created successfully:', profile);
+        }
       } catch (err) {
         console.error("Error creating profile:", err);
       }
@@ -90,9 +110,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Auto-create role for new users
     if (roleData.length === 0) {
+      console.log('Creating student role for:', u.id);
       try {
-        await supabase.from("user_roles").insert({ user_id: u.id, role: "student" });
-        roleData = [{ role: "student" }];
+        const { error: roleError } = await supabase.from("user_roles").insert({ user_id: u.id, role: "student" });
+        if (roleError) {
+          console.error('Role creation error:', roleError);
+        } else {
+          console.log('Role created successfully');
+          roleData = [{ role: "student" }];
+        }
       } catch (err) {
         console.error("Error creating role:", err);
       }
@@ -103,6 +129,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const role: Role = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : "student";
 
     const displayName = profile?.name || googleName || u.email?.split("@")[0] || "User";
+
+    console.log('Setting auth state:', { isLoggedIn: true, role, user: { name: displayName, email: u.email, id: u.id } });
 
     setAuth({
       isLoggedIn: true,
