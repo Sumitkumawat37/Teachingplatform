@@ -19,6 +19,7 @@ interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
+  signUpWithGoogle: () => Promise<boolean>;
   resetPassword: (email: string) => Promise<boolean>;
   updatePassword: (newPassword: string) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -115,8 +116,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
     let timeoutId: NodeJS.Timeout;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setUserFromSession(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (mounted) {
+        await setUserFromSession(session);
+        // Show welcome toast for new sign-ups
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'signup' && session?.user) {
+          toast.success(`Welcome aboard, ${session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Student'}! 🎉`);
+          // Clean up URL
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }
     });
 
     // getSession covers the case where onAuthStateChange hasn't fired yet
@@ -244,7 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async (): Promise<boolean> => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/?action=signin`;
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -263,6 +273,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Google sign-in error:', err);
       toast.error('Google sign-in failed. Please try again.');
+      return false;
+    }
+  };
+
+  const signUpWithGoogle = async (): Promise<boolean> => {
+    try {
+      const redirectUrl = `${window.location.origin}/?action=signup`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: false,
+        },
+      });
+
+      if (error) {
+        console.error('Google sign-up error:', error);
+        toast.error('Google sign-up failed. Please try again.');
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Google sign-up error:', err);
+      toast.error('Google sign-up failed. Please try again.');
       return false;
     }
   };
@@ -327,7 +362,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, signup, signInWithGoogle, resetPassword, updatePassword, logout, switchRole }}>
+    <AuthContext.Provider value={{ ...auth, login, signup, signInWithGoogle, signUpWithGoogle, resetPassword, updatePassword, logout, switchRole }}>
       {children}
     </AuthContext.Provider>
   );
