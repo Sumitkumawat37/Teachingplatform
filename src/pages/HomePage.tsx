@@ -48,18 +48,18 @@ const HomePage = () => {
     <div className="space-y-6" ref={scrollRef}>
 
       {/* ══ HERO SECTION ══ */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#A855F7]/80 via-[#1a1040] to-[#EC4899]/40 p-6 md:p-8 shadow-[0_0_40px_rgba(168,85,247,0.3)] animate-fade-in neon-border animate-glow-breathe">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#A855F7]/80 via-[#1a1040] to-[#EC4899]/40 p-5 sm:p-6 md:p-8 shadow-[0_0_40px_rgba(168,85,247,0.3)] animate-fade-in neon-border animate-glow-breathe">
         {/* Glow blobs */}
         <div className="absolute -top-16 -right-16 w-64 h-64 bg-[#A855F7]/25 rounded-full blur-3xl animate-blob pointer-events-none" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-[#EC4899]/25 rounded-full blur-3xl animate-blob-2 pointer-events-none" />
-        <div className="absolute top-8 right-32 w-6 h-6 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '0.3s' }} />
-        <div className="absolute bottom-10 right-16 w-4 h-4 bg-pink-400/50 rounded-full animate-float-reverse" />
+        <div className="absolute top-8 right-32 w-6 h-6 bg-purple-400/40 rounded-full animate-float pointer-events-none" style={{ animationDelay: '0.3s' }} />
+        <div className="absolute bottom-10 right-16 w-4 h-4 bg-pink-400/50 rounded-full animate-float-reverse pointer-events-none" />
         {/* Meteor streaks */}
         <div className="absolute top-0 left-1/4 w-px h-16 bg-gradient-to-b from-purple-400/60 to-transparent animate-meteor pointer-events-none" style={{ animationDelay: '1s' }} />
         <div className="absolute top-0 right-1/3 w-px h-12 bg-gradient-to-b from-pink-400/40 to-transparent animate-meteor pointer-events-none" style={{ animationDelay: '3s', animationDuration: '5s' }} />
 
-        <div className="flex items-start justify-between relative z-10">
-          <div className="flex-1 pr-3">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 sm:gap-6 relative z-10">
+          <div className="flex-1 w-full text-center sm:text-left">
             {/* Pill tag */}
             <div className="inline-flex items-center gap-1.5 bg-[#A855F7]/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-3 animate-slide-in-left border border-[#A855F7]/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
               <Sparkles className="w-3.5 h-3.5 text-[#C084FC] icon-glow-purple icon-animated-pulse" />
@@ -67,31 +67,31 @@ const HomePage = () => {
             </div>
 
             {/* Main headline */}
-            <h1 className="text-white font-extrabold text-[22px] md:text-3xl leading-tight mb-2 animate-slide-in-left animate-text-glow" style={{ animationDelay: '0.08s', fontFamily: 'Poppins, sans-serif' }}>
+            <h1 className="text-white font-extrabold text-[20px] sm:text-[22px] md:text-3xl leading-tight mb-2 animate-slide-in-left animate-text-glow text-center sm:text-left" style={{ animationDelay: '0.08s', fontFamily: 'Poppins, sans-serif' }}>
               Chalo Gen Z<br /><span className="text-shimmer">padhte hai!</span>
             </h1>
-            <p className="text-[#B3B3B3]/80 text-xs md:text-sm mb-4 leading-relaxed animate-slide-in-left max-w-md" style={{ animationDelay: '0.16s' }}>
-              Smart strategy, real guidance, and UPSC success — all in one platform. Hi {user?.name?.split(' ')[0] || 'Aspirant'}! <span className="animate-wave">🎯</span>
+            <p className="text-[#B3B3B3]/80 text-xs md:text-sm mb-4 leading-relaxed animate-slide-in-left max-w-md mx-auto sm:mx-0" style={{ animationDelay: '0.16s' }}>
+              Smart strategy, real guidance, and UPSC success — all in one platform.
             </p>
 
             {/* CTAs */}
-            <div className="flex gap-3 animate-slide-in-left" style={{ animationDelay: '0.24s' }}>
+            <div className="flex gap-3 justify-center sm:justify-start animate-slide-in-left" style={{ animationDelay: '0.24s' }}>
               <button
                 onClick={() => navigate('/courses')}
-                className="btn-action ripple text-xs font-extrabold px-6 py-3 rounded-full urgency-pulse"
+                className="btn-action ripple text-xs font-extrabold px-5 sm:px-6 py-3 rounded-full urgency-pulse"
               >
                 Start Learning Now
               </button>
               <button
                 onClick={() => navigate('/courses')}
-                className="bg-[#0D0D0D]/50 backdrop-blur-sm text-white text-xs font-semibold px-5 py-3 rounded-full border border-[#A855F7]/30 hover:bg-[#0D0D0D]/70 hover:border-[#A855F7]/50 transition-all ripple press shadow-[0_0_15px_rgba(168,85,247,0.1)]"
+                className="bg-[#0D0D0D]/50 backdrop-blur-sm text-white text-xs font-semibold px-4 sm:px-5 py-3 rounded-full border border-[#A855F7]/30 hover:bg-[#0D0D0D]/70 hover:border-[#A855F7]/50 transition-all ripple press shadow-[0_0_15px_rgba(168,85,247,0.1)]"
               >
                 Explore Courses
               </button>
             </div>
 
             {/* Student avatars */}
-            <div className="flex items-center gap-3 mt-4 animate-slide-in-left" style={{ animationDelay: '0.32s' }}>
+            <div className="flex items-center gap-3 mt-4 justify-center sm:justify-start animate-slide-in-left" style={{ animationDelay: '0.32s' }}>
               <div className="flex -space-x-2">
                 {["P", "R", "A", "M"].map((l, i) => (
                   <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold border-2 border-[#1a1040] shadow-md" style={{ zIndex: 4 - i }}>
@@ -103,29 +103,16 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Teacher photo + floating doodles */}
-          <div className="relative shrink-0 animate-slide-in-right mt-1">
+          {/* Teacher photo */}
+          <div className="relative shrink-0 animate-slide-in-right mx-auto sm:mx-0 sm:mt-1">
             <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-[#A855F7]/40 shadow-[0_0_30px_rgba(168,85,247,0.3)] animate-float-slow">
               <img src={teacherBanner} alt="Nadiya Ma'am" className="w-full h-full object-cover object-top scale-110" loading="lazy" />
-            </div>
-            {/* Floating doodles */}
-            <div className="absolute -top-1 -left-28 glass-dark rounded-2xl px-3 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-1.5 animate-float" style={{ animationDelay: '0.6s' }}>
-              <Target className="w-3 h-3 text-[#EC4899] icon-glow-pink" />
-              <span className="text-[10px] font-bold text-[#B3B3B3]">Discipline</span>
-            </div>
-            <div className="absolute top-1/2 -left-28 -translate-y-1/2 glass-dark rounded-2xl px-3 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-1.5 animate-float" style={{ animationDelay: '1.1s' }}>
-              <Flame className="w-3 h-3 text-orange-400 icon-glow-purple icon-animated-pulse" />
-              <span className="text-[10px] font-bold text-[#B3B3B3]">Consistency</span>
-            </div>
-            <div className="absolute -bottom-8 -left-28 glass-dark rounded-2xl px-3 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.2)] flex items-center gap-1.5 animate-float" style={{ animationDelay: '0.8s' }}>
-              <Rocket className="w-3 h-3 text-[#A855F7] icon-glow-purple icon-animated-bounce" />
-              <span className="text-[10px] font-bold text-[#B3B3B3]">Future Officer</span>
             </div>
           </div>
         </div>
 
         {/* Trust badges row */}
-        <div className="flex gap-2 mt-5 relative z-10 animate-slide-in-left flex-wrap" style={{ animationDelay: '0.4s' }}>
+        <div className="flex gap-2 mt-5 relative z-10 animate-slide-in-left flex-wrap justify-center sm:justify-start" style={{ animationDelay: '0.4s' }}>
           {[
             { icon: Shield, label: "45+ Cleared UPSC" },
             { icon: CheckCircle, label: "92% Completion" },
