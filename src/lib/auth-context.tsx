@@ -116,7 +116,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let mounted = true;
     let timeoutId: NodeJS.Timeout;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event, session?.user?.email);
       if (mounted) {
         await setUserFromSession(session);
         // Show welcome toast for new sign-ups
@@ -131,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // getSession covers the case where onAuthStateChange hasn't fired yet
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email);
       if (mounted) setUserFromSession(session);
     }).catch((err) => {
       console.error('Auth session error:', err);
@@ -254,7 +256,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async (): Promise<boolean> => {
     try {
-      const redirectUrl = `${window.location.origin}/?action=signin`;
+      const redirectUrl = 'https://teachingplatform-main-np4l0ngu9.vercel.app/?action=signin';
+      console.log('Google Sign In redirect URL:', redirectUrl);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -279,7 +282,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUpWithGoogle = async (): Promise<boolean> => {
     try {
-      const redirectUrl = `${window.location.origin}/?action=signup`;
+      const redirectUrl = 'https://teachingplatform-main-np4l0ngu9.vercel.app/?action=signup';
+      console.log('Google Sign Up redirect URL:', redirectUrl);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
