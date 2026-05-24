@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useProfiles, useUserRoles } from "@/lib/supabase-data";
-import { useSetUserRole, useDeleteProfile } from "@/lib/supabase-mutations";
+import { useSetUserRole, useDeleteProfile, useUpdateProfile } from "@/lib/supabase-mutations";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Users, UserCheck, GraduationCap, Plus, Trash2, Search, ShieldCheck, Mail, Crown } from "lucide-react";
+import { Users, UserCheck, GraduationCap, Plus, Trash2, Search, ShieldCheck, Mail, Crown, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -26,7 +26,9 @@ const SuperAdminUsers = () => {
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState<"student" | "admin">("student");
+  const [newAvatarUrl, setNewAvatarUrl] = useState("");
   const [adding, setAdding] = useState(false);
+  const updateProfile = useUpdateProfile();
 
   const getRoleForUser = (userId: string) => {
     const email = profiles.find((p) => p.user_id === userId)?.email ?? "";
@@ -94,14 +96,21 @@ const SuperAdminUsers = () => {
       });
       if (error) throw error;
       const newUserId = data.user?.id;
-      if (newUserId && newRole === "admin") {
-        await supabase.from("user_roles").insert({ user_id: newUserId, role: "admin" });
+      if (newUserId) {
+        // Update profile with name and avatar_url
+        await updateProfile.mutateAsync({
+          userId: newUserId,
+          updates: { name: newName.trim(), avatar_url: newAvatarUrl.trim() || null }
+        });
+        if (newRole === "admin") {
+          await supabase.from("user_roles").insert({ user_id: newUserId, role: "admin" });
+        }
       }
       qc.invalidateQueries({ queryKey: ["profiles"] });
       qc.invalidateQueries({ queryKey: ["user_roles"] });
       toast.success(`${newRole === "admin" ? "Teacher" : "Student"} account created! They may need to verify their email.`);
       setShowAdd(false);
-      setNewName(""); setNewEmail(""); setNewPassword(""); setNewRole("student");
+      setNewName(""); setNewEmail(""); setNewPassword(""); setNewRole("student"); setNewAvatarUrl("");
     } catch (err: any) {
       toast.error(err?.message || "Failed to create user");
     } finally {
@@ -149,7 +158,7 @@ const SuperAdminUsers = () => {
                 <Plus className="w-3.5 h-3.5" /> Add User
               </button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="overflow-y-auto max-h-[85vh]">
               <DialogHeader><DialogTitle>Create New User</DialogTitle></DialogHeader>
               <div className="space-y-3 mt-1">
                 <div className="space-y-1">
@@ -178,6 +187,53 @@ const SuperAdminUsers = () => {
                     ))}
                   </div>
                 </div>
+
+                {/* Profile Photo URL */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Profile Photo URL (optional)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="https://example.com/photo.jpg"
+                      value={newAvatarUrl}
+                      onChange={(e) => setNewAvatarUrl(e.target.value)}
+                      className="flex-1"
+                    />
+                    {newAvatarUrl && (
+                      <button
+                        onClick={() => setNewAvatarUrl("")}
+                        className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                      >
+                        <X className="w-4 h-4 text-slate-500" />
+                      </button>
+                    )}
+                  </div>
+                  {/* Live Preview with Crop Overlay */}
+                  {newAvatarUrl && (
+                    <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-50 border border-slate-100">
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-violet-200 shadow-sm shrink-0">
+                        <img
+                          src={newAvatarUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
+                        {/* Circular crop guide overlay */}
+                        <div className="absolute inset-0 rounded-full border-2 border-dashed border-violet-400/40 pointer-events-none" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-slate-400 font-medium">Preview (circular crop)</p>
+                        <p className="text-[10px] text-slate-300 truncate">{newAvatarUrl}</p>
+                      </div>
+                    </div>
+                  )}
+                  {!newAvatarUrl && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-dashed border-slate-200">
+                      <ImageIcon className="w-4 h-4 text-slate-300" />
+                      <p className="text-[10px] text-slate-400">Paste an image URL above to see preview</p>
+                    </div>
+                  )}
+                </div>
+
                 <div className="bg-amber-500/10 rounded-xl p-3 border border-amber-500/15">
                   <p className="text-[10px] text-amber-400 font-semibold">Note: If email confirmation is enabled in your Supabase project, the user must verify their email before logging in.</p>
                 </div>
@@ -242,8 +298,17 @@ const SuperAdminUsers = () => {
                 className="glass-card rounded-2xl p-3.5 flex items-center gap-3 animate-slide-up neon-border"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white text-xs font-extrabold shadow-sm shrink-0 ${isSA ? "bg-gradient-to-br from-amber-400 to-orange-500" : role === "admin" ? "bg-gradient-to-br from-violet-400 to-purple-500" : "bg-gradient-to-br from-purple-500 to-pink-500"}`}>
-                  {initials}
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white text-xs font-extrabold shadow-sm shrink-0 overflow-hidden ${isSA ? "bg-gradient-to-br from-amber-400 to-orange-500" : role === "admin" ? "bg-gradient-to-br from-violet-400 to-purple-500" : "bg-gradient-to-br from-purple-500 to-pink-500"}`}>
+                  {p.avatar_url ? (
+                    <img
+                      src={p.avatar_url}
+                      alt={p.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  ) : (
+                    initials
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">

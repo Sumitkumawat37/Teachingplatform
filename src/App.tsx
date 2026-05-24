@@ -52,8 +52,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading component for lazy loaded routes
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen bg-[#050505]">
-    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+  <div className="flex items-center justify-center min-h-screen bg-[#F7F7FA]">
+    <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
   </div>
 );
 

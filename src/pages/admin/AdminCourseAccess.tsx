@@ -33,7 +33,7 @@ const AdminCourseAccess = () => {
 
   return (
     <div className="space-y-4 animate-slide-up">
-      <h2 className="text-xl font-bold">Course Access</h2>
+      <h2 className="text-xl font-bold text-slate-800">Course Access</h2>
       <p className="text-muted-foreground text-sm">Manually grant or revoke student access to courses</p>
       <Select value={selectedCourse} onValueChange={setSelectedCourse}>
         <SelectTrigger><SelectValue /></SelectTrigger>

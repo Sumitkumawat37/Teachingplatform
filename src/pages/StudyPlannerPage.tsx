@@ -32,9 +32,9 @@ const CountdownTimer = () => {
     <Card className="p-4 bg-gradient-to-r from-red-500/10 to-purple-500/10 border border-red-500/20 text-center space-y-2 animate-pulse">
       <h4 className="text-xs uppercase font-extrabold text-red-400 tracking-wider">UPSC CSE Prelims 2026 Countdown</h4>
       <div className="flex justify-center gap-3">
-        <div className="bg-neutral-900/60 px-3 py-2 rounded-lg"><span className="text-lg md:text-xl font-extrabold text-white">{days}</span><p className="text-[10px] text-gray-500 font-bold uppercase">Days</p></div>
-        <div className="bg-neutral-900/60 px-3 py-2 rounded-lg"><span className="text-lg md:text-xl font-extrabold text-white">{hours}</span><p className="text-[10px] text-gray-500 font-bold uppercase">Hours</p></div>
-        <div className="bg-neutral-900/60 px-3 py-2 rounded-lg"><span className="text-lg md:text-xl font-extrabold text-white">{minutes}</span><p className="text-[10px] text-gray-500 font-bold uppercase">Mins</p></div>
+        <div className="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-100"><span className="text-lg md:text-xl font-extrabold text-slate-800">{days}</span><p className="text-[10px] text-slate-400 font-bold uppercase">Days</p></div>
+        <div className="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-100"><span className="text-lg md:text-xl font-extrabold text-slate-800">{hours}</span><p className="text-[10px] text-slate-400 font-bold uppercase">Hours</p></div>
+        <div className="bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-100"><span className="text-lg md:text-xl font-extrabold text-slate-800">{minutes}</span><p className="text-[10px] text-slate-400 font-bold uppercase">Mins</p></div>
       </div>
     </Card>
   );

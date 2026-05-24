@@ -32,9 +32,9 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe animate-slide-in-bounce">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe">
       <div className="mx-3 mb-3">
-        <div className="bg-[#050505]/90 backdrop-blur-xl rounded-3xl border border-[#A855F7]/30 shadow-[0_0_30px_rgba(168,85,247,0.2)] px-2 py-2 animate-glow-breathe" style={{ animationDuration: '4s' }}>
+        <div className="rounded-2xl px-2 py-1.5 border border-white/60 shadow-[0_-4px_24px_rgba(15,23,42,0.06)]" style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
           <div className="flex justify-around items-center">
             {items.map((item) => {
               const exactRoutes = ["/", "/admin", "/superadmin"];
@@ -44,25 +44,22 @@ export function BottomNav() {
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-2xl transition-all duration-300 relative min-w-[52px] ${
-                    isActive ? "scale-105" : "hover:scale-105 active:scale-95"
+                  className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 relative min-w-[52px] ${
+                    isActive ? "" : "active:scale-95"
                   }`}
                 >
-                  <div className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${
                     isActive
-                      ? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] shadow-[0_0_20px_rgba(168,85,247,0.5)] scale-110 animate-elastic"
-                      : "bg-transparent hover:bg-[#0D0D0D]"
+                      ? "bg-gradient-to-r from-violet-600 to-pink-500 shadow-sm shadow-violet-500/20"
+                      : ""
                   }`}>
                     <item.icon className={`transition-all duration-200 ${
-                      isActive ? "text-white animate-bounce-icon icon-glow-purple" : "text-[#B3B3B3]"
+                      isActive ? "text-white" : "text-slate-400"
                     }`} style={{ width: '18px', height: '18px' }} />
                   </div>
-                  <span className={`text-[10px] font-semibold transition-colors duration-200 ${
-                    isActive ? "text-[#A855F7]" : "text-[#777777]"
+                  <span className={`text-[10px] font-medium transition-colors duration-200 ${
+                    isActive ? "text-slate-800" : "text-slate-400"
                   }`}>{item.label}</span>
-                  {isActive && (
-                    <div className="absolute -bottom-0.5 w-1.5 h-1.5 rounded-full bg-[#A855F7] animate-pulse-ring shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
-                  )}
                 </NavLink>
               );
             })}

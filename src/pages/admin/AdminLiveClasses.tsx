@@ -62,7 +62,7 @@ const AdminLiveClasses = () => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      <h2 className="text-xl font-bold">Live Classes</h2>
+      <h2 className="text-xl font-bold text-slate-800">Live Classes</h2>
       <Card className="p-4 bg-card border border-border shadow-sm space-y-3">
         <h3 className="font-semibold text-sm flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Schedule New Class</h3>
         <Input placeholder="Class title" value={title} onChange={(e) => setTitle(e.target.value)} />

@@ -28,7 +28,7 @@ const AdminDoubts = () => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      <h2 className="text-xl font-bold">Student Doubts</h2>
+      <h2 className="text-xl font-bold text-slate-800">Student Doubts</h2>
       <p className="text-muted-foreground text-sm">{pending.length} pending · {answered.length} answered</p>
       {pending.length > 0 && (
         <div>

@@ -23,6 +23,9 @@ const AdminDashboard = () => {
   const { data: profiles = [] } = useProfiles();
   const [studentProfiles, setStudentProfiles] = useState<any[]>([]);
 
+  // Get current teacher's profile
+  const myProfile = profiles.find((p: any) => p.user_id === user?.id);
+
   useEffect(() => {
     const fetchStudentProfiles = async () => {
       const { data: userRoles } = await supabase.from("user_roles").select("user_id, role");
@@ -55,7 +58,7 @@ const AdminDashboard = () => {
       <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground mb-1">Teacher Dashboard</h1>
+            <h1 className="text-2xl font-bold text-slate-800 mb-1">Teacher Dashboard</h1>
             <p className="text-muted-foreground">Manage your courses and track student progress</p>
           </div>
           <div>
@@ -69,26 +72,35 @@ const AdminDashboard = () => {
         <div className="flex flex-col sm:flex-row gap-6">
           <div className="flex-shrink-0">
             <div className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-primary/30 shadow-lg shadow-primary/20 mx-auto sm:mx-0">
-              <img src="/shivam-sir.jpg" alt="Shivam Sir" className="w-full h-full object-cover" loading="lazy" />
+              <img
+                src={myProfile?.avatar_url || "/shivam-sir.jpg"}
+                alt={myProfile?.name || "Teacher"}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => { (e.target as HTMLImageElement).src = "/shivam-sir.jpg"; }}
+              />
             </div>
           </div>
           <div className="flex-1 space-y-3">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                  Shivam Sir
+                <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                  {myProfile?.name || "Teacher"}
                   <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/20 text-primary">Faculty</span>
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">UPSC Expert & Course Instructor</p>
               </div>
-              <button className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
+              <button
+                onClick={() => navigate("/admin/profile")}
+                className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+              >
                 <Edit className="w-4 h-4 text-primary" />
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Mail className="w-4 h-4 text-primary icon-glow-purple" />
-                <span className="truncate">shivam@upscbynadia.com</span>
+                <span className="truncate">{myProfile?.email || user?.email || "teacher@upscbynadia.com"}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="w-4 h-4 text-primary icon-glow-purple" />

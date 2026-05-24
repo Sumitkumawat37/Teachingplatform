@@ -286,6 +286,19 @@ export function useSetUserRole() {
   });
 }
 
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, updates }: { userId: string; updates: { name?: string; email?: string; avatar_url?: string | null } }) => {
+      const { error } = await supabase.from("profiles").update(updates).eq("user_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["profiles"] });
+    },
+  });
+}
+
 export function useDeleteProfile() {
   const qc = useQueryClient();
   return useMutation({

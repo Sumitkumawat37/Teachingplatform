@@ -1,4 +1,4 @@
-import { Bell, GraduationCap, LogOut, User, Search } from "lucide-react";
+import { Bell, LogOut, User, Search } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate } from "react-router-dom";
 import { useAnnouncements } from "@/lib/supabase-data";
@@ -134,24 +134,21 @@ export function AppHeader() {
   }, [navigate]);
 
   return (
-    <header className="sticky top-0 z-30 bg-[#050505]/90 backdrop-blur-xl border-b border-[#A855F7]/20 shadow-[0_0_30px_rgba(168,85,247,0.1)]">
-      <div className="px-4 md:px-8 py-4">
+    <header className="sticky top-0 z-30 border-b border-black/[0.03]" style={{ background: 'rgba(247,246,250,0.78)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+      <div className="px-4 md:px-8 py-3">
         <div className="flex items-center justify-between">
           {/* Logo — mobile only (desktop uses sidebar) */}
           <div className="flex items-center gap-2.5 md:hidden">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#A855F7] to-[#EC4899] flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-              <GraduationCap className="w-5 h-5 text-white" />
-            </div>
             <div>
-              <h1 className="text-sm font-bold text-white leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                UPSC <span className="gradient-text">Nadiya</span>
+              <h1 className="text-sm font-semibold text-slate-800 leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                UPSC Nadiya
               </h1>
-              <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold ${
+              <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${
                 role === "super_admin"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  ? "bg-amber-50 text-amber-600"
                   : role === "admin"
-                  ? "bg-[#A855F7]/20 text-[#A855F7] border border-[#A855F7]/30"
-                  : "bg-[#EC4899]/20 text-[#EC4899] border border-[#EC4899]/30"
+                  ? "bg-violet-50 text-violet-600"
+                  : "bg-pink-50 text-pink-600"
               }`}>
                 {role === "super_admin" ? "Super Admin" : role === "admin" ? "Teacher" : "Student"}
               </div>
@@ -160,16 +157,16 @@ export function AppHeader() {
 
           {/* Desktop: search bar + greeting */}
           <div className="hidden md:flex items-center gap-4 flex-1">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#B3B3B3]" />
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search courses, lectures, notes..."
-                className="w-full pl-10 pr-4 py-2.5 bg-[#0D0D0D] border border-[#A855F7]/30 rounded-xl text-sm text-white placeholder-[#777777] focus:outline-none focus:ring-2 focus:ring-[#A855F7]/50 focus:bg-[#121212] focus:border-[#A855F7] transition-all shadow-[0_0_15px_rgba(168,85,247,0.1)]"
+                className="w-full pl-10 pr-4 py-2 bg-white/70 border border-slate-200/60 rounded-xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:bg-white focus:border-violet-300/60 transition-all"
               />
             </div>
-            <p className="text-sm font-semibold text-[#B3B3B3] whitespace-nowrap" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              Welcome back, <span className="gradient-text">{user?.name?.split(' ')[0] ?? 'there'}</span>
+            <p className="text-sm text-slate-500 whitespace-nowrap">
+              Welcome back, <span className="font-semibold text-slate-700">{user?.name?.split(' ')[0] ?? 'there'}</span>
             </p>
           </div>
 
@@ -178,11 +175,11 @@ export function AppHeader() {
             {/* Notifications */}
             <button
               onClick={handleBellClick}
-              className="relative w-10 h-10 rounded-xl bg-[#0D0D0D] hover:bg-[#121212] border border-[#A855F7]/20 hover:border-[#A855F7]/40 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_25px_rgba(168,85,247,0.2)]"
+              className="relative w-9 h-9 rounded-xl bg-white/70 hover:bg-white border border-slate-200/60 transition-all duration-200 flex items-center justify-center shadow-sm"
             >
-              <Bell className="w-5 h-5 text-[#B3B3B3]" />
+              <Bell className="w-[18px] h-[18px] text-slate-400" />
               {unread > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-gradient-to-r from-[#A855F7] to-[#EC4899] rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-[0_0_15px_rgba(168,85,247,0.5)] animate-pulse">
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-sm shadow-pink-400/25">
                   {unread > 9 ? "9+" : unread}
                 </span>
               )}
@@ -191,17 +188,17 @@ export function AppHeader() {
             {/* Profile — mobile only (sidebar handles it on desktop) */}
             <button
               onClick={handleProfileClick}
-              className="md:hidden w-10 h-10 rounded-xl bg-[#0D0D0D] hover:bg-[#121212] border border-[#A855F7]/20 hover:border-[#A855F7]/40 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_25px_rgba(168,85,247,0.2)]"
+              className="md:hidden w-9 h-9 rounded-xl bg-white/70 hover:bg-white border border-slate-200/60 transition-all duration-200 flex items-center justify-center shadow-sm"
             >
-              <User className="w-5 h-5 text-[#B3B3B3]" />
+              <User className="w-[18px] h-[18px] text-slate-500" />
             </button>
 
             {/* Logout — mobile only */}
             <button
               onClick={handleLogout}
-              className="md:hidden w-10 h-10 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.2)] hover:shadow-[0_0_25px_rgba(239,68,68,0.3)]"
+              className="md:hidden w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200/80 transition-all duration-200 flex items-center justify-center"
             >
-              <LogOut className="w-5 h-5 text-red-400" />
+              <LogOut className="w-[18px] h-[18px] text-red-500" />
             </button>
           </div>
         </div>

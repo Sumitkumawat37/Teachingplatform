@@ -38,6 +38,8 @@ const VideoPlayerPage = () => {
   const [showRecordingWarning, setShowRecordingWarning] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [autoNextEnabled, setAutoNextEnabled] = useState(true);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [ytPlaying, setYtPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const autoCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -45,8 +47,13 @@ const VideoPlayerPage = () => {
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const ytPlayerRef = useRef<any>(null);
 
-  const { isTabHidden, devToolsOpen, screenRecordingDetected } = useAntiPiracy({ enabled: true });
-  const isScreenProtected = useScreenProtection();
+  // Disabled anti-piracy hooks to prevent video pause issues
+  // const { isTabHidden, devToolsOpen, screenRecordingDetected } = useAntiPiracy({ enabled: true });
+  // const isScreenProtected = useScreenProtection();
+  const isTabHidden = false;
+  const devToolsOpen = false;
+  const screenRecordingDetected = false;
+  const isScreenProtected = false;
 
   // Re-arm blur protection each time user returns to the tab
   useEffect(() => {
@@ -109,36 +116,8 @@ const VideoPlayerPage = () => {
     return videoUrl;
   };
 
-  // Pause video when tab is hidden, resume when visible
-  useEffect(() => {
-    if (isTabHidden) {
-      // Pause uploaded video
-      if (hasUploadedVideo && !isDriveVideo && videoRef.current) {
-        setWasPlaying(!videoRef.current.paused);
-        videoRef.current.pause();
-      }
-      // Pause YouTube video
-      if (hasYoutubeVideo && iframeRef.current?.contentWindow) {
-        setWasPlaying(true);
-        iframeRef.current.contentWindow.postMessage(
-          JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
-          "*"
-        );
-      }
-    } else {
-      // Resume uploaded video if it was playing
-      if (hasUploadedVideo && !isDriveVideo && videoRef.current && wasPlaying) {
-        videoRef.current.play().catch(() => {});
-      }
-      // Resume YouTube video if it was playing
-      if (hasYoutubeVideo && iframeRef.current?.contentWindow && wasPlaying) {
-        iframeRef.current.contentWindow.postMessage(
-          JSON.stringify({ event: "command", func: "playVideo", args: [] }),
-          "*"
-        );
-      }
-    }
-  }, [isTabHidden, hasUploadedVideo, hasYoutubeVideo, hasDriveVideo, wasPlaying]);
+  // Video pause on tab switch disabled to prevent interference with video controls
+  // Video will continue playing even when tab is switched
 
   // Auto-complete when 80% watched
   const handleAutoComplete = useCallback(() => {
@@ -189,8 +168,12 @@ const VideoPlayerPage = () => {
     if (videoRef.current) {
       videoRef.current.playbackRate = speed;
     }
-    if (ytPlayerRef.current && hasYoutubeVideo) {
-      ytPlayerRef.current.setPlaybackRate(speed);
+    // YouTube playback speed via postMessage
+    if (hasYoutubeVideo && iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "setPlaybackRate", args: [speed] }),
+        "*"
+      );
     }
   };
 
@@ -213,12 +196,15 @@ const VideoPlayerPage = () => {
             handleAutoComplete();
           }
         }
-        // Detect when video starts playing for auto-fullscreen
-        if (data?.event === "onStateChange" && data?.info === 1 && !videoStarted) {
-          setVideoStarted(true);
-          // Request fullscreen when video starts
-          if (videoContainerRef.current && !isFullscreen) {
-            videoContainerRef.current.requestFullscreen?.().catch(() => {});
+        // Detect YouTube video state changes
+        if (data?.event === "onStateChange") {
+          const state = data?.info;
+          // YouTube player states: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
+          if (state === 1) {
+            setYtPlaying(true);
+            if (!videoStarted) setVideoStarted(true);
+          } else if (state === 2 || state === 0) {
+            setYtPlaying(false);
           }
         }
       } catch { /* ignore non-JSON messages */ }
@@ -242,24 +228,7 @@ const VideoPlayerPage = () => {
     };
   }, [hasYoutubeVideo, completed, handleAutoComplete, videoStarted, isFullscreen]);
 
-  // Auto-fullscreen for uploaded videos when they start playing
-  useEffect(() => {
-    if (!hasUploadedVideo) return;
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handlePlay = () => {
-      if (!videoStarted) {
-        setVideoStarted(true);
-        if (videoContainerRef.current && !isFullscreen) {
-          videoContainerRef.current.requestFullscreen?.().catch(() => {});
-        }
-      }
-    };
-
-    video.addEventListener("play", handlePlay);
-    return () => video.removeEventListener("play", handlePlay);
-  }, [hasUploadedVideo, videoStarted, isFullscreen]);
+  // Auto-fullscreen disabled to prevent interference with video playback
 
   // Format time as mm:ss
   const formatTime = (seconds: number) => {
@@ -282,17 +251,17 @@ const VideoPlayerPage = () => {
   if (!canAccess) {
     return (
       <div className="space-y-4 animate-slide-up">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
           <ChevronLeft className="w-4 h-4" /> Back to {course.title}
         </button>
-        <div className="glass-card rounded-3xl p-8 text-center neon-border">
-          <div className="w-16 h-16 rounded-2xl bg-rose-500/15 flex items-center justify-center mx-auto mb-4 border border-rose-500/20">
-            <Lock className="w-8 h-8 text-rose-400" />
+        <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-100">
+          <div className="w-16 h-16 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8 text-rose-500" />
           </div>
-          <h2 className="text-lg font-bold text-white">Lecture Locked</h2>
-          <p className="text-gray-400 text-sm mt-2">Purchase this course to unlock all lectures.</p>
+          <h2 className="text-lg font-semibold text-slate-800">Lecture Locked</h2>
+          <p className="text-slate-500 text-sm mt-2">Purchase this course to unlock all lectures.</p>
           <button
-            className="btn-action ripple mt-5 px-6 py-3 rounded-2xl text-sm font-bold"
+            className="bg-gradient-to-r from-violet-600 to-pink-500 text-white mt-5 px-6 py-3 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all"
             onClick={() => navigate(`/courses/${courseId}`)}
           >
             View Course →
@@ -351,11 +320,11 @@ const VideoPlayerPage = () => {
 
       {/* Back nav */}
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors press">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         {/* Protection indicator */}
-        <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-3 py-1.5 rounded-full border border-emerald-500/20">
+        <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-3 py-1.5 rounded-full border border-emerald-100">
           <ShieldCheck className="w-3 h-3" />
           Protected Content
         </div>
@@ -379,7 +348,7 @@ const VideoPlayerPage = () => {
         className={`relative overflow-hidden shadow-2xl transition-all duration-300 ${
           isFullscreen
             ? "fixed inset-0 z-50 rounded-none bg-black flex items-center justify-center"
-            : "rounded-3xl bg-black border border-purple-500/15 shadow-purple-900/30"
+            : "rounded-2xl bg-black border border-slate-200 shadow-sm"
         }`}
         data-protected
         onContextMenu={(e) => e.preventDefault()}
@@ -437,7 +406,7 @@ const VideoPlayerPage = () => {
                 allowFullScreen={false}
               />
               {/* Top overlay - gradient to hide YouTube header completely */}
-              <div className="absolute top-0 left-0 right-0 h-24 z-[5] pointer-events-auto" style={{ background: 'linear-gradient(to bottom, #000 80%, transparent)' }} />
+              <div className="absolute top-0 left-0 right-0 h-24 z-[5] pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000 80%, transparent)' }} />
               {/* Bottom overlay - gradient to hide YouTube footer */}
               <div className="absolute bottom-0 left-0 right-0 h-28 z-[5] pointer-events-none" style={{ background: 'linear-gradient(to top, #000 70%, transparent)' }} />
               {/* Bottom-right - blocks Watch on YouTube button */}
@@ -446,6 +415,25 @@ const VideoPlayerPage = () => {
               <div className="absolute top-0 right-0 w-24 h-20 bg-black z-[6] pointer-events-auto" />
               {/* Top-left - blocks YouTube logo completely */}
               <div className="absolute top-0 left-0 w-32 h-20 bg-black z-[6] pointer-events-auto" />
+              
+              {/* Custom Play Button Overlay - shows when YouTube video is paused */}
+              {!ytPlaying && (
+                <div className="absolute inset-0 z-[7] flex items-center justify-center pointer-events-auto bg-black/30">
+                  <button
+                    onClick={() => {
+                      if (iframeRef.current?.contentWindow) {
+                        iframeRef.current.contentWindow.postMessage(
+                          JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+                          "*"
+                        );
+                      }
+                    }}
+                    className="w-20 h-20 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center transition-transform hover:scale-110 shadow-lg"
+                  >
+                    <Play className="w-10 h-10 text-white ml-1" />
+                  </button>
+                </div>
+              )}
               {/* Additional overlay for YouTube title area */}
               <div className="absolute top-20 left-0 right-0 h-12 bg-black z-[6] pointer-events-auto" />
               
@@ -481,27 +469,36 @@ const VideoPlayerPage = () => {
         {(hasUploadedVideo || hasYoutubeVideo) && (
           <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-2">
             {/* Playback Speed Control */}
-            <div className="relative group">
-              <button className="bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors flex items-center gap-1">
+            <div className="relative">
+              <button 
+                onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                className="bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors flex items-center gap-1"
+              >
                 <FastForward className="w-4 h-4" />
                 <span className="text-xs font-bold">{playbackSpeed}x</span>
               </button>
-              <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-sm rounded-xl p-2 border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity min-w-[120px]">
-                <p className="text-[10px] text-gray-400 font-semibold mb-2 px-1">Playback Speed</p>
-                <div className="space-y-1">
-                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
-                    <button
-                      key={speed}
-                      onClick={() => handlePlaybackSpeedChange(speed)}
-                      className={`w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                        speed === playbackSpeed ? "bg-primary text-white" : "text-gray-300 hover:bg-white/10"
-                      }`}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
+              {showSpeedMenu && (
+                <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-sm rounded-xl p-2 border border-white/10 min-w-[120px]">
+                  <p className="text-[10px] text-gray-400 font-semibold mb-2 px-1">Playback Speed</p>
+                  <div className="space-y-1">
+                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                      <button
+                        key={speed}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlaybackSpeedChange(speed);
+                          setShowSpeedMenu(false);
+                        }}
+                        className={`w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          speed === playbackSpeed ? "bg-primary text-white" : "text-gray-300 hover:bg-white/10"
+                        }`}
+                      >
+                        {speed}x
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             
             {/* Auto-Next Toggle */}
@@ -536,11 +533,7 @@ const VideoPlayerPage = () => {
         {/* Anti-piracy Watermark */}
         <WatermarkOverlay visible={!isFullscreen} />
 
-        {/* Tab-switch blur overlay */}
-        <TabBlurOverlay
-          visible={(isTabHidden && !tabResumed) || isScreenProtected}
-          onResume={() => setTabResumed(true)}
-        />
+        {/* Tab-switch blur overlay disabled */}
 
         {/* Branding badge */}
         {!isFullscreen && (
@@ -563,23 +556,23 @@ const VideoPlayerPage = () => {
       </div>
 
       {/* Lecture info + complete */}
-      <div className="glass-card rounded-3xl p-4 neon-border">
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h2 className="text-base font-bold text-white leading-snug">{lecture.title}</h2>
-            <p className="text-gray-500 text-xs mt-0.5">{course.title}</p>
+            <h2 className="text-base font-semibold text-slate-800 leading-snug">{lecture.title}</h2>
+            <p className="text-slate-400 text-xs mt-0.5">{course.title}</p>
             {lecture.duration && (
               <p className="text-gray-500 text-[10px] mt-1">Duration: {lecture.duration}</p>
             )}
           </div>
           {completed ? (
-            <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-3 py-1.5 rounded-full border border-emerald-500/20 shrink-0">
+            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-semibold px-3 py-1.5 rounded-full border border-emerald-100 shrink-0">
               <CheckCircle className="w-3.5 h-3.5" /> Completed
             </div>
           ) : (
             <button
               onClick={handleMarkComplete}
-              className="flex items-center gap-1.5 btn-primary text-[10px] font-bold px-3 py-1.5 rounded-full shrink-0"
+              className="flex items-center gap-1.5 bg-violet-600 text-white text-[10px] font-semibold px-3 py-1.5 rounded-full shrink-0 shadow-sm hover:shadow-md transition-all"
             >
               <CheckCircle className="w-3.5 h-3.5" /> Mark Done
             </button>
@@ -592,22 +585,22 @@ const VideoPlayerPage = () => {
       {/* RIGHT COLUMN: doubts */}
       <div className="space-y-3 mt-4 md:mt-0">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
-            <MessageCircle className="w-3.5 h-3.5 text-white" />
+          <div className="w-7 h-7 rounded-lg bg-violet-100 flex items-center justify-center">
+            <MessageCircle className="w-3.5 h-3.5 text-violet-600" />
           </div>
-          <h3 className="font-bold text-sm text-white">Doubts & Discussion</h3>
+          <h3 className="font-semibold text-sm text-slate-800">Doubts & Discussion</h3>
         </div>
 
-        <div className="glass-card rounded-3xl p-4 neon-border">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
           <Textarea
             placeholder="Ask a doubt about this lecture..."
             value={newDoubt}
             onChange={(e) => setNewDoubt(e.target.value)}
             rows={2}
-            className="rounded-2xl border-purple-500/15 bg-white/5 text-white resize-none input-glow text-sm"
+            className="rounded-xl border-slate-200 bg-slate-50 text-slate-800 resize-none text-sm focus:border-violet-300 focus:ring-2 focus:ring-violet-500/20"
           />
           <button
-            className="btn-primary ripple w-full mt-3 py-2.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
+            className="w-full mt-3 py-2.5 rounded-xl text-sm font-semibold bg-violet-600 text-white shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
             onClick={handleSubmitDoubt}
           >
             <Send className="w-3.5 h-3.5" /> Submit Doubt
@@ -617,32 +610,32 @@ const VideoPlayerPage = () => {
         {lectureDoubts.length > 0 ? (
           <div className="space-y-2.5">
             {lectureDoubts.map((d) => (
-              <div key={d.id} className="glass-card rounded-2xl p-4 animate-slide-up neon-border">
+              <div key={d.id} className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                     {d.student_name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                   </div>
-                  <span className="text-xs font-semibold text-gray-300">{d.student_name}</span>
+                  <span className="text-xs font-semibold text-slate-600">{d.student_name}</span>
                   {d.reply ? (
-                    <span className="ml-auto bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">Answered</span>
+                    <span className="ml-auto bg-emerald-50 text-emerald-600 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-emerald-100">Answered</span>
                   ) : (
-                    <span className="ml-auto bg-amber-500/10 text-amber-400 text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-500/20">Pending</span>
+                    <span className="ml-auto bg-amber-50 text-amber-600 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-amber-100">Pending</span>
                   )}
                 </div>
-                <p className="text-sm text-gray-300">{d.question}</p>
+                <p className="text-sm text-slate-600">{d.question}</p>
                 {d.reply && (
-                  <div className="bg-purple-500/10 rounded-xl p-3 mt-2.5 border border-purple-500/15">
-                    <p className="text-[9px] font-bold text-purple-400 uppercase tracking-wide mb-1">Teacher's Reply</p>
-                    <p className="text-xs text-gray-400">{d.reply}</p>
+                  <div className="bg-violet-50 rounded-xl p-3 mt-2.5 border border-violet-100">
+                    <p className="text-[9px] font-semibold text-violet-600 uppercase tracking-wide mb-1">Teacher's Reply</p>
+                    <p className="text-xs text-slate-500">{d.reply}</p>
                   </div>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <div className="glass-card rounded-2xl p-6 text-center neon-border">
-            <MessageCircle className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-            <p className="text-gray-400 text-sm">No doubts yet. Be the first to ask!</p>
+          <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-slate-100">
+            <MessageCircle className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+            <p className="text-slate-400 text-sm">No doubts yet. Be the first to ask!</p>
           </div>
         )}
       </div>{/* end right column */}

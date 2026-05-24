@@ -16,19 +16,19 @@ const ResultsPage = () => {
 
   return (
     <div className="space-y-5 animate-slide-up" ref={scrollRef}>
-      <h2 className="text-xl font-bold animate-text-glow">Results & Analytics</h2>
+      <h2 className="text-xl font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Results & Analytics</h2>
 
-      <Card className="p-4 reveal spotlight-card">
-        <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-primary icon-glow-purple" /> Performance Overview
+      <Card className="p-5 border border-violet-100/40 shadow-sm rounded-2xl" style={{ background: '#F3EEFF' }}>
+        <h3 className="font-semibold text-sm mb-3 flex items-center gap-2 text-slate-800">
+          <TrendingUp className="w-4 h-4 text-violet-600" /> Performance Overview
         </h3>
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={chartData}>
               <XAxis dataKey="quiz" tick={{ fontSize: 11, fill: '#6b7280' }} axisLine={false} tickLine={false} />
               <YAxis hide domain={[0, 100]} />
-              <Tooltip contentStyle={{ background: '#1a1040', border: '1px solid rgba(168,85,247,0.2)', borderRadius: '0.75rem', color: '#e5e7eb' }} />
-              <Line type="monotone" dataKey="score" stroke="#a855f7" strokeWidth={2.5} dot={{ r: 4, fill: '#a855f7' }} />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.06)', color: '#334155' }} />
+              <Line type="monotone" dataKey="score" stroke="#8B5CF6" strokeWidth={2.5} dot={{ r: 4, fill: '#8B5CF6' }} />
             </LineChart>
           </ResponsiveContainer>
         ) : (
@@ -37,12 +37,12 @@ const ResultsPage = () => {
       </Card>
 
       <div>
-        <h3 className="font-bold text-base mb-3">Quiz History</h3>
+        <h3 className="font-semibold text-base text-slate-800 mb-3">Quiz History</h3>
         <div className="space-y-2">
           {attempts.map((attempt, i) => (
-            <Card key={attempt.id} className="p-3 flex items-center gap-3 reveal" style={{ transitionDelay: `${i * 30}ms` }}>
-              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center icon-glass">
-                <Trophy className="w-5 h-5 text-success icon-glow-purple" />
+            <Card key={attempt.id} className="p-3 flex items-center gap-3 bg-white border border-slate-100/60 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-emerald-500" />
               </div>
               <div className="flex-1">
                 <h4 className="font-medium text-sm">{(attempt as any).quizzes?.title || "Quiz"}</h4>

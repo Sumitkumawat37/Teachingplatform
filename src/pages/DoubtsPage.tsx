@@ -37,21 +37,21 @@ const DoubtsPage = () => {
 
   return (
     <div className="space-y-4 animate-slide-up" ref={scrollRef}>
-      <h2 className="text-xl font-bold animate-text-glow">My Doubts</h2>
+      <h2 className="text-xl font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>My Doubts</h2>
 
-      <Card className="p-4 space-y-3 reveal spotlight-card">
-        <h3 className="font-semibold text-sm flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-primary icon-glow-purple" /> Ask a Question
+      <Card className="p-4 space-y-3 border border-pink-100/40 shadow-sm rounded-2xl" style={{ background: '#FFEAF4' }}>
+        <h3 className="font-semibold text-sm flex items-center gap-2 text-slate-800">
+          <MessageCircle className="w-4 h-4 text-violet-600" /> Ask a Question
         </h3>
         <Textarea placeholder="Type your doubt or question here..." value={newDoubt} onChange={(e) => setNewDoubt(e.target.value)} rows={3} />
-        <Button className="w-full" onClick={handleSubmit}>
-          <Send className="w-4 h-4 mr-2 icon-glow-purple" /> Submit Doubt
+        <Button className="w-full rounded-xl" onClick={handleSubmit}>
+          <Send className="w-4 h-4 mr-2" /> Submit Doubt
         </Button>
       </Card>
 
       <div className="space-y-3">
         {doubts.map((d, i) => (
-          <Card key={d.id} className="p-4 reveal" style={{ transitionDelay: `${i * 35}ms` }}>
+          <Card key={d.id} className="p-4 bg-white border border-slate-100/60 shadow-sm rounded-2xl reveal hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ transitionDelay: `${i * 35}ms` }}>
             <div className="flex items-start gap-2 mb-2">
               <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                 {d.student_name.split(" ").map((n: string) => n[0]).join("")}

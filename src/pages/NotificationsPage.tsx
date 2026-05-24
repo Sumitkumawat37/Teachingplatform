@@ -14,7 +14,7 @@ const NotificationsPage = () => {
   return (
     <div className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Notifications</h2>
+        <h2 className="text-xl font-bold text-slate-800">Notifications</h2>
         <span className="text-xs text-muted-foreground">{announcements.length} total</span>
       </div>
       {announcements.length === 0 && (

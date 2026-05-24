@@ -54,7 +54,7 @@ const NotesPage = () => {
 
   return (
     <div className="space-y-4 animate-slide-up" ref={scrollRef}>
-      <h2 className="text-xl font-bold animate-text-glow">Study Material</h2>
+      <h2 className="text-xl font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Study Material</h2>
 
       <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
         <Button
@@ -84,12 +84,12 @@ const NotesPage = () => {
         {notes.map((note, i) => {
           const purchased = hasPurchased(note.course_id);
           return (
-            <Card key={note.id} className={`p-3 flex items-center gap-3 reveal spotlight-card ${!purchased ? "opacity-70" : ""}`} style={{ transitionDelay: `${i * 35}ms` }}>
-              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0 icon-glass">
+            <Card key={note.id} className={`p-3 flex items-center gap-3 bg-white border border-slate-100/60 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 ${!purchased ? "opacity-70" : ""}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${purchased ? "bg-rose-50" : "bg-slate-50"}`}>
                 {purchased ? (
-                  <FileText className="w-5 h-5 text-destructive icon-glow-purple" />
+                  <FileText className="w-5 h-5 text-rose-500" />
                 ) : (
-                  <Lock className="w-5 h-5 text-muted-foreground icon-glow-purple" />
+                  <Lock className="w-5 h-5 text-slate-400" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -101,11 +101,11 @@ const NotesPage = () => {
               </div>
               {purchased ? (
                 <Button size="sm" variant="ghost" className="shrink-0" onClick={() => setSelectedNote(note)}>
-                  <Download className="w-4 h-4 icon-glow-purple" />
+                  <Download className="w-4 h-4 text-slate-500" />
                 </Button>
               ) : (
-                <Badge variant="secondary" className="text-[10px]">
-                  <Lock className="w-2.5 h-2.5 mr-0.5 icon-glow-purple" /> Locked
+                <Badge variant="secondary" className="text-[10px] bg-slate-50 text-slate-500 border border-slate-100">
+                  <Lock className="w-2.5 h-2.5 mr-0.5" /> Locked
                 </Badge>
               )}
             </Card>
@@ -115,13 +115,13 @@ const NotesPage = () => {
 
       {selectedNote && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col animate-fade-in">
-          <div className="flex items-center justify-between p-3 md:p-4 bg-[#12122a] border-b border-purple-500/15 z-10 shrink-0">
-            <h3 className="font-semibold text-sm md:text-base truncate pr-4">{selectedNote.title}</h3>
+          <div className="flex items-center justify-between p-3 md:p-4 bg-white border-b border-slate-200 z-10 shrink-0">
+            <h3 className="font-semibold text-sm md:text-base text-slate-800 truncate pr-4">{selectedNote.title}</h3>
             <Button size="sm" variant="ghost" onClick={() => setSelectedNote(null)}>
-              <X className="w-5 h-5 icon-glow-purple" />
+              <X className="w-5 h-5 text-slate-500" />
             </Button>
           </div>
-          <div className="flex-1 overflow-hidden relative bg-[#0a0a1a]" style={{ minHeight: 'calc(100vh - 60px)' }}>
+          <div className="flex-1 overflow-hidden relative bg-slate-50" style={{ minHeight: 'calc(100vh - 60px)' }}>
             {(isTabBlurred || isScreenProtected) ? (
               <div className="absolute inset-0 bg-black flex items-center justify-center z-50">
                 <div className="text-center space-y-4 px-4">

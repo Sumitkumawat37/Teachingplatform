@@ -49,20 +49,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const u = session.user;
 
+    // Google OAuth users have name/avatar in user_metadata
+    const googleName = u.user_metadata?.full_name || u.user_metadata?.name || "";
+    const googleAvatar = u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
+
     // Parallel fetch — 2× faster than sequential
-    const [{ data: roleData }, { data: profile }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", u.id),
-      supabase.from("profiles").select("name").eq("user_id", u.id).single(),
-    ]);
+    let roleData: any[] = [];
+    let profile: any = null;
+    try {
+      const [roleRes, profileRes] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", u.id),
+        supabase.from("profiles").select("name,avatar_url").eq("user_id", u.id).maybeSingle(),
+      ]);
+      roleData = roleRes.data ?? [];
+      profile = profileRes.data;
+    } catch (err) {
+      console.error("Error fetching profile/role:", err);
+    }
+
+    // Auto-create profile for new users (e.g., Google OAuth first-timers)
+    if (!profile) {
+      const nameToUse = googleName || u.email?.split("@")[0] || "User";
+      try {
+        const { data: newProfile } = await supabase
+          .from("profiles")
+          .upsert({
+            user_id: u.id,
+            name: nameToUse,
+            email: u.email,
+            avatar_url: googleAvatar,
+          }, { onConflict: "user_id" })
+          .select("name,avatar_url")
+          .single();
+        profile = newProfile;
+      } catch (err) {
+        console.error("Error creating profile:", err);
+      }
+    }
+
+    // Auto-create role for new users
+    if (roleData.length === 0) {
+      try {
+        await supabase.from("user_roles").insert({ user_id: u.id, role: "student" });
+        roleData = [{ role: "student" }];
+      } catch (err) {
+        console.error("Error creating role:", err);
+      }
+    }
 
     const isAdmin = roleData?.some((r) => r.role === "admin") ?? false;
     const isSuperAdmin = SUPER_ADMIN_EMAILS.includes((u.email ?? "").toLowerCase());
     const role: Role = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : "student";
 
+    const displayName = profile?.name || googleName || u.email?.split("@")[0] || "User";
+
     setAuth({
       isLoggedIn: true,
       role,
-      user: { name: profile?.name || u.email?.split("@")[0] || "", email: u.email || "", id: u.id },
+      user: { name: displayName, email: u.email || "", id: u.id },
       loading: false,
     });
   };
@@ -167,19 +211,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Sign out immediately — user must verify email before logging in
     await supabase.auth.signOut();
 
-    // Send verification email via Vercel serverless function
-    try {
-      const res = await fetch('/api/email/send-verification', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, frontendUrl: window.location.origin }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("Verification email error:", err);
+    // Send verification email via Vercel serverless function (only on production)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      try {
+        const res = await fetch('/api/email/send-verification', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, frontendUrl: window.location.origin }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error("Verification email error:", err);
+        }
+      } catch (fetchErr) {
+        console.error("Could not reach email service:", fetchErr);
       }
-    } catch (fetchErr) {
-      console.error("Could not reach email service:", fetchErr);
     }
 
     return true;

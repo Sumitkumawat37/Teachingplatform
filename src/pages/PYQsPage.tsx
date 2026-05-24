@@ -242,7 +242,7 @@ const PYQsPage = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search PYQs…"
-                className="w-full bg-white/5 border border-purple-500/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500/30"
+                className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-700 focus:outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10"
               />
             </div>
 
@@ -252,9 +252,9 @@ const PYQsPage = () => {
               <select
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-2 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-sm text-slate-700 focus:outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10"
               >
-                {SUBJECTS.map((sub) => <option key={sub} value={sub} className="bg-neutral-900">{sub}</option>)}
+                {SUBJECTS.map((sub) => <option key={sub} value={sub} className="bg-white">{sub}</option>)}
               </select>
             </div>
 
@@ -264,9 +264,9 @@ const PYQsPage = () => {
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-2 py-2 text-sm text-white focus:outline-none"
+                className="w-full bg-white border border-slate-200 rounded-xl px-2 py-2 text-sm text-slate-700 focus:outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10"
               >
-                {YEARS.map((y) => <option key={y} value={y} className="bg-neutral-900">{y}</option>)}
+                {YEARS.map((y) => <option key={y} value={y} className="bg-white">{y}</option>)}
               </select>
             </div>
 

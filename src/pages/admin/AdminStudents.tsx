@@ -145,7 +145,7 @@ const AdminStudents = () => {
     <div className="space-y-6 animate-slide-up">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <UserCheck className="w-5 h-5 text-primary" />
             Student Management
           </h2>

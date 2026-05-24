@@ -55,35 +55,28 @@ const LoginPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#F7F7FA] flex flex-col md:flex-row">
 
       {/* LEFT: branding */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#A855F7]/80 via-[#1a1040] to-[#EC4899]/40 pt-14 pb-20 px-6 flex flex-col items-center md:w-1/2 md:min-h-screen md:pt-0 md:pb-0 md:items-start md:justify-center md:px-14 aurora-bg">
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#A855F7]/25 rounded-full blur-3xl animate-blob" />
-        <div className="absolute bottom-0 -left-10 w-40 h-40 bg-[#EC4899]/25 rounded-full blur-3xl animate-blob-2" />
-        <div className="absolute top-8 left-8 w-6 h-6 bg-purple-400/30 rounded-full animate-float" />
-        <div className="absolute top-12 right-20 w-4 h-4 bg-pink-400/50 rounded-full animate-float-reverse" />
-        <div className="hidden md:block absolute bottom-20 right-10 w-32 h-32 bg-purple-500/5 rounded-full animate-blob" />
-
-        <div className="relative z-10 flex flex-col items-center text-center md:items-start md:text-left animate-fade-in">
-          <div className="relative w-16 h-16 rounded-3xl bg-gradient-to-br from-[#A855F7] to-[#EC4899] border-4 border-[#A855F7]/40 flex items-center justify-center shadow-[0_0_40px_rgba(168,85,247,0.4)] mb-4 animate-float-slow animate-glow-breathe icon-container-glow">
-            <div className="absolute inset-0 rounded-3xl bg-white/10 animate-pulse" style={{ animationDuration: '3s' }} />
-            <GraduationCap className="w-8 h-8 text-white relative z-10 icon-glow-purple icon-animated-pulse" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-violet-600 via-violet-500 to-pink-500 pt-14 pb-20 px-6 flex flex-col items-center md:w-1/2 md:min-h-screen md:pt-0 md:pb-0 md:items-start md:justify-center md:px-14">
+        <div className="relative z-10 flex flex-col items-center text-center md:items-start md:text-left">
+          <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4">
+            <GraduationCap className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl md:text-4xl font-bold text-white leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            UPSC by <span className="text-shimmer">Nadiya Ma&apos;am</span>
+            UPSC by Nadiya Ma&apos;am
           </h1>
-          <p className="text-[#B3B3B3]/75 text-sm md:text-base mt-1.5 md:mt-3">Sign in to continue your UPSC prep</p>
+          <p className="text-violet-100 text-sm md:text-base mt-1.5 md:mt-3">Sign in to continue your UPSC prep</p>
 
           <div className="hidden md:flex flex-col gap-3 mt-10">
             {featureItems.map((f) => {
               const Icon = f.icon;
               return (
-                <div key={f.text} className="flex items-center gap-3 animate-slide-in-left" style={{ animationDelay: `${featureItems.indexOf(f) * 100}ms` }}>
-                  <div className="w-8 h-8 rounded-xl bg-[#A855F7]/20 border border-[#A855F7]/30 flex items-center justify-center shrink-0 hover-scale icon-glass shadow-[0_0_10px_rgba(168,85,247,0.15)]">
-                    <Icon className="w-4 h-4 text-white icon-glow-purple" />
+                <div key={f.text} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-[#B3B3B3]/90 text-sm font-medium">{f.text}</span>
+                  <span className="text-violet-100 text-sm font-medium">{f.text}</span>
                 </div>
               );
             })}
@@ -94,18 +87,18 @@ const LoginPage = () => {
       {/* RIGHT: form */}
       <div className="flex-1 flex items-start md:items-center justify-center px-4 pt-0 pb-8 md:py-0 -mt-8 md:mt-0 relative z-10">
         <div className="w-full max-w-sm">
-          <div className="bg-[#0D0D0D]/90 backdrop-blur-xl rounded-3xl shadow-[0_0_40px_rgba(168,85,247,0.3)] border border-[#A855F7]/30 p-5 animate-slide-in-bounce neon-border">
-            <div className="flex gap-1.5 bg-[#050505]/50 border border-[#A855F7]/20 p-1.5 rounded-2xl mb-5">
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-5">
+            <div className="flex gap-1.5 bg-slate-50 border border-slate-100 p-1.5 rounded-xl mb-5">
               {(['student', 'teacher', 'admin'] as const).map((r) => (
                 <button
                   key={r}
                   onClick={() => handleRoleSwitch(r)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ripple press ${
+                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     role === r
                       ? r === 'admin'
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_0_20px_rgba(245,158,11,0.4)] text-white scale-[1.02]'
-                        : 'bg-gradient-to-r from-[#A855F7] to-[#EC4899] shadow-[0_0_20px_rgba(168,85,247,0.4)] text-white scale-[1.02]'
-                      : 'text-[#777777] hover:text-[#B3B3B3]'
+                        ? 'bg-amber-500 text-white shadow-sm'
+                        : 'bg-violet-600 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-slate-600'
                   }`}
                 >
                   {r === 'student' ? 'Student' : r === 'teacher' ? 'Teacher' : 'Admin'}
@@ -115,47 +108,48 @@ const LoginPage = () => {
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-semibold text-[#777777] uppercase tracking-wide">Email</Label>
+                <Label htmlFor="email" className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="rounded-2xl border-[#A855F7]/20 bg-[#050505]/50 h-12 pl-4 text-white input-glow shadow-[0_0_10px_rgba(168,85,247,0.1)]"
+                  className="rounded-xl border-slate-200 bg-slate-50 h-12 pl-4 text-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/20"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-xs font-semibold text-[#777777] uppercase tracking-wide">Password</Label>
+                <Label htmlFor="password" className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Password</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="rounded-2xl border-[#A855F7]/20 bg-[#050505]/50 h-12 pl-4 pr-11 text-white input-glow shadow-[0_0_10px_rgba(168,85,247,0.1)]"
+                    className="rounded-xl border-slate-200 bg-slate-50 h-12 pl-4 pr-11 text-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/20"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#777777] hover:text-[#B3B3B3] transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4 icon-glow-purple" /> : <Eye className="w-4 h-4 icon-glow-purple" />}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="bg-[#A855F7]/10 rounded-2xl p-3 border border-[#A855F7]/20 shadow-[0_0_10px_rgba(168,85,247,0.1)]">
-                <p className="text-[10px] font-bold text-[#A855F7] mb-1 uppercase tracking-wide">Demo Credentials</p>
-                <p className="text-[10px] text-[#777777]">Student: student@demo.com / 123456</p>
-                <p className="text-[10px] text-[#777777]">Teacher: teacher@demo.com / 123456</p>
-                <p className="text-[10px] text-amber-400 font-semibold mt-0.5">Admin: superadmin@demo.com / 123456</p>
+              <div className="bg-violet-50 rounded-xl p-3 border border-violet-100">
+                <p className="text-[10px] font-bold text-violet-600 mb-1 uppercase tracking-wide">Demo Credentials</p>
+                <p className="text-[10px] text-slate-500">Student: student@demo.com / 123456</p>
+                <p className="text-[10px] text-slate-500">Teacher: teacher@demo.com / 123456</p>
+                <p className="text-[10px] text-amber-600 font-semibold mt-0.5">Admin: superadmin@demo.com / 123456</p>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary py-3.5 rounded-2xl text-sm ripple neon-glow disabled:opacity-70 magnetic-hover"
+                className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white py-3.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-70"
+                style={{ boxShadow: '0 10px 24px rgba(139,92,246,0.18)' }}
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -169,7 +163,7 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/forgot-password")}
-                  className="text-[#A855F7] text-xs font-semibold hover:underline"
+                  className="text-violet-600 text-xs font-semibold hover:underline"
                 >
                   Forgot Password?
                 </button>
@@ -177,10 +171,10 @@ const LoginPage = () => {
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-[#A855F7]/20" />
+                  <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-2 bg-[#0D0D0D] text-[#777777]">Or continue with</span>
+                  <span className="px-2 bg-white text-slate-400">Or continue with</span>
                 </div>
               </div>
 
@@ -188,7 +182,7 @@ const LoginPage = () => {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-white hover:bg-white/90 text-gray-900 py-3 rounded-2xl text-sm font-semibold transition-all disabled:opacity-70"
+                className="w-full flex items-center justify-center gap-3 bg-slate-50 hover:bg-slate-100 text-slate-700 py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-70 border border-slate-200"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -201,18 +195,18 @@ const LoginPage = () => {
             </form>
           </div>
 
-          <p className="text-center text-sm text-[#777777] mt-5">
+          <p className="text-center text-sm text-slate-500 mt-5">
             Don&apos;t have an account?{' '}
-            <Link to="/signup" className="text-[#A855F7] font-bold hover:underline">Sign Up</Link>
+            <Link to="/signup" className="text-violet-600 font-semibold hover:underline">Sign Up</Link>
           </p>
 
-          <div className="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-[#A855F7]/20">
+          <div className="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-slate-200">
             {proofItems.map((b) => {
               const Icon = b.icon;
               return (
-                <div key={b.label} className="flex flex-col items-center gap-0.5 stat-counter hover-scale">
-                  <Icon className={`w-4 h-4 ${b.color} icon-glow-purple`} />
-                  <span className="text-[9px] font-bold text-[#777777] whitespace-nowrap">{b.label}</span>
+                <div key={b.label} className="flex flex-col items-center gap-0.5">
+                  <Icon className={`w-4 h-4 ${b.color}`} />
+                  <span className="text-[9px] font-semibold text-slate-400 whitespace-nowrap">{b.label}</span>
                 </div>
               );
             })}

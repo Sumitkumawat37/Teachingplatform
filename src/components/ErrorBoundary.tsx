@@ -33,8 +33,8 @@ class ErrorBoundary extends Component<Props, State> {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#050505',
-          color: 'white',
+          backgroundColor: '#F7F7FA',
+          color: '#1e293b',
           padding: '20px',
           textAlign: 'center'
         }}>
@@ -46,7 +46,7 @@ class ErrorBoundary extends Component<Props, State> {
             onClick={() => window.location.reload()}
             style={{
               padding: '12px 24px',
-              backgroundColor: '#A855F7',
+              backgroundColor: '#8B5CF6',
               color: 'white',
               border: 'none',
               borderRadius: '8px',

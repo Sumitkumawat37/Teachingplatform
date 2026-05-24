@@ -54,54 +54,53 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a1a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F7F7FA] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <button
           onClick={() => navigate("/login")}
-          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-6"
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Login
         </button>
 
-        <div className="bg-[#12122a]/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-purple-900/30 border border-purple-500/15 p-6 animate-slide-in-bounce">
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
           <div className="flex flex-col items-center mb-6">
-            <div className="relative w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 border-4 border-purple-400/40 flex items-center justify-center shadow-2xl shadow-purple-500/30 mb-4 animate-float-slow animate-glow-breathe">
-              <div className="absolute inset-0 rounded-3xl bg-white/10 animate-pulse" style={{ animationDuration: '3s' }} />
-              <Lock className="w-8 h-8 text-white relative z-10 icon-glow-purple" />
+            <div className="w-14 h-14 rounded-2xl bg-violet-100 flex items-center justify-center mb-4">
+              <Lock className="w-7 h-7 text-violet-600" />
             </div>
-            <h1 className="text-xl font-bold text-white">Reset Password</h1>
-            <p className="text-gray-400 text-sm mt-2 text-center">Enter your new password below</p>
+            <h1 className="text-xl font-bold text-slate-800">Reset Password</h1>
+            <p className="text-slate-500 text-sm mt-2 text-center">Enter your new password below</p>
           </div>
 
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="newPassword" className="text-xs font-semibold text-gray-400 uppercase tracking-wide">New Password</Label>
+              <Label htmlFor="newPassword" className="text-xs font-semibold text-slate-500 uppercase tracking-wide">New Password</Label>
               <Input
                 id="newPassword"
                 type="password"
                 placeholder="Min. 6 characters"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="rounded-2xl border-purple-500/15 bg-white/5 h-12 pl-4 text-white input-glow"
+                className="rounded-xl border-slate-200 bg-slate-50 h-12 pl-4 text-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/20"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 placeholder="Re-enter password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="rounded-2xl border-purple-500/15 bg-white/5 h-12 pl-4 text-white input-glow"
+                className="rounded-xl border-slate-200 bg-slate-50 h-12 pl-4 text-slate-800 focus:border-violet-300 focus:ring-2 focus:ring-violet-500/20"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary py-3.5 rounded-2xl text-sm mt-2 ripple neon-glow disabled:opacity-70 magnetic-hover"
+              className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white py-3.5 rounded-xl text-sm font-semibold mt-2 shadow-sm hover:shadow-md transition-all disabled:opacity-70"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -112,8 +111,8 @@ const ResetPasswordPage = () => {
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-purple-500/10">
-            <p className="text-center text-xs text-gray-500">
+          <div className="mt-6 pt-4 border-t border-slate-100">
+            <p className="text-center text-xs text-slate-400">
               Your password has been reset. You can now log in with your new password.
             </p>
           </div>

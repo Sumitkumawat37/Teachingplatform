@@ -26,7 +26,7 @@ const QuizzesPage = () => {
 
   return (
     <div className="space-y-4 animate-slide-up" ref={scrollRef}>
-      <h2 className="text-xl font-bold animate-text-glow">Quizzes & Tests</h2>
+      <h2 className="text-xl font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Quizzes & Tests</h2>
 
       <div className="space-y-3">
         {quizzes.map((quiz, i) => {
@@ -34,43 +34,42 @@ const QuizzesPage = () => {
           return (
             <Card
               key={quiz.id}
-              className={`p-4 transition-all reveal spotlight-card ${
-                purchased && quiz.status === "available" ? "cursor-pointer hover:card-shadow-lg hover:scale-[1.01] active:scale-[0.99]" : ""
+              className={`p-4 transition-all duration-250 bg-white border border-slate-100/60 shadow-sm rounded-2xl ${
+                purchased && quiz.status === "available" ? "cursor-pointer hover:shadow-md hover:-translate-y-0.5" : ""
               } ${!purchased ? "opacity-70" : ""}`}
               onClick={() => handleQuizClick(quiz)}
-              style={{ transitionDelay: `${i * 40}ms` }}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  !purchased ? "bg-muted" :
-                  quiz.status === "available" ? "bg-warning/10" : "bg-muted"
-                } icon-glass`}>
+                  !purchased ? "bg-slate-50" :
+                  quiz.status === "available" ? "bg-amber-50" : "bg-slate-50"
+                }`}>
                   {!purchased ? (
-                    <Lock className="w-5 h-5 text-muted-foreground icon-glow-purple" />
+                    <Lock className="w-5 h-5 text-slate-400" />
                   ) : quiz.status === "available" ? (
-                    <Trophy className="w-5 h-5 text-warning icon-glow-purple" />
+                    <Trophy className="w-5 h-5 text-amber-500" />
                   ) : (
-                    <Lock className="w-5 h-5 text-muted-foreground icon-glow-purple" />
+                    <Lock className="w-5 h-5 text-slate-400" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-sm">{quiz.title}</h4>
-                  <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                  <h4 className="font-semibold text-sm text-slate-800">{quiz.title}</h4>
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
                     <span>{(quiz as any).courses?.title}</span>
                     <span>·</span>
-                    <span className="flex items-center gap-0.5"><Clock className="w-3 h-3 icon-glow-purple" /> {quiz.duration}</span>
+                    <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" /> {quiz.duration}</span>
                   </div>
                   {!purchased && (
-                    <p className="text-[10px] text-destructive mt-0.5">Purchase course to access</p>
+                    <p className="text-[10px] text-red-500 mt-0.5">Purchase course to access</p>
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {purchased && quiz.status === "available" && (
-                    <Badge className="bg-warning/10 text-warning border-0">Start</Badge>
+                    <Badge className="bg-amber-50 text-amber-600 border border-amber-100">Start</Badge>
                   )}
                   {quiz.status === "upcoming" && <Badge variant="secondary">Upcoming</Badge>}
-                  {!purchased && <Lock className="w-4 h-4 text-muted-foreground" />}
-                  {purchased && quiz.status === "available" && <ChevronRight className="w-4 h-4 text-muted-foreground icon-glow-purple" />}
+                  {!purchased && <Lock className="w-4 h-4 text-slate-400" />}
+                  {purchased && quiz.status === "available" && <ChevronRight className="w-4 h-4 text-slate-400" />}
                 </div>
               </div>
             </Card>

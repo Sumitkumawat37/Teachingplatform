@@ -40,69 +40,66 @@ const CoursesPage = memo(() => {
   const scrollRef = useScrollReveal();
 
   return (
-    <div className="space-y-4 animate-slide-up" ref={scrollRef}>
+    <div className="space-y-5" ref={scrollRef}>
       {/* Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#A855F7]/80 via-[#1a1040] to-[#EC4899]/40 p-4 shadow-[0_0_30px_rgba(168,85,247,0.3)] neon-border animate-glow-breathe">
-        <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#A855F7]/20 rounded-full blur-2xl animate-float" />
-        <div className="absolute bottom-0 left-8 w-12 h-12 bg-[#EC4899]/20 rounded-full blur-xl animate-float-reverse" />
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#A855F7]/20 backdrop-blur-sm flex items-center justify-center border border-[#A855F7]/40 shadow-[0_0_15px_rgba(168,85,247,0.2)] animate-float-slow icon-glass">
-            <BookOpen className="w-5 h-5 text-white icon-glow-purple icon-animated-bounce" />
+      <div className="rounded-2xl p-5 border border-violet-100/40" style={{ background: 'linear-gradient(135deg, #F3EEFF 0%, #EAF6FF 100%)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white/70 flex items-center justify-center shadow-sm">
+            <BookOpen className="w-5 h-5 text-violet-600" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Course Marketplace</h2>
-            <p className="text-[#B3B3B3]/70 text-[10px]">Tap any course · 2 free lectures included</p>
+            <h2 className="text-lg font-semibold text-slate-800">Course Marketplace</h2>
+            <p className="text-slate-500 text-xs">Tap any course · 2 free lectures included</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger-fast">
-        {courses.map((course, i) => {
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {courses.map((course) => {
           const purchased = hasPurchased(course.id);
           return (
             <div
               key={course.id}
-              className="reveal-scale overflow-hidden cursor-pointer flex flex-col rounded-3xl glass-card card-interactive tilt-hover neon-border spotlight-card"
+              className="overflow-hidden cursor-pointer flex flex-col rounded-2xl bg-white shadow-sm border border-slate-100/60 hover:shadow-md hover:-translate-y-1 transition-all duration-250"
               onClick={() => navigate(`/courses/${course.id}`)}
-              style={{ transitionDelay: `${i * 35}ms` }}
             >
               {/* Square thumbnail */}
-              <div className="relative aspect-square w-full overflow-hidden rounded-t-3xl bg-[#0D0D0D]">
+              <div className="relative aspect-square w-full overflow-hidden rounded-t-2xl bg-slate-50">
                 {course.thumbnail_url ? (
                   <img
                     src={course.thumbnail_url}
                     alt={course.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-item:hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-[#A855F7]/60 to-[#EC4899]/40 opacity-90 animate-float-slow">
+                  <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-violet-100 to-pink-100">
                     <span>{course.thumbnail_emoji || "📚"}</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
                 {/* Status badge */}
                 {purchased ? (
-                  <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-lg animate-pop-in">
-                    <CheckCircle2 className="w-2.5 h-2.5 icon-glow-purple" /> ENROLLED
+                  <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                    <CheckCircle2 className="w-2.5 h-2.5" /> ENROLLED
                   </div>
                 ) : (
-                  <div className="absolute top-2 right-2 bg-[#0D0D0D]/50 backdrop-blur-sm text-[#B3B3B3] text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm border border-[#A855F7]/20">
-                    <Eye className="w-2.5 h-2.5 icon-glow-purple" /> 2 FREE
+                  <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-slate-600 text-[9px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                    <Eye className="w-2.5 h-2.5" /> 2 FREE
                   </div>
                 )}
 
                 {/* Category */}
                 {course.category && (
-                  <div className="absolute top-2 left-2 gradient-hero text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-md">
+                  <div className="absolute top-2 left-2 bg-violet-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                     {course.category}
                   </div>
                 )}
 
                 {/* Title overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                  <h3 className="font-bold text-xs text-white line-clamp-2 leading-tight">
+                  <h3 className="font-semibold text-xs text-white line-clamp-2 leading-tight">
                     {course.title}
                   </h3>
                 </div>
@@ -112,22 +109,22 @@ const CoursesPage = memo(() => {
               <div className="p-3 flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   {!purchased ? (
-                    <p className="text-sm font-bold text-[#A855F7]">₹{course.price}</p>
+                    <p className="text-sm font-bold text-violet-600">₹{course.price}</p>
                   ) : (
-                    <p className="text-[10px] text-emerald-400 font-bold">▶ Continue</p>
+                    <p className="text-[10px] text-emerald-600 font-semibold">▶ Continue</p>
                   )}
-                  <p className="text-[10px] text-[#777777] truncate">{course.instructor}</p>
+                  <p className="text-[10px] text-slate-400 truncate">{course.instructor}</p>
                 </div>
                 {!purchased ? (
                   <button
-                    className="w-8 h-8 rounded-xl bg-gradient-to-r from-[#A855F7] to-[#EC4899] flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.4)] hover-scale ripple shrink-0"
+                    className="w-8 h-8 rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow shrink-0"
                     onClick={(e) => handleBuyCourse(e, course.id)}
                   >
-                    <ShoppingCart className="w-3.5 h-3.5 text-white icon-glow-purple" />
+                    <ShoppingCart className="w-3.5 h-3.5 text-white" />
                   </button>
                 ) : (
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0 border border-emerald-500/20 icon-glass">
-                    <Lock className="w-3.5 h-3.5 text-emerald-400 icon-glow-purple" />
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                    <Lock className="w-3.5 h-3.5 text-emerald-500" />
                   </div>
                 )}
               </div>
@@ -137,7 +134,7 @@ const CoursesPage = memo(() => {
       </div>
 
       {courses.length === 0 && (
-        <div className="p-8 text-center glass-card rounded-3xl neon-border text-[#777777] text-sm">
+        <div className="p-8 text-center bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500 text-sm">
           No courses yet. Check back soon!
         </div>
       )}

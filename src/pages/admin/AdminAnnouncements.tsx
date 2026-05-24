@@ -37,7 +37,7 @@ const AdminAnnouncements = () => {
 
   return (
     <div className="space-y-6 animate-slide-up">
-      <h2 className="text-xl font-bold">Announcements</h2>
+      <h2 className="text-xl font-bold text-slate-800">Announcements</h2>
       <Card className="p-4 bg-card border border-border shadow-sm space-y-3">
         <h3 className="font-semibold text-sm flex items-center gap-2">
           <Megaphone className="w-4 h-4 text-primary" /> Send to all students

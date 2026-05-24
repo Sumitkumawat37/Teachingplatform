@@ -59,7 +59,7 @@ const AdminQuizzes = () => {
   return (
     <div className="space-y-6 animate-slide-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Quiz Management</h2>
+        <h2 className="text-xl font-bold text-slate-800">Quiz Management</h2>
       </div>
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogTrigger asChild><Button className="w-full"><Plus className="w-4 h-4 mr-2" /> Create New Quiz</Button></DialogTrigger>

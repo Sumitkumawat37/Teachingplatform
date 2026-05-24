@@ -228,7 +228,7 @@ const PersonalNotesPage = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-sm text-gray-300 leading-relaxed font-mono whitespace-pre-line bg-neutral-900/40 p-4 rounded-xl border border-white/5">{activeNote.content}</p>
+              <p className="text-sm text-slate-600 leading-relaxed font-mono whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">{activeNote.content}</p>
               <div className="flex gap-2">
                 <Button onClick={() => { setEditContent(activeNote.content); setIsEditing(true); }} size="sm" variant="ghost">
                   <Edit className="w-4 h-4 mr-2" /> Edit Note
@@ -251,11 +251,11 @@ const PersonalNotesPage = () => {
                 <select
                   value={selectedLectureId}
                   onChange={(e) => setSelectedLectureId(e.target.value)}
-                  className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-500/10"
                 >
-                  <option value="" className="bg-neutral-900">Choose a lecture...</option>
+                  <option value="" className="bg-white">Choose a lecture...</option>
                   {lectures.map((lec) => (
-                    <option key={lec.id} value={lec.id} className="bg-neutral-900">{lec.title}</option>
+                    <option key={lec.id} value={lec.id} className="bg-white">{lec.title}</option>
                   ))}
                 </select>
               </div>

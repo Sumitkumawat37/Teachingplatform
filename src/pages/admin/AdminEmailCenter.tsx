@@ -51,7 +51,7 @@ const AdminEmailCenter = () => {
             <Mail className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Email Center</h1>
+            <h1 className="text-xl font-bold text-slate-800">Email Center</h1>
             <p className="text-muted-foreground text-sm">Send, schedule and track emails to your students</p>
           </div>
         </div>

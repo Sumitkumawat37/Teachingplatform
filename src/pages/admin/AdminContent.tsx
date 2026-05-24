@@ -250,7 +250,7 @@ const AdminContent = () => {
   return (
     <div className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Content Management</h2>
+        <h2 className="text-xl font-bold text-slate-800">Content Management</h2>
       </div>
       <Tabs defaultValue="courses">
         <TabsList className="w-full">
@@ -264,7 +264,7 @@ const AdminContent = () => {
           <div className="flex gap-2">
             <Dialog open={showCourseForm} onOpenChange={setShowCourseForm}>
               <DialogTrigger asChild><Button className="flex-1"><Plus className="w-4 h-4 mr-2" /> New Course</Button></DialogTrigger>
-              <DialogContent>
+              <DialogContent className="overflow-y-auto max-h-[85vh]">
                 <DialogHeader><DialogTitle>Create New Course</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <div className="space-y-1"><Label className="text-xs">Course Title *</Label><Input placeholder="e.g. Advanced Mathematics" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} /></div>
@@ -305,7 +305,7 @@ const AdminContent = () => {
             </Dialog>
             <Dialog open={showChapterForm} onOpenChange={setShowChapterForm}>
               <DialogTrigger asChild><Button variant="secondary"><FolderPlus className="w-4 h-4 mr-2" /> Chapter</Button></DialogTrigger>
-              <DialogContent>
+              <DialogContent className="overflow-y-auto max-h-[85vh]">
                 <DialogHeader><DialogTitle>Add Chapter</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <div className="space-y-1">
@@ -361,7 +361,7 @@ const AdminContent = () => {
         <TabsContent value="videos" className="space-y-3 mt-3">
           <Dialog open={showLectureForm} onOpenChange={setShowLectureForm}>
             <DialogTrigger asChild><Button className="w-full"><Upload className="w-4 h-4 mr-2" /> Add Video Lecture</Button></DialogTrigger>
-            <DialogContent>
+            <DialogContent className="overflow-y-auto max-h-[85vh]">
               <DialogHeader><DialogTitle>Add Video Lecture</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div className="space-y-1">
@@ -493,7 +493,7 @@ const AdminContent = () => {
         <TabsContent value="notes" className="space-y-3 mt-3">
           <Dialog open={showNoteForm} onOpenChange={setShowNoteForm}>
             <DialogTrigger asChild><Button className="w-full"><Upload className="w-4 h-4 mr-2" /> Upload Study Material</Button></DialogTrigger>
-            <DialogContent>
+            <DialogContent className="overflow-y-auto max-h-[85vh]">
               <DialogHeader><DialogTitle>Upload Notes / PDF</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 <div className="space-y-1">
@@ -537,7 +537,7 @@ const AdminContent = () => {
           
           {/* Drive File Picker Dialog */}
           <Dialog open={showDrivePicker} onOpenChange={setShowDrivePicker}>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl overflow-y-auto max-h-[85vh]">
               <DialogHeader>
                 <DialogTitle>Select from Google Drive</DialogTitle>
               </DialogHeader>

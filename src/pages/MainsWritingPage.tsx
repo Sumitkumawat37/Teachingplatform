@@ -129,7 +129,7 @@ const MainsWritingPage = () => {
           <div className="lg:col-span-2 space-y-4">
             <Card className="p-5 bg-card border border-border space-y-3">
               <h3 className="font-bold text-base text-purple-300">{activeQuestion.title}</h3>
-              <p className="text-sm text-foreground leading-relaxed font-mono whitespace-pre-line bg-neutral-900/40 p-4 rounded-xl border border-white/5">{activeQuestion.question}</p>
+              <p className="text-sm text-slate-600 leading-relaxed font-mono whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">{activeQuestion.question}</p>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <span>Word Limit: <strong>{activeQuestion.word_limit} words</strong></span>
                 <span>Max Marks: <strong>{activeQuestion.max_marks} marks</strong></span>

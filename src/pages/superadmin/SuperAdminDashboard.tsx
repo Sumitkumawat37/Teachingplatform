@@ -39,14 +39,14 @@ const SuperAdminDashboard = () => {
   ];
 
   const quickActions = [
-    { label: "User Management",  desc: "Add / promote / remove users",   icon: UserCog,       path: "/superadmin/users",        bg: "bg-amber-500/10",  iconBg: "bg-amber-500/20 text-amber-400",   border: "border-amber-500/15" },
-    { label: "Content",          desc: "Courses, chapters & lectures",    icon: BookOpen,      path: "/admin/content",           bg: "bg-purple-500/10",    iconBg: "bg-purple-500/20 text-purple-400",       border: "border-purple-500/15" },
-    { label: "Students",         desc: "View all registered students",    icon: GraduationCap, path: "/admin/students",          bg: "bg-emerald-500/10",iconBg: "bg-emerald-500/20 text-emerald-400",border: "border-emerald-500/15" },
-    { label: "Quizzes",          desc: "Create & manage quiz tests",      icon: Trophy,        path: "/admin/quizzes",           bg: "bg-violet-500/10", iconBg: "bg-violet-500/20 text-violet-400", border: "border-violet-500/15" },
-    { label: "Announcements",    desc: "Post updates & notices",          icon: Megaphone,     path: "/admin/announcements",     bg: "bg-rose-500/10",   iconBg: "bg-rose-500/20 text-rose-400",     border: "border-rose-500/15" },
-    { label: "Doubts",           desc: "Review & reply to queries",       icon: MessageCircle, path: "/admin/doubts",            bg: "bg-cyan-500/10",   iconBg: "bg-cyan-500/20 text-cyan-400",     border: "border-cyan-500/15" },
-    { label: "Live Classes",     desc: "Schedule & manage live sessions", icon: Activity,      path: "/admin/live",              bg: "bg-pink-500/10",   iconBg: "bg-pink-500/20 text-pink-400",     border: "border-pink-500/15" },
-    { label: "Course Access",    desc: "Grant / revoke course access",    icon: Lock,          path: "/admin/access",            bg: "bg-indigo-500/10", iconBg: "bg-indigo-500/20 text-indigo-400", border: "border-indigo-500/15" },
+    { label: "User Management",  desc: "Add / promote / remove users",   icon: UserCog,       path: "/superadmin/users",        from: "from-amber-400",  to: "to-orange-500" },
+    { label: "Content",          desc: "Courses, chapters & lectures",    icon: BookOpen,      path: "/admin/content",           from: "from-violet-400", to: "to-purple-500" },
+    { label: "Students",         desc: "View all registered students",    icon: GraduationCap, path: "/admin/students",          from: "from-emerald-400",to: "to-teal-500" },
+    { label: "Quizzes",          desc: "Create & manage quiz tests",      icon: Trophy,        path: "/admin/quizzes",           from: "from-yellow-400", to: "to-amber-500" },
+    { label: "Announcements",    desc: "Post updates & notices",          icon: Megaphone,     path: "/admin/announcements",     from: "from-rose-400",   to: "to-pink-500" },
+    { label: "Doubts",           desc: "Review & reply to queries",       icon: MessageCircle, path: "/admin/doubts",            from: "from-sky-400",   to: "to-cyan-500" },
+    { label: "Live Classes",     desc: "Schedule & manage live sessions", icon: Activity,      path: "/admin/live",              from: "from-pink-400",   to: "to-rose-500" },
+    { label: "Course Access",    desc: "Grant / revoke course access",    icon: Lock,          path: "/admin/access",            from: "from-indigo-400", to: "to-blue-500" },
   ];
 
   const recentUsers = [...profiles].slice(0, 6);
@@ -127,13 +127,13 @@ const SuperAdminDashboard = () => {
               <button
                 key={a.label}
                 onClick={() => navigate(a.path)}
-                className={`${a.bg} rounded-2xl p-3.5 text-left border ${a.border} hover:shadow-md transition-all active:scale-95 group`}
+                className="relative overflow-hidden rounded-2xl p-4 text-left bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg hover:shadow-purple-500/10 transition-all active:scale-95 group"
               >
-                <div className={`w-9 h-9 rounded-xl ${a.iconBg} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-4 h-4" />
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${a.from} ${a.to} flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-xs font-bold text-white">{a.label}</p>
-                <p className="text-[9px] text-gray-500 mt-0.5 leading-tight">{a.desc}</p>
+                <p className="text-sm font-bold text-slate-800 group-hover:text-purple-600 transition-colors">{a.label}</p>
+                <p className="text-[10px] text-slate-500 mt-1 leading-tight">{a.desc}</p>
               </button>
             );
           })}
