@@ -284,6 +284,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async (): Promise<boolean> => {
     try {
+      // Sign out any existing session to ensure clean login
+      await supabase.auth.signOut();
+      
       const redirectUrl = 'https://teachingplatform-main-np4l0ngu9.vercel.app/?action=signin';
       console.log('Google Sign In redirect URL:', redirectUrl);
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -310,6 +313,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUpWithGoogle = async (): Promise<boolean> => {
     try {
+      // Sign out any existing session to ensure clean signup
+      await supabase.auth.signOut();
+      
       const redirectUrl = 'https://teachingplatform-main-np4l0ngu9.vercel.app/?action=signup';
       console.log('Google Sign Up redirect URL:', redirectUrl);
       const { data, error } = await supabase.auth.signInWithOAuth({
