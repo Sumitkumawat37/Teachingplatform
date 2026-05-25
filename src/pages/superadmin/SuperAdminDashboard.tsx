@@ -99,11 +99,11 @@ const SuperAdminDashboard = () => {
 
       {/* Stats grid */}
       <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-        {stats.map((s) => {
+        {stats.map((s, index) => {
           const Icon = s.icon;
           return (
             <button
-              key={s.label}
+              key={`stat-${index}`}
               onClick={() => navigate(s.to_path)}
               className="glass-card rounded-2xl p-3 text-center neon-border hover:shadow-lg hover:shadow-purple-500/10 transition-all active:scale-95 group"
             >
@@ -121,11 +121,11 @@ const SuperAdminDashboard = () => {
       <div>
         <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-0.5">Quick Actions</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {quickActions.map((a) => {
+          {quickActions.map((a, index) => {
             const Icon = a.icon;
             return (
               <button
-                key={a.label}
+                key={`action-${index}`}
                 onClick={() => navigate(a.path)}
                 className="relative overflow-hidden rounded-2xl p-4 text-left bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-lg hover:shadow-purple-500/10 transition-all active:scale-95 group"
               >
@@ -157,7 +157,7 @@ const SuperAdminDashboard = () => {
             const initials = (p.name ?? p.email ?? "U").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
             return (
               <div
-                key={p.id}
+                key={`recent-${p.id || i}`}
                 className="glass-card rounded-2xl px-3.5 py-2.5 flex items-center gap-3 animate-slide-up neon-border"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
