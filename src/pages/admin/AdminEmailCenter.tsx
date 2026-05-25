@@ -171,7 +171,7 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
             <input value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Search name or email…"
-              className="w-full bg-white/5 border border-purple-500/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30" />
+              className="w-full bg-white/10 border border-purple-500/20 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30" />
           </div>
           <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
             {filtered.length === 0 && <p className="text-center text-xs text-gray-400 py-4">No students found</p>}
@@ -215,7 +215,7 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
             <label className="text-xs font-semibold text-white uppercase tracking-wider block mb-2">Subject</label>
             <input value={subject} onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. Quiz Results — Chapter 3"
-              className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30" />
+              className="w-full bg-white/10 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30" />
           </div>
 
           <div>
@@ -232,14 +232,14 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
             </div>
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={9}
               placeholder={`Hi {{name}},\n\nYour message here…`}
-              className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30 resize-none font-mono" />
+              className="w-full bg-white/10 border border-purple-500/20 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30 resize-none font-mono" />
           </div>
 
           {/* Schedule */}
           <div>
             <label className="text-xs font-semibold text-white uppercase tracking-wider block mb-2">Schedule (optional)</label>
             <input type="datetime-local" value={scheduleAt} onChange={(e) => setSchedule(e.target.value)}
-              className="bg-white/5 border border-purple-500/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/30" />
+              className="bg-white/10 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-purple-500/30" />
           </div>
 
           {/* Actions */}
