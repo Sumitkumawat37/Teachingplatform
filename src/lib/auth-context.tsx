@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoggedIn: false,
     role: "student",
     user: null,
-    loading: true,
+    loading: false,
   });
 
   const lastSessionToken = useRef<string | null>("__init__");
