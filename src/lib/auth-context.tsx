@@ -196,6 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
 
     const {
       data: { subscription },
@@ -238,8 +239,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
 
+    // Fallback timeout to ensure loading is always set to false
+    timeoutId = setTimeout(() => {
+      if (mounted && auth.loading) {
+        console.warn('Auth initialization taking too long - forcing loading to false');
+        setAuth(prev => ({ ...prev, loading: false }));
+      }
+    }, 3000);
+
     return () => {
       mounted = false;
+      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);
