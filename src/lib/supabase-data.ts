@@ -272,7 +272,7 @@ export function useAllPurchases() {
   return useQuery({
     queryKey: ["all_purchases"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("purchases").select("*, courses(title)");
+      const { data, error } = await supabase.from("purchases").select("*");
       if (error) throw error;
       return data;
     },
