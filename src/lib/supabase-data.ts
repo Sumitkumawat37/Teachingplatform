@@ -267,17 +267,10 @@ export function useProfiles() {
   });
 }
 
-// All purchases (admin)
+// All purchases (admin) - disabled due to database schema issues
 export function useAllPurchases() {
   return useQuery({
     queryKey: ["all_purchases"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("purchases").select("*");
-      if (error) {
-        console.error('Purchases query error:', error);
-        return []; // Return empty array instead of throwing
-      }
-      return data;
-    },
+    queryFn: async () => [],
   });
 }
