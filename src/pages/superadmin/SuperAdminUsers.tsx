@@ -301,7 +301,7 @@ const SuperAdminUsers = () => {
             const initials = (p.name ?? p.email ?? "U").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
             return (
               <div
-                key={p.id}
+                key={p.id || `user-${i}`}
                 className="glass-card rounded-2xl p-3.5 flex items-center gap-3 animate-slide-up neon-border"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
