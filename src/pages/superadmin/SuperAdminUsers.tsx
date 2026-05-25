@@ -39,6 +39,8 @@ const SuperAdminUsers = () => {
 
   const getRoleForUser = (userId: string) => {
     const email = profiles.find((p) => p.user_id === userId)?.email ?? "";
+    const userRole = userRoles.find((r) => r.user_id === userId);
+    console.log(`User ${userId} (${email}):`, { email, userRole, hasAdminRole: userRoles.some((r) => r.user_id === userId && r.role === "admin") });
     if (SUPER_ADMIN_EMAILS.includes(email.toLowerCase())) return "super_admin";
     return userRoles.some((r) => r.user_id === userId && r.role === "admin") ? "admin" : "student";
   };
