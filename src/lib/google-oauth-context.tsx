@@ -31,9 +31,57 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [gapiError, setGapiError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Google Drive features disabled - not loading GAPI to avoid iframe sandbox warnings
-    // Re-enable if Google Drive integration is needed in the future
-    return;
+    const loadGapi = async () => {
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+      if (!clientId) {
+        console.warn('Google Client ID not found in environment variables - Google Drive features will be disabled');
+        // Don't set error, just skip loading - app should work without Google Auth
+        return;
+      }
+
+      try {
+        const gapiScript = document.createElement('script');
+        gapiScript.src = 'https://apis.google.com/js/api.js';
+        gapiScript.async = true;
+        gapiScript.defer = true;
+        gapiScript.onload = () => {
+          if (typeof window.gapi === 'undefined') {
+            console.warn('Failed to load Google API script - Google Drive features will be disabled');
+            return;
+          }
+          window.gapi.load('client:auth2', async () => {
+            try {
+              await window.gapi.client.init({
+                clientId: clientId,
+                scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly',
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+              });
+              setGapi(window.gapi);
+              setGapiLoaded(true);
+
+              const authInstance = window.gapi.auth2.getAuthInstance();
+              if (authInstance && authInstance.isSignedIn.get()) {
+                const user = authInstance.currentUser.get();
+                const token = user.getAuthResponse().access_token;
+                setAccessToken(token);
+                setIsSignedIn(true);
+              }
+            } catch (error: any) {
+              console.warn('GAPI client init error - Google Drive features will be disabled:', error.message);
+            }
+          });
+        };
+        gapiScript.onerror = () => {
+          console.warn('Failed to load Google API script - Google Drive features will be disabled');
+        };
+        document.body.appendChild(gapiScript);
+      } catch (error: any) {
+        console.warn('GAPI load error - Google Drive features will be disabled:', error.message);
+      }
+    };
+
+    loadGapi();
   }, []);
 
   const signIn = async () => {
