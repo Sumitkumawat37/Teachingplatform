@@ -16,13 +16,6 @@ const SUPER_ADMIN_EMAILS = ["superadmin@demo.com"];
 const SuperAdminUsers = () => {
   const { data: profiles = [], isLoading } = useProfiles();
   const { data: userRoles = [] } = useUserRoles();
-  
-  // Debug logging
-  console.log('Profiles count:', profiles.length);
-  console.log('Profiles data:', profiles);
-  console.log('User roles count:', userRoles.length);
-  console.log('User roles data:', userRoles);
-  
   const setUserRole = useSetUserRole();
   const deleteProfile = useDeleteProfile();
   const qc = useQueryClient();
