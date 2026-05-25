@@ -28,6 +28,12 @@ const SuperAdminDashboard = () => {
   console.log('SuperAdminDashboard - Profiles:', profiles);
   console.log('SuperAdminDashboard - User roles:', userRoles);
   console.log('SuperAdminDashboard - Total teachers:', totalTeachers);
+  
+  // Detailed debug
+  profiles.forEach(p => {
+    const role = userRoles.find(r => r.user_id === p.user_id);
+    console.log(`Profile: ${p.email} (${p.user_id}) - Role:`, role);
+  });
 
   const totalStudents = profiles.filter((p) =>
     !userRoles.some((r) => r.user_id === p.user_id && r.role === "admin") &&
