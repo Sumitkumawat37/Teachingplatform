@@ -13,6 +13,8 @@ const transporter = nodemailer.createTransport({
 });
 
 module.exports = async function handler(req, res) {
+  console.log('Email API called:', req.method, req.url);
+  
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,15 +22,19 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
+    console.log('OPTIONS request handled');
     return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
+    console.log('Method not allowed:', req.method);
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   // Check if email service is configured
+  console.log('EMAIL_PASSWORD exists:', !!process.env.EMAIL_PASSWORD);
   if (!process.env.EMAIL_PASSWORD) {
+    console.error('EMAIL_PASSWORD not set');
     return res.status(503).json({ 
       message: 'Email service not configured. Please add EMAIL_PASSWORD environment variable.' 
     });
@@ -36,14 +42,22 @@ module.exports = async function handler(req, res) {
 
   try {
     const { email, name, frontendUrl } = req.body;
+    console.log('Email request:', { email, name, frontendUrl });
 
     if (!email || !frontendUrl) {
+      console.error('Missing required fields');
       return res.status(400).json({ message: 'Email and frontendUrl are required' });
     }
+
+    // Test transporter connection
+    console.log('Testing transporter connection...');
+    await transporter.verify();
+    console.log('Transporter verified successfully');
 
     // Generate a verification token
     const token = crypto.randomBytes(32).toString('hex');
     const verifyLink = `${frontendUrl}/verify-email?token=${token}`;
+    console.log('Generated token, verify link:', verifyLink);
 
     // Store token with expiration (24 hours)
     resetTokens.set(`verify_${token}`, {
@@ -69,10 +83,12 @@ module.exports = async function handler(req, res) {
       `
     };
 
-    await transporter.sendMail(mailOptions);
+    console.log('Sending email to:', email);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
     res.json({ message: 'Verification email sent successfully' });
   } catch (error) {
     console.error('Error sending verification email:', error);
-    res.status(500).json({ message: 'Failed to send verification email' });
+    res.status(500).json({ message: 'Failed to send verification email', error: error.message });
   }
 };
