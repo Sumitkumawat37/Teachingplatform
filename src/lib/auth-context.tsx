@@ -52,7 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Parallel fetch — 2× faster than sequential
     let profile = null;
     try {
-      profile = await supabase.from("profiles").select("*").eq("user_id", u.id).single();
+      const { data: profileData } = await supabase.from("profiles").select("*").eq("user_id", u.id).limit(1);
+      profile = profileData?.[0] || null;
     } catch (e) {
       // Profile may not exist, use null
     }
