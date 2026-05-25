@@ -5,13 +5,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAnnouncements, useCreateAnnouncement } from "@/lib/supabase-data";
 import { useDeleteAnnouncement } from "@/lib/supabase-mutations";
-import { Megaphone, Send, Info, CheckCircle, AlertTriangle, Trash2 } from "lucide-react";
+import { Megaphone, Send, Info, CheckCircle, AlertTriangle, Trash2, Lock as LockIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const iconMap: Record<string, typeof Info> = { info: Info, success: CheckCircle, warning: AlertTriangle };
 
 const AdminAnnouncements = () => {
+  // Lock: Announcement management is disabled
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-[#0a0a1a]">
+      <div className="text-center p-8">
+        <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          <LockIcon className="w-10 h-10 text-amber-400" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Announcement Management Locked</h2>
+        <p className="text-gray-400">Announcement creation and management is currently disabled.</p>
+      </div>
+    </div>
+  );
+
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [type, setType] = useState<"info" | "success" | "warning">("info");

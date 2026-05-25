@@ -2,10 +2,22 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
-import { Mail, RefreshCw, UserCheck, Download, Upload, Trash2, CheckSquare, Square, X } from "lucide-react";
+import { Mail, RefreshCw, UserCheck, Download, Upload, Trash2, CheckSquare, Square, X, Lock as LockIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const AdminStudents = () => {
+  // Lock: Student management is disabled
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-[#0a0a1a]">
+      <div className="text-center p-8">
+        <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          <LockIcon className="w-10 h-10 text-amber-400" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Student Management Locked</h2>
+        <p className="text-gray-400">Student management is currently disabled.</p>
+      </div>
+    </div>
+  );
   const [studentProfiles, setStudentProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);

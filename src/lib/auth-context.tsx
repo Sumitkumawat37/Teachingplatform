@@ -140,6 +140,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (email: string, password: string, name: string): Promise<boolean> => {
+    // Lock: Signups are disabled
+    toast.error("Signups are currently disabled. Please contact admin.");
+    return false;
+
     const redirectUrl = `${window.location.origin}/`;
     const { data, error } = await supabase.auth.signUp({
       email,
