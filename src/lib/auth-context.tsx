@@ -263,13 +263,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string,
     password: string
   ): Promise<boolean> => {
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
+    // 1. Try normal sign-in first
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (!signInErr) return true;
+
+    // 2. For demo accounts — auto-create if missing, then retry
+    const demoEmails = ["student@demo.com", "teacher@demo.com", "superadmin@demo.com"];
+    if (!demoEmails.includes(email) || password !== "123456") return false;
+
+    const name = email === "teacher@demo.com" ? "Shivam Sir"
+               : email === "superadmin@demo.com" ? "Super Admin"
+               : "Demo Student";
+
+    // Attempt signup — ignore errors ("already registered" is fine)
+    const { data: signUpData } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+
+    // Assign role if new user was created
+    if (signUpData.user) {
+      const role = email === "teacher@demo.com" ? "admin" 
+                  : email === "superadmin@demo.com" ? "admin" 
+                  : "student";
+      
+      await supabase.from("user_roles").insert({
+        user_id: signUpData.user.id,
+        role: role
       });
 
-    return !error;
+      // Also create profile if needed
+      await supabase.from("profiles").upsert({
+        user_id: signUpData.user.id,
+        name: name
+      }, { onConflict: "user_id" });
+    }
+
+    // 3. Retry sign-in (works when email confirmation is disabled)
+    const { error: retryErr } = await supabase.auth.signInWithPassword({ email, password });
+    return !retryErr;
   };
 
   const signup = async (
@@ -403,15 +432,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const resetPassword = async (
     email: string
   ): Promise<boolean> => {
-    const { error } =
-      await supabase.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${window.location.origin}/reset-password`,
-        }
-      );
+    try {
+      // Send password reset email via Vercel serverless function
+      const res = await fetch('/api/email/send-password-reset', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          email, 
+          frontendUrl: window.location.origin 
+        }),
+      });
 
-    return !error;
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error("Password reset email error:", err);
+        throw new Error(err.error || "Failed to send reset link");
+      }
+
+      return true;
+    } catch (err: any) {
+      console.error('Password reset error:', err.message || err);
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('fetch')) {
+        throw new Error("Backend service is not running. Please start the backend server.");
+      }
+      throw new Error(err.message || "Failed to send reset link");
+    }
   };
 
   const updatePassword = async (
