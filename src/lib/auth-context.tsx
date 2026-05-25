@@ -102,9 +102,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           profile = newProfile;
           console.log('Profile created successfully:', profile);
+          toast.success('Profile created successfully!');
         }
       } catch (err) {
         console.error("Error creating profile:", err);
+        toast.error('Failed to create profile. Please contact support.');
       }
     }
 
@@ -115,12 +117,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { error: roleError } = await supabase.from("user_roles").insert({ user_id: u.id, role: "student" });
         if (roleError) {
           console.error('Role creation error:', roleError);
+          toast.error('Failed to assign student role. Please contact support.');
         } else {
           console.log('Role created successfully');
           roleData = [{ role: "student" }];
+          toast.success('Student role assigned successfully!');
         }
       } catch (err) {
         console.error("Error creating role:", err);
+        toast.error('Failed to assign student role. Please contact support.');
       }
     }
 
