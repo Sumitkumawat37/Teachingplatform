@@ -19,19 +19,6 @@ import { useGoogleAuth } from "@/lib/google-oauth-context";
 const AdminContent = () => {
   const { isSignedIn, signIn, listDriveFiles } = useGoogleAuth();
   
-  // Lock: Content management is disabled
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0a0a1a]">
-      <div className="text-center p-8">
-        <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
-          <LockIcon className="w-10 h-10 text-amber-400" />
-        </div>
-        <h2 className="text-xl font-bold text-white mb-2">Content Management Locked</h2>
-        <p className="text-gray-400">Content creation and modification is currently disabled.</p>
-      </div>
-    </div>
-  );
-  
   // Course form
   const [showCourseForm, setShowCourseForm] = useState(false);
   const [courseTitle, setCourseTitle] = useState("");

@@ -8,19 +8,6 @@ import { MessageCircle, Send, Lock as LockIcon } from "lucide-react";
 import { toast } from "sonner";
 
 const AdminDoubts = () => {
-  // Lock: Doubt management is disabled
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0a0a1a]">
-      <div className="text-center p-8">
-        <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
-          <LockIcon className="w-10 h-10 text-amber-400" />
-        </div>
-        <h2 className="text-xl font-bold text-white mb-2">Doubt Management Locked</h2>
-        <p className="text-gray-400">Doubt replies and management is currently disabled.</p>
-      </div>
-    </div>
-  );
-
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
   const { data: doubts = [] } = useDoubts();
