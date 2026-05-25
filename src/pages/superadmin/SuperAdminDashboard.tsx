@@ -20,7 +20,7 @@ const SuperAdminDashboard = () => {
   const { data: purchases = [] } = useAllPurchases();
 
   const totalTeachers = profiles.filter((p) =>
-    userRoles.some((r) => r.user_id === p.user_id && r.role === "admin") &&
+    userRoles.some((r) => r.user_id === p.user_id && (r.role === "admin" || (r.role as any) === "teacher")) &&
     !SUPER_ADMIN_EMAILS.includes((p.email ?? "").toLowerCase())
   ).length;
   
@@ -36,7 +36,7 @@ const SuperAdminDashboard = () => {
   });
 
   const totalStudents = profiles.filter((p) =>
-    !userRoles.some((r) => r.user_id === p.user_id && r.role === "admin") &&
+    !userRoles.some((r) => r.user_id === p.user_id && (r.role === "admin" || (r.role as any) === "teacher")) &&
     !SUPER_ADMIN_EMAILS.includes((p.email ?? "").toLowerCase())
   ).length;
 
