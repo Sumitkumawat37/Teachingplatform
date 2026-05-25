@@ -198,31 +198,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    supabase.auth
-      .getSession()
-      .then(async ({ data: { session } }) => {
-        console.log(
-          "Initial session:",
-          session?.user?.email
-        );
-
-        if (mounted) {
-          await setUserFromSession(session);
-        }
-      })
-      .catch((err) => {
-        console.error("Session restore error:", err);
-
-        if (mounted) {
-          setAuth({
-            isLoggedIn: false,
-            role: "student",
-            user: null,
-            loading: false,
-          });
-        }
-      });
-
     return () => {
       mounted = false;
       subscription.unsubscribe();

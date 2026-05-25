@@ -98,7 +98,7 @@ function AppRoutes() {
             ? <Navigate to="/superadmin" replace /> 
             : role === "admin" 
             ? <Navigate to="/admin" replace />
-            : <Suspense fallback={<PageLoader />}><HomePage /></Suspense>
+            : <Navigate to="/dashboard" replace />
         } />
         
         {/* Student Routes */}
