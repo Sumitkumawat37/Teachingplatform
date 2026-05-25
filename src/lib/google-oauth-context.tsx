@@ -31,55 +31,9 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [gapiError, setGapiError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadGapi = async () => {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-      if (!clientId) {
-        // Silently skip Google Drive features if not configured
-        return;
-      }
-
-      try {
-        const gapiScript = document.createElement('script');
-        gapiScript.src = 'https://apis.google.com/js/api.js';
-        gapiScript.async = true;
-        gapiScript.defer = true;
-        gapiScript.onload = () => {
-          if (typeof window.gapi === 'undefined') {
-            return;
-          }
-          window.gapi.load('client:auth2', async () => {
-            try {
-              await window.gapi.client.init({
-                clientId: clientId,
-                scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly',
-                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-              });
-              setGapi(window.gapi);
-              setGapiLoaded(true);
-
-              const authInstance = window.gapi.auth2.getAuthInstance();
-              if (authInstance && authInstance.isSignedIn.get()) {
-                const user = authInstance.currentUser.get();
-                const token = user.getAuthResponse().access_token;
-                setAccessToken(token);
-                setIsSignedIn(true);
-              }
-            } catch (error: any) {
-              // Silently fail - Google Drive features will be disabled
-            }
-          });
-        };
-        gapiScript.onerror = () => {
-          // Silently fail - Google Drive features will be disabled
-        };
-        document.body.appendChild(gapiScript);
-      } catch (error: any) {
-        // Silently fail - Google Drive features will be disabled
-      }
-    };
-
-    loadGapi();
+    // Google Drive features disabled - not loading GAPI to avoid iframe sandbox warnings
+    // Re-enable if Google Drive integration is needed in the future
+    return;
   }, []);
 
   const signIn = async () => {
