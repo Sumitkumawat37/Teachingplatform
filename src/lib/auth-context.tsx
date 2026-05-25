@@ -165,38 +165,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       u.email?.split("@")[0] ||
       "User";
 
-    try {
-      setAuth({
-        isLoggedIn: true,
-        role,
-        user: {
-          name: displayName,
-          email: u.email || "",
-          id: u.id,
-        },
-        loading: false,
-      });
+    setAuth({
+      isLoggedIn: true,
+      role,
+      user: {
+        name: displayName,
+        email: u.email || "",
+        id: u.id,
+      },
+      loading: false,
+    });
 
-      toast.success(`Welcome ${displayName}!`);
-    } catch (err) {
-      console.error("Error setting auth state:", err);
-      // Fallback to ensure loading is always set to false
-      setAuth({
-        isLoggedIn: true,
-        role: "student",
-        user: {
-          name: displayName,
-          email: u.email || "",
-          id: u.id,
-        },
-        loading: false,
-      });
-    }
+    toast.success(`Welcome ${displayName}!`);
   };
 
   useEffect(() => {
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
 
     const {
       data: { subscription },
@@ -239,17 +223,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
 
-    // Fallback timeout to ensure loading is always set to false
-    timeoutId = setTimeout(() => {
-      if (mounted && auth.loading) {
-        console.warn('Auth initialization taking too long - forcing loading to false');
-        setAuth(prev => ({ ...prev, loading: false }));
-      }
-    }, 3000);
-
     return () => {
       mounted = false;
-      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);
