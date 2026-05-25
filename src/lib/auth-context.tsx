@@ -265,6 +265,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false;
     }
 
+    // Create profile and role for the new user
+    if (data.user) {
+      console.log('Creating profile for user:', data.user.id);
+      try {
+        const { error: profileError } = await supabase.from('profiles').insert({
+          user_id: data.user.id,
+          name: name,
+          email: email,
+        });
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        } else {
+          console.log('Profile created successfully');
+        }
+      } catch (err) {
+        console.error('Profile creation error:', err);
+      }
+
+      try {
+        const { error: roleError } = await supabase.from('user_roles').insert({
+          user_id: data.user.id,
+          role: 'student',
+        });
+        if (roleError) {
+          console.error('Role creation error:', roleError);
+        } else {
+          console.log('Role created successfully');
+        }
+      } catch (err) {
+        console.error('Role creation error:', err);
+      }
+    }
+
     // Send verification email via Nodemailer (only on production)
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       console.log('Sending verification email via API');
