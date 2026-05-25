@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Parallel fetch — 2× faster than sequential
     const [{ data: roleData }, { data: profile }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", u.id),
-      supabase.from("profiles").select("name").eq("user_id", u.id).single(),
+      supabase.from("profiles").select("*").eq("user_id", u.id).single(),
     ]);
 
     const isAdmin = roleData?.some((r) => r.role === "admin") ?? false;

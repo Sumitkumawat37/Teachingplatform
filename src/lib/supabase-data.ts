@@ -273,7 +273,10 @@ export function useAllPurchases() {
     queryKey: ["all_purchases"],
     queryFn: async () => {
       const { data, error } = await supabase.from("purchases").select("*");
-      if (error) throw error;
+      if (error) {
+        console.error('Purchases query error:', error);
+        return []; // Return empty array instead of throwing
+      }
       return data;
     },
   });
