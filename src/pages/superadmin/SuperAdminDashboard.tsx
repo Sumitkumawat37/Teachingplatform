@@ -23,6 +23,11 @@ const SuperAdminDashboard = () => {
     userRoles.some((r) => r.user_id === p.user_id && r.role === "admin") &&
     !SUPER_ADMIN_EMAILS.includes((p.email ?? "").toLowerCase())
   ).length;
+  
+  // Debug logging
+  console.log('SuperAdminDashboard - Profiles:', profiles);
+  console.log('SuperAdminDashboard - User roles:', userRoles);
+  console.log('SuperAdminDashboard - Total teachers:', totalTeachers);
 
   const totalStudents = profiles.filter((p) =>
     !userRoles.some((r) => r.user_id === p.user_id && r.role === "admin") &&
