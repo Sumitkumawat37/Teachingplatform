@@ -196,7 +196,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
 
     const {
       data: { subscription },
@@ -239,22 +238,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
 
-    // Timeout to prevent infinite loading
-    timeoutId = setTimeout(() => {
-      if (mounted && auth.loading) {
-        console.warn('Auth initialization timeout - forcing render');
-        setAuth({
-          isLoggedIn: false,
-          role: "student",
-          user: null,
-          loading: false,
-        });
-      }
-    }, 5000);
-
     return () => {
       mounted = false;
-      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);
