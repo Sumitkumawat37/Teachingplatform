@@ -158,32 +158,32 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
       {/* Student Selector */}
       <div className="lg:col-span-2 space-y-3">
-        <Card className="p-4 bg-card border border-border">
+        <Card className="p-4 bg-white border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-bold text-white flex items-center gap-2"><Users className="w-4 h-4 text-purple-400" /> Students ({selected.length} selected)</p>
+            <p className="text-sm font-bold text-black flex items-center gap-2"><Users className="w-4 h-4 text-purple-600" /> Students ({selected.length} selected)</p>
             <div className="flex gap-2">
-              <button onClick={selectAll} className="text-xs text-purple-300 hover:text-purple-200 font-medium">All</button>
-              <span className="text-gray-500">·</span>
-              <button onClick={clearAll}  className="text-xs text-gray-300 hover:text-gray-200">Clear</button>
+              <button onClick={selectAll} className="text-xs text-purple-600 hover:text-purple-700 font-medium">All</button>
+              <span className="text-gray-600">·</span>
+              <button onClick={clearAll}  className="text-xs text-gray-600 hover:text-gray-700">Clear</button>
             </div>
           </div>
           <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
             <input value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Search name or email…"
-              className="w-full bg-white/10 border border-purple-500/20 rounded-xl pl-9 pr-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30" />
+              className="w-full bg-white border border-purple-500/30 rounded-xl pl-9 pr-3 py-2 text-sm text-black placeholder:text-gray-500 focus:outline-none focus:border-purple-500/50" />
           </div>
           <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
-            {filtered.length === 0 && <p className="text-center text-xs text-gray-400 py-4">No students found</p>}
+            {filtered.length === 0 && <p className="text-center text-xs text-gray-600 py-4">No students found</p>}
             {filtered.map((s) => {
               const isSelected = selected.includes(s.user_id);
               return (
                 <button key={s.user_id} onClick={() => toggleStudent(s.user_id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left ${isSelected ? "bg-purple-500/20 border border-purple-500/30" : "hover:bg-white/5 border border-transparent"}`}>
-                  {isSelected ? <CheckSquare className="w-4 h-4 text-purple-400 shrink-0" /> : <Square className="w-4 h-4 text-gray-400 shrink-0" />}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left ${isSelected ? "bg-purple-100 border border-purple-300" : "hover:bg-gray-100 border border-transparent"}`}>
+                  {isSelected ? <CheckSquare className="w-4 h-4 text-purple-600 shrink-0" /> : <Square className="w-4 h-4 text-gray-400 shrink-0" />}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{s.name}</p>
-                    <p className="text-xs text-gray-400 truncate">{s.email}</p>
+                    <p className="text-sm font-medium text-black truncate">{s.name}</p>
+                    <p className="text-xs text-gray-600 truncate">{s.email}</p>
                   </div>
                 </button>
               );
@@ -195,13 +195,13 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
       {/* Compose Form */}
       <div className="lg:col-span-3 space-y-4">
         {/* Category */}
-        <Card className="p-4 bg-card border border-border">
-          <p className="text-xs font-semibold text-white uppercase tracking-wider mb-3">Email Category</p>
+        <Card className="p-4 bg-white border border-gray-200">
+          <p className="text-xs font-semibold text-black uppercase tracking-wider mb-3">Email Category</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {CATEGORIES.map((c) => (
               <button key={c.value} onClick={() => setCategory(c.value)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border ${
-                  category === c.value ? "bg-purple-500/20 border-purple-500/30 text-purple-300" : "border-white/5 text-gray-300 hover:bg-white/5 hover:text-white"
+                  category === c.value ? "bg-purple-100 border-purple-300 text-purple-700" : "border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-black"
                 }`}>
                 <c.icon className={`w-3.5 h-3.5 ${c.color}`} /> {c.label}
               </button>
@@ -210,21 +210,21 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
         </Card>
 
         {/* Subject + Body */}
-        <Card className="p-4 bg-card border border-border space-y-4">
+        <Card className="p-4 bg-white border border-gray-200 space-y-4">
           <div>
-            <label className="text-xs font-semibold text-white uppercase tracking-wider block mb-2">Subject</label>
+            <label className="text-xs font-semibold text-black uppercase tracking-wider block mb-2">Subject</label>
             <input value={subject} onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. Quiz Results — Chapter 3"
-              className="w-full bg-white/10 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30" />
+              className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-black placeholder:text-gray-500 focus:outline-none focus:border-purple-500/50" />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold text-white uppercase tracking-wider">Message</label>
+              <label className="text-xs font-semibold text-black uppercase tracking-wider">Message</label>
               <div className="flex gap-1">
                 {["name","score","courseName","meetingLink","deadline"].map((ph) => (
                   <button key={ph} onClick={() => insertPlaceholder(ph)}
-                    className="text-[10px] px-2 py-0.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:bg-purple-500/20 transition">
+                    className="text-[10px] px-2 py-0.5 rounded-lg bg-purple-100 border border-purple-300 text-purple-700 hover:bg-purple-200 transition">
                     {`{{${ph}}}`}
                   </button>
                 ))}
@@ -232,14 +232,14 @@ const ComposeTab = ({ teacherId, onDraftSaved }: { teacherId: string; onDraftSav
             </div>
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={9}
               placeholder={`Hi {{name}},\n\nYour message here…`}
-              className="w-full bg-white/10 border border-purple-500/20 rounded-xl px-4 py-3 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30 resize-none font-mono" />
+              className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-sm text-black placeholder:text-gray-500 focus:outline-none focus:border-purple-500/50 resize-none font-mono" />
           </div>
 
           {/* Schedule */}
           <div>
-            <label className="text-xs font-semibold text-white uppercase tracking-wider block mb-2">Schedule (optional)</label>
+            <label className="text-xs font-semibold text-black uppercase tracking-wider block mb-2">Schedule (optional)</label>
             <input type="datetime-local" value={scheduleAt} onChange={(e) => setSchedule(e.target.value)}
-              className="bg-white/10 border border-purple-500/20 rounded-xl px-4 py-2.5 text-sm text-gray-100 focus:outline-none focus:border-purple-500/30" />
+              className="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sm text-black focus:outline-none focus:border-purple-500/50" />
           </div>
 
           {/* Actions */}
