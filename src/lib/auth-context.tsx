@@ -165,18 +165,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       u.email?.split("@")[0] ||
       "User";
 
-    setAuth({
-      isLoggedIn: true,
-      role,
-      user: {
-        name: displayName,
-        email: u.email || "",
-        id: u.id,
-      },
-      loading: false,
-    });
+    try {
+      setAuth({
+        isLoggedIn: true,
+        role,
+        user: {
+          name: displayName,
+          email: u.email || "",
+          id: u.id,
+        },
+        loading: false,
+      });
 
-    toast.success(`Welcome ${displayName}!`);
+      toast.success(`Welcome ${displayName}!`);
+    } catch (err) {
+      console.error("Error setting auth state:", err);
+      // Fallback to ensure loading is always set to false
+      setAuth({
+        isLoggedIn: true,
+        role: "student",
+        user: {
+          name: displayName,
+          email: u.email || "",
+          id: u.id,
+        },
+        loading: false,
+      });
+    }
   };
 
   useEffect(() => {
