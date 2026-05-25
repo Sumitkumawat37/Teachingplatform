@@ -9,7 +9,9 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'nadiyakhan0205@gmail.com',
     pass: process.env.EMAIL_PASSWORD
-  }
+  },
+  debug: true,
+  logger: true
 });
 
 module.exports = async function handler(req, res) {
@@ -69,10 +71,15 @@ module.exports = async function handler(req, res) {
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    res.json({ message: 'Verification email sent successfully' });
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
+    console.log('Email accepted by:', info.accepted);
+    console.log('Email rejected by:', info.rejected);
+    res.json({ message: 'Verification email sent successfully', messageId: info.messageId });
   } catch (error) {
     console.error('Error sending verification email:', error);
-    res.status(500).json({ message: 'Failed to send verification email' });
+    console.error('Error details:', error.message);
+    console.error('Error code:', error.code);
+    res.status(500).json({ message: 'Failed to send verification email', error: error.message });
   }
 };
