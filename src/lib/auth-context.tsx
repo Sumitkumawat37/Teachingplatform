@@ -261,6 +261,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false;
     }
 
+    // Send verification email via Nodemailer (only on production)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      try {
+        const res = await fetch('/api/email/send-verification', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, frontendUrl: window.location.origin }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error("Verification email error:", err);
+        }
+      } catch (fetchErr) {
+        console.error("Could not reach email service:", fetchErr);
+      }
+    }
+
     return true;
   };
 
