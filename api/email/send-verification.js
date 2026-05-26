@@ -7,8 +7,8 @@ const resetTokens = new Map();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'nadiyakhan0205@gmail.com',
-    pass: process.env.EMAIL_PASSWORD
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   },
   debug: true,
   logger: true
@@ -30,9 +30,9 @@ module.exports = async function handler(req, res) {
   }
 
   // Check if email service is configured
-  if (!process.env.EMAIL_PASSWORD) {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     return res.status(503).json({ 
-      message: 'Email service not configured. Please add EMAIL_PASSWORD environment variable.' 
+      message: 'Email service not configured. Please add EMAIL_USER and EMAIL_PASS environment variables.' 
     });
   }
 
@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
 
     // Send email
     const mailOptions = {
-      from: 'nadiyakhan0205@gmail.com',
+      from: process.env.EMAIL_USER,
       to: email,
       subject: 'Email Verification - UPSC Nadiya',
       html: `
