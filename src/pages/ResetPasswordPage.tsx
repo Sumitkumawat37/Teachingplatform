@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Lock, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -13,28 +12,6 @@ const ResetPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sessionReady, setSessionReady] = useState(false);
-
-  useEffect(() => {
-    // admin.generateLink uses implicit flow (hash fragment) even when client uses PKCE.
-    // Manually extract and set the session so updateUser has a valid session.
-    const hash = window.location.hash;
-    if (hash && hash.includes("access_token")) {
-      const params = new URLSearchParams(hash.substring(1));
-      const accessToken = params.get("access_token");
-      const refreshToken = params.get("refresh_token");
-      if (accessToken && refreshToken) {
-        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-          .then(() => setSessionReady(true))
-          .catch(() => toast.error("Invalid or expired reset link"));
-      } else {
-        setSessionReady(true);
-      }
-    } else {
-      // PKCE flow: detectSessionInUrl handles ?code= automatically
-      setSessionReady(true);
-    }
-  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,7 +89,7 @@ const ResetPasswordPage = () => {
 
             <button
               type="submit"
-              disabled={loading || !sessionReady}
+              disabled={loading}
               className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white py-3.5 rounded-xl text-sm font-semibold mt-2 shadow-sm hover:shadow-md transition-all disabled:opacity-70"
             >
               {loading ? (
