@@ -136,6 +136,8 @@ function AppRoutes() {
         <Route path="/superadmin" element={<Suspense fallback={<PageLoader />}><SuperAdminDashboard /></Suspense>} />
         <Route path="/superadmin/users" element={<Suspense fallback={<PageLoader />}><SuperAdminUsers /></Suspense>} />
 
+        {/* Auth pages accessible even when logged in (e.g. recovery session) */}
+        <Route path="/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
         <Route path="/login" element={<Navigate to="/" replace />} />
         <Route path="/signup" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Suspense fallback={<PageLoader />}><NotFound /></Suspense>} />
