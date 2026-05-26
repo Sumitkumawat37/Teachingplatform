@@ -1,8 +1,6 @@
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
-
-// Store verification tokens temporarily
-const verificationTokens = new Map();
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import { setToken } from "./token-storage.js";
 
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -13,7 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   try {
     // CORS
     res.setHeader("Access-Control-Allow-Credentials", true);
@@ -31,11 +29,13 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const { email, name, frontendUrl } = req.body;
+    const { email, name } = req.body;
 
-    if (!email || !frontendUrl) {
+    const frontendUrl = process.env.FRONTEND_URL;
+
+    if (!email) {
       return res.status(400).json({
-        message: "Email and frontendUrl are required",
+        message: "Email is required",
       });
     }
 
@@ -46,11 +46,8 @@ module.exports = async function handler(req, res) {
     const verificationLink =
       `${frontendUrl}/verify-email?token=${token}`;
 
-    // Store token
-    verificationTokens.set(token, {
-      email,
-      expiresAt: Date.now() + 1000 * 60 * 60, // 1 hour
-    });
+    // Store token using shared storage
+    setToken(token, email);
 
     // Send Email
     await transporter.sendMail({
@@ -92,17 +89,7 @@ module.exports = async function handler(req, res) {
           </div>
 
           <p>
-            This verification link will expire in 1 hour.
-          </p>
-
-          <p>
-            If you did not create this account, you can ignore this email.
-          </p>
-
-          <hr style="margin: 30px 0;" />
-
-          <p style="font-size: 12px; color: #666;">
-            UPSC Nadiya Team
+            This link will expire in 1 hour.
           </p>
 
         </div>
@@ -115,11 +102,13 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Verification email error:", error);
+    console.error("=== FULL ERROR ===");
+    console.error(error);
+    console.error(error.message);
 
     return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-};
+}
