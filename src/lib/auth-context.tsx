@@ -57,6 +57,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       // Profile may not exist, use null
     }
+
+    // For OAuth (Google) users — upsert profile and assign student role on first login
+    const isOAuthUser = u.app_metadata?.provider === "google" || (u.identities ?? []).some((i: any) => i.provider === "google");
+    if (isOAuthUser) {
+      const name = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split("@")[0] || "";
+      const avatar_url = u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
+      await supabase.from("profiles").upsert(
+        { user_id: u.id, name, email: u.email, avatar_url },
+        { onConflict: "user_id" }
+      );
+      if (!profile) {
+        await supabase.from("user_roles").upsert(
+          { user_id: u.id, role: "student" },
+          { onConflict: "user_id,role" }
+        );
+      }
+      if (!profile) profile = { name, avatar_url };
+    }
+
     const [{ data: roleData }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", u.id),
     ]);
@@ -121,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                        : email === "superadmin@demo.com" ? "admin"
                        : "student";
         await supabase.from("user_roles")
-          .upsert({ user_id: signInData.user.id, role: demoRole }, { onConflict: "user_id,role" });
+          .upsert({ user_id: signInData.user.id, role: demoRole as any }, { onConflict: "user_id,role" });
         // Clear cache so setUserFromSession re-fetches roles with updated value
         lastSessionToken.current = null;
         await setUserFromSession(signInData.session);
@@ -145,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                      : email === "superadmin@demo.com" ? "admin" 
                      : "student";
       await supabase.from("user_roles")
-        .upsert({ user_id: signUpData.user.id, role: demoRole }, { onConflict: "user_id,role" });
+        .upsert({ user_id: signUpData.user.id, role: demoRole as any }, { onConflict: "user_id,role" });
       await supabase.from("profiles")
         .upsert({ user_id: signUpData.user.id, name }, { onConflict: "user_id" });
     }
@@ -234,7 +253,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          skipBrowserRedirect: false,
         },
       });
 
