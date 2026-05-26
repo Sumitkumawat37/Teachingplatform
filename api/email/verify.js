@@ -1,5 +1,26 @@
-import { getToken, deleteToken } from "./token-storage.js";
+import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
+
+function verifyToken(token) {
+  try {
+    const secret = process.env.EMAIL_PASS;
+    const lastDot = token.lastIndexOf(".");
+    if (lastDot === -1) return null;
+
+    const payload = token.substring(0, lastDot);
+    const sig = token.substring(lastDot + 1);
+    const expectedSig = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+
+    if (sig !== expectedSig) return null;
+
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString());
+    if (data.expiresAt < Date.now()) return null;
+
+    return data;
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req, res) {
   try {
@@ -13,35 +34,18 @@ export default async function handler(req, res) {
       });
     }
 
-    // Use service role key for admin operations
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const { token } = req.query;
+    const rawToken = req.query.token;
 
-    if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid token",
-      });
+    if (!rawToken) {
+      return res.status(400).json({ success: false, message: "No token provided" });
     }
 
-    // Get token data from shared storage
-    const tokenData = getToken(token);
+    const tokenData = verifyToken(rawToken);
 
     if (!tokenData) {
-      return res.status(400).json({
-        success: false,
-        message: "Token not found or expired",
-      });
-    }
-
-    // Check if token is expired
-    if (tokenData.expiresAt < Date.now()) {
-      deleteToken(token);
-      return res.status(400).json({
-        success: false,
-        message: "Token has expired",
-      });
+      return res.status(400).json({ success: false, message: "Invalid or expired verification link" });
     }
 
     // Find user by email in profiles
@@ -52,14 +56,10 @@ export default async function handler(req, res) {
       .single();
 
     if (profileError || !profile) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(400).json({ success: false, message: "User not found" });
     }
 
-    // Update user's email_confirmed_at in auth.users via Supabase Admin
-    // Since we can't directly update auth.users from client, we'll use Supabase Auth API
+    // Confirm email via Supabase Admin
     const { error: updateError } = await supabase.auth.admin.updateUserById(
       profile.user_id,
       { email_confirm: true }
@@ -67,25 +67,13 @@ export default async function handler(req, res) {
 
     if (updateError) {
       console.error("Error confirming email:", updateError);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to confirm email",
-      });
+      return res.status(500).json({ success: false, message: "Failed to confirm email" });
     }
 
-    // Delete the token after successful verification
-    deleteToken(token);
-
-    return res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-    });
+    return res.status(200).json({ success: true, message: "Email verified successfully" });
 
   } catch (error) {
     console.error("Verification error:", error);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 }

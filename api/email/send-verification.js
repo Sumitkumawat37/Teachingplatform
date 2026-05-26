@@ -1,6 +1,15 @@
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { setToken } from "./token-storage.js";
+
+function createVerificationToken(email) {
+  const secret = process.env.EMAIL_PASS;
+  const payload = Buffer.from(JSON.stringify({
+    email,
+    expiresAt: Date.now() + 1000 * 60 * 60,
+  })).toString("base64url");
+  const sig = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+  return `${payload}.${sig}`;
+}
 
 // Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -39,15 +48,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // Generate token
-    const token = crypto.randomBytes(32).toString("hex");
+    // Generate self-signed token (no shared storage needed)
+    const token = createVerificationToken(email);
 
     // Verification link
     const verificationLink =
-      `${frontendUrl}/verify-email?token=${token}`;
-
-    // Store token using shared storage
-    setToken(token, email);
+      `${frontendUrl}/verify-email?token=${encodeURIComponent(token)}`;
 
     // Send Email
     await transporter.sendMail({

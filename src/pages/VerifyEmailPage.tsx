@@ -25,7 +25,7 @@ const VerifyEmailPage = () => {
           setTimeout(() => navigate("/login?verified=true"), 3000);
         } else {
           setStatus("error");
-          setMessage(data.error || "Invalid or expired verification link.");
+          setMessage(data.message || "Invalid or expired verification link.");
         }
       })
       .catch(() => {
