@@ -1,34 +1,60 @@
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 export default async function handler(req, res) {
   try {
-    // Enable CORS
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // CORS
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    if (req.method === 'OPTIONS') {
+    if (req.method === "OPTIONS") {
       return res.status(200).end();
     }
 
-    if (req.method !== 'POST') {
-      return res.status(405).json({ message: 'Method not allowed' });
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        message: "Method not allowed",
+      });
     }
 
-    const { email, name, frontendUrl } = req.body;
+    const { email, name } = req.body;
 
-    console.log('=== Email Verification Request ===');
-    console.log('Email:', email);
-    console.log('Name:', name);
-    console.log('Frontend URL:', frontendUrl);
-    console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'NOT SET');
-    console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'SET' : 'NOT SET');
+    console.log("=== Sending Email ===");
+    console.log("To:", email);
 
-    // Temporarily return success without sending email to test endpoint
-    res.json({ message: 'Email endpoint working (email sending disabled for testing)', email, name });
+    // Send Email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Welcome to UPSC Platform",
+      html: `
+        <h1>Hello ${name}</h1>
+        <p>Your account has been created successfully.</p>
+        <p>Welcome to the platform.</p>
+      `,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Email sent successfully",
+    });
+
   } catch (error) {
-    console.error('=== Handler Error ===');
-    console.error('Error:', error);
-    console.error('Error message:', error.message);
-    res.status(500).json({ message: 'Failed', error: error.message });
+    console.error("=== Email Error ===");
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }
