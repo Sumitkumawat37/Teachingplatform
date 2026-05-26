@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   try {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -31,4 +31,4 @@ module.exports = async function handler(req, res) {
     console.error('Error message:', error.message);
     res.status(500).json({ message: 'Failed', error: error.message });
   }
-};
+}
