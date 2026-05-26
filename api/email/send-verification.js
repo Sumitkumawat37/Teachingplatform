@@ -1,5 +1,10 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
+// Store verification tokens temporarily
+const verificationTokens = new Map();
+
+// Nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -8,7 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
     // CORS
     res.setHeader("Access-Control-Allow-Credentials", true);
@@ -26,35 +31,95 @@ export default async function handler(req, res) {
       });
     }
 
-    const { email, name } = req.body;
+    const { email, name, frontendUrl } = req.body;
 
-    console.log("=== Sending Email ===");
-    console.log("To:", email);
+    if (!email || !frontendUrl) {
+      return res.status(400).json({
+        message: "Email and frontendUrl are required",
+      });
+    }
+
+    // Generate token
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // Verification link
+    const verificationLink =
+      `${frontendUrl}/verify-email?token=${token}`;
+
+    // Store token
+    verificationTokens.set(token, {
+      email,
+      expiresAt: Date.now() + 1000 * 60 * 60, // 1 hour
+    });
 
     // Send Email
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"UPSC Nadiya" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Welcome to UPSC Platform",
+      subject: "Verify Your Account - UPSC Nadiya",
       html: `
-        <h1>Hello ${name}</h1>
-        <p>Your account has been created successfully.</p>
-        <p>Welcome to the platform.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
+
+          <h2 style="color: #6366f1;">
+            Verify Your Email
+          </h2>
+
+          <p>Hello ${name || "User"},</p>
+
+          <p>
+            Thank you for registering on UPSC Nadiya.
+          </p>
+
+          <p>
+            Please verify your email address by clicking the button below:
+          </p>
+
+          <div style="margin: 30px 0;">
+            <a
+              href="${verificationLink}"
+              style="
+                background: linear-gradient(135deg, #6366f1, #ec4899);
+                color: white;
+                padding: 14px 24px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: bold;
+                display: inline-block;
+              "
+            >
+              Verify Email
+            </a>
+          </div>
+
+          <p>
+            This verification link will expire in 1 hour.
+          </p>
+
+          <p>
+            If you did not create this account, you can ignore this email.
+          </p>
+
+          <hr style="margin: 30px 0;" />
+
+          <p style="font-size: 12px; color: #666;">
+            UPSC Nadiya Team
+          </p>
+
+        </div>
       `,
     });
 
     return res.status(200).json({
       success: true,
-      message: "Email sent successfully",
+      message: "Verification email sent successfully",
     });
 
   } catch (error) {
-    console.error("=== Email Error ===");
-    console.error(error);
+    console.error("Verification email error:", error);
 
     return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-}
+};
