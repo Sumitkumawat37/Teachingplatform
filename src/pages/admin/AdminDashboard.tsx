@@ -216,8 +216,8 @@ const AdminDashboard = () => {
           </button>
         </div>
         <div className="space-y-3">
-          {studentProfiles.slice(0, 4).map((student, index) => (
-            <div key={student.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
+          {studentProfiles.slice(0, 4).map((student) => (
+            <div key={student.user_id || student.id} className="flex items-center gap-4 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-sm font-bold text-primary">
                 {student.name?.split(" ").map((n: string) => n[0]).join("") || "?"}
               </div>

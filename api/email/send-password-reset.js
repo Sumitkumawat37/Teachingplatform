@@ -1,10 +1,16 @@
-const nodemailer = require("nodemailer");
-const crypto = require("crypto");
+import nodemailer from "nodemailer";
+import crypto from "crypto";
 
-// Store reset tokens temporarily
-const resetTokens = new Map();
+function createResetToken(email) {
+  const secret = process.env.EMAIL_PASS;
+  const payload = Buffer.from(JSON.stringify({
+    email,
+    expiresAt: Date.now() + 1000 * 60 * 60,
+  })).toString("base64url");
+  const sig = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+  return `${payload}.${sig}`;
+}
 
-// Create transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -13,18 +19,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Verify transporter on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("Email configuration error:", error);
-  } else {
-    console.log("Email server is ready");
-  }
-});
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   try {
-    // CORS
     res.setHeader("Access-Control-Allow-Credentials", true);
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -35,38 +31,22 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method !== "POST") {
-      return res.status(405).json({
-        message: "Method not allowed",
-      });
+      return res.status(405).json({ message: "Method not allowed" });
     }
 
-    // Check env variables
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      return res.status(500).json({
-        message: "Email service is not configured",
-      });
+      return res.status(500).json({ message: "Email service is not configured" });
     }
 
     const { email, frontendUrl } = req.body;
 
-    // Validation
     if (!email || !frontendUrl) {
-      return res.status(400).json({
-        message: "Email and frontendUrl are required",
-      });
+      return res.status(400).json({ message: "Email and frontendUrl are required" });
     }
 
-    // Generate secure token
-    const token = crypto.randomBytes(32).toString("hex");
-
-    // Reset link
-    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
-
-    // Store token
-    resetTokens.set(token, {
-      email,
-      expiresAt: Date.now() + 1000 * 60 * 60, // 1 hour
-    });
+    // Generate self-signed token (no shared storage needed)
+    const token = createResetToken(email);
+    const resetLink = `${frontendUrl}/reset-password?token=${encodeURIComponent(token)}`;
 
     console.log("Sending password reset email to:", email);
 
@@ -136,4 +116,4 @@ module.exports = async function handler(req, res) {
       message: error.message || "Failed to send reset email",
     });
   }
-};
+}
