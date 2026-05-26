@@ -39,6 +39,13 @@ module.exports = async function handler(req, res) {
   try {
     const { email, name, frontendUrl } = req.body;
 
+    console.log('=== Email Verification Request ===');
+    console.log('Email:', email);
+    console.log('Name:', name);
+    console.log('Frontend URL:', frontendUrl);
+    console.log('EMAIL_USER exists:', !!process.env.EMAIL_USER);
+    console.log('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
+
     if (!email || !frontendUrl) {
       return res.status(400).json({ message: 'Email and frontendUrl are required' });
     }
@@ -46,6 +53,9 @@ module.exports = async function handler(req, res) {
     // Generate a verification token
     const token = crypto.randomBytes(32).toString('hex');
     const verifyLink = `${frontendUrl}/verify-email?token=${token}`;
+
+    console.log('Generated token:', token.substring(0, 10) + '...');
+    console.log('Verify link:', verifyLink);
 
     // Store token with expiration (24 hours)
     resetTokens.set(`verify_${token}`, {
@@ -71,15 +81,19 @@ module.exports = async function handler(req, res) {
       `
     };
 
+    console.log('Attempting to send email...');
     const info = await transporter.sendMail(mailOptions);
     console.log('Email sent successfully:', info.messageId);
     console.log('Email accepted by:', info.accepted);
     console.log('Email rejected by:', info.rejected);
+    console.log('Email response:', info.response);
     res.json({ message: 'Verification email sent successfully', messageId: info.messageId });
   } catch (error) {
-    console.error('Error sending verification email:', error);
-    console.error('Error details:', error.message);
+    console.error('=== Email Sending Error ===');
+    console.error('Error:', error);
+    console.error('Error message:', error.message);
     console.error('Error code:', error.code);
-    res.status(500).json({ message: 'Failed to send verification email', error: error.message });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ message: 'Failed to send verification email', error: error.message, code: error.code });
   }
 };
