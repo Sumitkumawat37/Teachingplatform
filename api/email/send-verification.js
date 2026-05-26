@@ -4,39 +4,57 @@ const crypto = require('crypto');
 // Store verification tokens in memory (in production, use Vercel KV or a database)
 const resetTokens = new Map();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  debug: true,
-  logger: true
-});
+let transporter;
+try {
+  console.log('Creating email transporter...');
+  console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'NOT SET');
+  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'SET' : 'NOT SET');
+  
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    },
+    debug: true,
+    logger: true
+  });
+  
+  console.log('Transporter created successfully');
+} catch (error) {
+  console.error('Failed to create transporter:', error);
+}
 
 module.exports = async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
-
-  // Check if email service is configured
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    return res.status(503).json({ 
-      message: 'Email service not configured. Please add EMAIL_USER and EMAIL_PASS environment variables.' 
-    });
-  }
-
   try {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    if (req.method !== 'POST') {
+      return res.status(405).json({ message: 'Method not allowed' });
+    }
+
+    // Check if email service is configured
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(503).json({ 
+        message: 'Email service not configured. Please add EMAIL_USER and EMAIL_PASS environment variables.' 
+      });
+    }
+
+    // Check if transporter was created successfully
+    if (!transporter) {
+      return res.status(503).json({ 
+        message: 'Email transporter failed to initialize. Check server logs for details.' 
+      });
+    }
+
     const { email, name, frontendUrl } = req.body;
 
     console.log('=== Email Verification Request ===');
@@ -89,7 +107,7 @@ module.exports = async function handler(req, res) {
     console.log('Email response:', info.response);
     res.json({ message: 'Verification email sent successfully', messageId: info.messageId });
   } catch (error) {
-    console.error('=== Email Sending Error ===');
+    console.error('=== Handler Error ===');
     console.error('Error:', error);
     console.error('Error message:', error.message);
     console.error('Error code:', error.code);
