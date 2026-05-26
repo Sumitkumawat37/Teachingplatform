@@ -73,7 +73,7 @@ export function SidebarNav() {
   const avatarUrl = myProfile?.avatar_url;
 
   const isSuperAdmin = role === "super_admin";
-  const isAdmin = role === "admin";
+  const isAdmin = role === "admin" || role === "teacher";
 
   const activeStyle = "bg-gradient-to-r from-violet-600 to-pink-500 text-white font-semibold shadow-[0_4px_16px_rgba(139,92,246,0.20)]";
   const hoverStyle = "text-slate-500 hover:text-slate-800 hover:bg-[#F3EEFF]";
@@ -102,7 +102,7 @@ export function SidebarNav() {
             <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full mt-0.5 ${
               isSuperAdmin ? "bg-amber-50 text-amber-600" : isAdmin ? "bg-violet-50 text-violet-600" : "bg-pink-50 text-pink-600"
             }`}>
-              {isSuperAdmin ? "Super Admin" : isAdmin ? "Teacher" : "Student"}
+              {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : isAdmin ? "Teacher" : "Student"}
             </span>
           </div>
         </div>

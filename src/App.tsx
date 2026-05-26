@@ -82,7 +82,7 @@ function AppRoutes() {
   // Role-based root redirect
   const rootRedirect = role === "super_admin"
     ? "/superadmin"
-    : role === "admin"
+    : (role === "admin" || role === "teacher")
     ? "/admin"
     : "/";
 
@@ -96,7 +96,7 @@ function AppRoutes() {
         <Route path="/" element={
           role === "super_admin" 
             ? <Navigate to="/superadmin" replace /> 
-            : role === "admin" 
+            : (role === "admin" || role === "teacher")
             ? <Navigate to="/admin" replace />
             : <Suspense fallback={<PageLoader />}><HomePage /></Suspense>
         } />

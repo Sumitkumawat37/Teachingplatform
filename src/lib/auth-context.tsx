@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
-export type Role = "student" | "admin" | "super_admin";
+export type Role = "student" | "teacher" | "admin" | "super_admin";
 
 // Emails that get super_admin role (add yours here for production)
 const SUPER_ADMIN_EMAILS = ["superadmin@demo.com"];
@@ -62,8 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ]);
 
     const isAdmin = roleData?.some((r) => r.role === "admin") ?? false;
+    const isTeacher = roleData?.some((r) => (r.role as string) === "teacher") ?? false;
     const isSuperAdmin = SUPER_ADMIN_EMAILS.includes((u.email ?? "").toLowerCase());
-    const role: Role = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : "student";
+    const role: Role = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : isTeacher ? "teacher" : "student";
 
     setAuth({
       isLoggedIn: true,
@@ -107,13 +108,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    const demoEmails = ["student@demo.com", "teacher@demo.com", "superadmin@demo.com"];
+    const isDemoAccount = demoEmails.includes(email) && password === "123456";
+
     // 1. Try normal sign-in first
-    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-    if (!signInErr) return true;
+    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (!signInErr && signInData.user) {
+      // For demo accounts, always ensure the correct role is set (upsert)
+      if (isDemoAccount) {
+        const demoRole = email === "teacher@demo.com" ? "teacher"
+                       : email === "superadmin@demo.com" ? "admin"
+                       : "student";
+        await supabase.from("user_roles")
+          .upsert({ user_id: signInData.user.id, role: demoRole }, { onConflict: "user_id,role" });
+        // Clear cache so setUserFromSession re-fetches roles with updated value
+        lastSessionToken.current = null;
+        await setUserFromSession(signInData.session);
+      }
+      return true;
+    }
 
     // 2. For demo accounts — auto-create if missing, then retry
-    const demoEmails = ["student@demo.com", "teacher@demo.com", "superadmin@demo.com"];
-    if (!demoEmails.includes(email) || password !== "123456") return false;
+    if (!isDemoAccount) return false;
 
     const name = email === "teacher@demo.com" ? "Shivam Sir"
                : email === "superadmin@demo.com" ? "Super Admin"
@@ -124,23 +141,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Assign role if new user was created
     if (signUpData.user) {
-      const role = email === "teacher@demo.com" ? "admin" 
-                  : email === "superadmin@demo.com" ? "admin" 
-                  : "student";
-      
-      await supabase.from("user_roles").insert({
-        user_id: signUpData.user.id,
-        role: role
-      });
-
-      // Also create profile if needed
-      await supabase.from("profiles").upsert({
-        user_id: signUpData.user.id,
-        name: name
-      }, { onConflict: "user_id" });
+      const demoRole = email === "teacher@demo.com" ? "teacher"
+                     : email === "superadmin@demo.com" ? "admin"
+                     : "student";
+      await supabase.from("user_roles")
+        .upsert({ user_id: signUpData.user.id, role: demoRole }, { onConflict: "user_id,role" });
+      await supabase.from("profiles")
+        .upsert({ user_id: signUpData.user.id, name }, { onConflict: "user_id" });
     }
 
-    // 3. Retry sign-in (works when email confirmation is disabled)
+    // 3. Retry sign-in
     const { error: retryErr } = await supabase.auth.signInWithPassword({ email, password });
     return !retryErr;
   };

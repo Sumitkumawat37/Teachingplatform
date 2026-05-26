@@ -28,7 +28,7 @@ const superAdminNav = [
 
 export function BottomNav() {
   const { role } = useAuth();
-  const items = role === "super_admin" ? superAdminNav : role === "admin" ? adminNav : studentNav;
+  const items = role === "super_admin" ? superAdminNav : (role === "admin" || role === "teacher") ? adminNav : studentNav;
   const location = useLocation();
 
   return (
