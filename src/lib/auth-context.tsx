@@ -176,14 +176,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Send verification email via Vercel serverless function (only on production)
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       try {
+        console.log('=== Sending verification email request ===');
+        console.log('Email:', email);
+        console.log('Name:', name);
+        console.log('Frontend URL:', window.location.origin);
+        
         const res = await fetch('/api/email/send-verification', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, name, frontendUrl: window.location.origin }),
         });
+        
+        console.log('Response status:', res.status);
+        console.log('Response ok:', res.ok);
+        
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           console.error("Verification email error:", err);
+          console.error("Error details:", JSON.stringify(err, null, 2));
+        } else {
+          const success = await res.json().catch(() => ({}));
+          console.log("Email sent successfully:", success);
         }
       } catch (fetchErr) {
         console.error("Could not reach email service:", fetchErr);
