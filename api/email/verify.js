@@ -1,14 +1,21 @@
 import { getToken, deleteToken } from "./token-storage.js";
 import { createClient } from "@supabase/supabase-js";
 
-// Use service role key for admin operations
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
 export default async function handler(req, res) {
   try {
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return res.status(503).json({
+        success: false,
+        message: "Verification service is not configured",
+      });
+    }
+
+    // Use service role key for admin operations
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
     const { token } = req.query;
 
     if (!token) {
