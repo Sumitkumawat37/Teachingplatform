@@ -141,8 +141,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Assign role if new user was created
     if (signUpData.user) {
-      const demoRole = email === "teacher@demo.com" ? "teacher"
-                     : email === "superadmin@demo.com" ? "admin"
+      const demoRole = email === "teacher@demo.com" ? "teacher" 
+                     : email === "superadmin@demo.com" ? "admin" 
                      : "student";
       await supabase.from("user_roles")
         .upsert({ user_id: signUpData.user.id, role: demoRole }, { onConflict: "user_id,role" });
@@ -253,15 +253,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = async (email: string): Promise<boolean> => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    // On localhost use Supabase native reset (Vercel API not available locally)
+    if (isLocalhost) {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw new Error(error.message);
+      return true;
+    }
+
     try {
-      // Send password reset email via Vercel serverless function
       const res = await fetch('/api/email/send-password-reset', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email, 
-          frontendUrl: window.location.origin 
-        }),
+        body: JSON.stringify({ email, frontendUrl: window.location.origin }),
       });
 
       if (!res.ok) {
@@ -273,9 +280,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true;
     } catch (err: any) {
       console.error('Password reset error:', err.message || err);
-      if (err.message?.includes('Failed to fetch') || err.message?.includes('fetch')) {
-        throw new Error("Backend service is not running. Please start the backend server.");
-      }
       throw new Error(err.message || "Failed to send reset link");
     }
   };
