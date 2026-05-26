@@ -4,27 +4,6 @@ const crypto = require('crypto');
 // Store verification tokens in memory (in production, use Vercel KV or a database)
 const resetTokens = new Map();
 
-let transporter;
-try {
-  console.log('Creating email transporter...');
-  console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'NOT SET');
-  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'SET' : 'NOT SET');
-  
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    },
-    debug: true,
-    logger: true
-  });
-  
-  console.log('Transporter created successfully');
-} catch (error) {
-  console.error('Failed to create transporter:', error);
-}
-
 module.exports = async function handler(req, res) {
   try {
     // Enable CORS
@@ -43,17 +22,29 @@ module.exports = async function handler(req, res) {
 
     // Check if email service is configured
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.log('Environment variables missing');
+      console.log('EMAIL_USER:', !!process.env.EMAIL_USER);
+      console.log('EMAIL_PASS:', !!process.env.EMAIL_PASS);
       return res.status(503).json({ 
         message: 'Email service not configured. Please add EMAIL_USER and EMAIL_PASS environment variables.' 
       });
     }
 
-    // Check if transporter was created successfully
-    if (!transporter) {
-      return res.status(503).json({ 
-        message: 'Email transporter failed to initialize. Check server logs for details.' 
-      });
-    }
+    console.log('Creating email transporter...');
+    console.log('EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'NOT SET');
+    console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? 'SET' : 'NOT SET');
+    
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      },
+      debug: true,
+      logger: true
+    });
+    
+    console.log('Transporter created successfully');
 
     const { email, name, frontendUrl } = req.body;
 
@@ -61,8 +52,6 @@ module.exports = async function handler(req, res) {
     console.log('Email:', email);
     console.log('Name:', name);
     console.log('Frontend URL:', frontendUrl);
-    console.log('EMAIL_USER exists:', !!process.env.EMAIL_USER);
-    console.log('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
 
     if (!email || !frontendUrl) {
       return res.status(400).json({ message: 'Email and frontendUrl are required' });
