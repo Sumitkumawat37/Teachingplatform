@@ -1,27 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Lock, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 const ResetPasswordPage = () => {
   const { updatePassword } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Check if we have the access token in the URL (from Supabase password reset)
-    const accessToken = searchParams.get("access_token");
-    if (!accessToken) {
-      toast.error("Invalid or expired reset link");
-      navigate("/forgot-password");
-    }
-  }, [searchParams, navigate]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();

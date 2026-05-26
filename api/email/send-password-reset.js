@@ -1,15 +1,5 @@
 import nodemailer from "nodemailer";
-import crypto from "crypto";
-
-function createResetToken(email) {
-  const secret = process.env.EMAIL_PASS;
-  const payload = Buffer.from(JSON.stringify({
-    email,
-    expiresAt: Date.now() + 1000 * 60 * 60,
-  })).toString("base64url");
-  const sig = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
-  return `${payload}.${sig}`;
-}
+import { createClient } from "@supabase/supabase-js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -44,9 +34,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: "Email and frontendUrl are required" });
     }
 
-    // Generate self-signed token (no shared storage needed)
-    const token = createResetToken(email);
-    const resetLink = `${frontendUrl}/reset-password?token=${encodeURIComponent(token)}`;
+    // Generate Supabase recovery link so the reset session works properly
+    const supabase = createClient(
+      process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: { redirectTo: `${frontendUrl}/reset-password` },
+    });
+    if (linkError || !linkData?.properties?.action_link) {
+      return res.status(500).json({ message: "Failed to generate reset link" });
+    }
+    const resetLink = linkData.properties.action_link;
 
     console.log("Sending password reset email to:", email);
 
