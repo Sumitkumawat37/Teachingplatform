@@ -16,7 +16,7 @@ const VerifyEmailPage = () => {
       return;
     }
 
-    fetch(`http://localhost:5000/api/v1/email/verify-token?token=${token}`)
+    fetch(`/api/email/verify-email?token=${token}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
