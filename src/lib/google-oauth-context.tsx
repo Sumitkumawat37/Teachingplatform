@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 declare global {
   interface Window {
     gapi: any;
+    google: any;
   }
 }
 
@@ -26,140 +27,111 @@ export const useGoogleAuth = () => {
 export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [gapi, setGapi] = useState<any>(null);
-  const [gapiLoaded, setGapiLoaded] = useState(false);
-  const [gapiError, setGapiError] = useState<string | null>(null);
+  const [gapiReady, setGapiReady] = useState(false);
+  const tokenClientRef = useRef<any>(null);
 
   useEffect(() => {
-    const loadGapi = async () => {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn('VITE_GOOGLE_CLIENT_ID not set - Google Drive features disabled');
+      return;
+    }
 
-      if (!clientId) {
-        console.warn('Google Client ID not found in environment variables - Google Drive features will be disabled');
-        // Don't set error, just skip loading - app should work without Google Auth
-        return;
-      }
+    const loadScript = (src: string) =>
+      new Promise<void>((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.body.appendChild(s);
+      });
 
+    const init = async () => {
       try {
-        const gapiScript = document.createElement('script');
-        gapiScript.src = 'https://apis.google.com/js/api.js';
-        gapiScript.async = true;
-        gapiScript.defer = true;
-        gapiScript.onload = () => {
-          if (typeof window.gapi === 'undefined') {
-            console.warn('Failed to load Google API script - Google Drive features will be disabled');
-            return;
-          }
-          window.gapi.load('client:auth2', async () => {
+        // Load gapi (Drive API calls) + GIS (new auth library)
+        await Promise.all([
+          loadScript('https://apis.google.com/js/api.js'),
+          loadScript('https://accounts.google.com/gsi/client'),
+        ]);
+
+        // Init gapi client with Drive discovery doc only (no auth here)
+        await new Promise<void>((resolve, reject) => {
+          window.gapi.load('client', async () => {
             try {
               await window.gapi.client.init({
-                clientId: clientId,
-                scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly',
                 discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
               });
-              setGapi(window.gapi);
-              setGapiLoaded(true);
-
-              const authInstance = window.gapi.auth2.getAuthInstance();
-              if (authInstance && authInstance.isSignedIn.get()) {
-                const user = authInstance.currentUser.get();
-                const token = user.getAuthResponse().access_token;
-                setAccessToken(token);
-                setIsSignedIn(true);
-              }
-            } catch (error: any) {
-              console.warn('GAPI client init error - Google Drive features will be disabled:', error.message);
-            }
+              resolve();
+            } catch (e) { reject(e); }
           });
-        };
-        gapiScript.onerror = () => {
-          console.warn('Failed to load Google API script - Google Drive features will be disabled');
-        };
-        document.body.appendChild(gapiScript);
+        });
+
+        // Init GIS token client (replaces deprecated gapi.auth2)
+        tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly',
+          callback: (response: any) => {
+            if (response.access_token) {
+              window.gapi.client.setToken({ access_token: response.access_token });
+              setAccessToken(response.access_token);
+              setIsSignedIn(true);
+            }
+          },
+        });
+
+        setGapiReady(true);
       } catch (error: any) {
-        console.warn('GAPI load error - Google Drive features will be disabled:', error.message);
+        console.warn('Google Drive init error - features disabled:', error?.message ?? error);
       }
     };
 
-    loadGapi();
+    init();
   }, []);
 
   const signIn = async () => {
-    if (!gapi || !gapiLoaded) return;
-    try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      const user = await authInstance.signIn();
-      const token = user.getAuthResponse().access_token;
-      setAccessToken(token);
-      setIsSignedIn(true);
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      throw error;
+    if (!gapiReady || !tokenClientRef.current) {
+      console.warn('Google Drive not ready');
+      return;
     }
+    tokenClientRef.current.requestAccessToken({ prompt: 'consent' });
   };
 
   const signOut = async () => {
-    if (!gapi || !gapiLoaded) return;
-    try {
-      const authInstance = gapi.auth2.getAuthInstance();
-      await authInstance.signOut();
-      setAccessToken(null);
-      setIsSignedIn(false);
-    } catch (error: any) {
-      console.error('Sign out error:', error);
+    if (accessToken) {
+      window.google?.accounts?.oauth2?.revoke(accessToken, () => {});
     }
+    window.gapi?.client?.setToken(null);
+    setAccessToken(null);
+    setIsSignedIn(false);
   };
 
   const listDriveFiles = async (folderId?: string) => {
-    if (!gapi || !accessToken) {
-      console.error('GAPI not loaded or no access token');
-      return [];
-    }
-    
+    if (!accessToken) { console.error('Not signed in to Google Drive'); return []; }
     try {
-      const allFilesQuery = folderId 
-        ? `'${folderId}' in parents and trashed=false`
-        : "trashed=false";
-      
-      console.log('Querying Drive with query:', allFilesQuery);
-      
-      const response = await gapi.client.drive.files.list({
-        q: allFilesQuery,
+      const q = folderId ? `'${folderId}' in parents and trashed=false` : 'trashed=false';
+      const response = await window.gapi.client.drive.files.list({
+        q,
         fields: 'files(id, name, mimeType, webViewLink, thumbnailLink, size, modifiedTime)',
         pageSize: 100,
       });
-      
-      console.log('Drive API response:', response);
-      const allFiles = response.result.files || [];
-      
-      const relevantFiles = allFiles.filter((file: any) => {
-        const mimeType = file.mimeType?.toLowerCase() || '';
-        return mimeType.includes('pdf') || 
-               mimeType.includes('text') || 
-               mimeType.includes('document') ||
-               mimeType.includes('application/vnd.google');
+      const allFiles: any[] = response.result.files || [];
+      return allFiles.filter((file: any) => {
+        const m = file.mimeType?.toLowerCase() || '';
+        return m.includes('pdf') || m.includes('text') || m.includes('document') || m.includes('application/vnd.google');
       });
-      
-      console.log('All files:', allFiles.length);
-      console.log('Relevant files:', relevantFiles.length);
-      
-      return relevantFiles;
     } catch (error: any) {
       console.error('Error listing Drive files:', error);
-      console.error('Error details:', error.result?.error);
       return [];
     }
   };
 
   const getDriveFile = async (fileId: string) => {
-    if (!gapi || !accessToken) return null;
-    
+    if (!accessToken) return null;
     try {
-      const response = await gapi.client.drive.files.get({
-        fileId: fileId,
-        alt: 'media',
-      });
-      return response;
+      return await window.gapi.client.drive.files.get({ fileId, alt: 'media' });
     } catch (error) {
       console.error('Error getting Drive file:', error);
       return null;
