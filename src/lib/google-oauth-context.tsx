@@ -50,13 +50,10 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     const init = async () => {
       try {
-        // Scripts are loaded statically in index.html — just wait for them
-        await Promise.all([
-          waitFor(() => window.gapi),
-          waitFor(() => window.google?.accounts?.oauth2),
-        ]);
+        // Wait for gapi (required). GIS is optional — don't block on it.
+        await waitFor(() => window.gapi);
 
-        // Init gapi client with Drive discovery doc only (no auth here)
+        // Init gapi client with Drive discovery doc (no auth needed here)
         await new Promise<void>((resolve, reject) => {
           window.gapi.load('client', async () => {
             try {
@@ -68,18 +65,23 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           });
         });
 
-        // Init GIS token client (replaces deprecated gapi.auth2)
-        tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
-          scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly',
-          callback: (response: any) => {
-            if (response.access_token) {
-              window.gapi.client.setToken({ access_token: response.access_token });
-              setAccessToken(response.access_token);
-              setIsSignedIn(true);
-            }
-          },
-        });
+        // Try to init GIS token client (optional — might not load in some networks)
+        try {
+          await waitFor(() => window.google?.accounts?.oauth2, 5000);
+          tokenClientRef.current = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.metadata.readonly',
+            callback: (response: any) => {
+              if (response.access_token) {
+                window.gapi.client.setToken({ access_token: response.access_token });
+                setAccessToken(response.access_token);
+                setIsSignedIn(true);
+              }
+            },
+          });
+        } catch {
+          console.warn('Google Identity Services unavailable - Drive sign-in disabled');
+        }
 
         setGapiReady(true);
       } catch (error: any) {
