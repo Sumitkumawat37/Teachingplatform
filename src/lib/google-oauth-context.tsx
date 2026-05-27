@@ -37,24 +37,23 @@ export const GoogleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return;
     }
 
-    const loadScript = (src: string) =>
+    // Wait for a global variable to appear (scripts loaded via index.html)
+    const waitFor = (getter: () => any, timeout = 10000) =>
       new Promise<void>((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
-        const s = document.createElement('script');
-        s.src = src;
-        s.async = true;
-        s.defer = true;
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error(`Failed to load ${src}`));
-        document.body.appendChild(s);
+        if (getter()) { resolve(); return; }
+        const start = Date.now();
+        const id = setInterval(() => {
+          if (getter()) { clearInterval(id); resolve(); }
+          else if (Date.now() - start > timeout) { clearInterval(id); reject(new Error('timeout')); }
+        }, 100);
       });
 
     const init = async () => {
       try {
-        // Load gapi (Drive API calls) + GIS (new auth library)
+        // Scripts are loaded statically in index.html — just wait for them
         await Promise.all([
-          loadScript('https://apis.google.com/js/api.js'),
-          loadScript('https://accounts.google.com/gsi/client'),
+          waitFor(() => window.gapi),
+          waitFor(() => window.google?.accounts?.oauth2),
         ]);
 
         // Init gapi client with Drive discovery doc only (no auth here)
