@@ -39,59 +39,161 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const lastSessionToken = useRef<string | null>("__init__");
 
   const setUserFromSession = async (session: Session | null) => {
+  try {
     const token = session?.access_token ?? null;
-    if (lastSessionToken.current === token) return;
+
+    console.log("=== setUserFromSession ===");
+
+    if (lastSessionToken.current === token) {
+      console.log("Token unchanged, skipping");
+      return;
+    }
+
     lastSessionToken.current = token;
 
     if (!session?.user) {
-      setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
+      console.log("STEP 0 - No session");
+      setAuth({
+        isLoggedIn: false,
+        role: "student",
+        user: null,
+        loading: false,
+      });
       return;
     }
+
     const u = session.user;
 
-    // Parallel fetch — 2× faster than sequential
-    let profile = null;
+    console.log("STEP 1", u.email);
+
+    let profile: any = null;
+
     try {
-      const { data: profileData } = await supabase.from("profiles").select("*").eq("user_id", u.id).limit(1);
-      profile = profileData?.[0] || null;
-    } catch (e) {
-      // Profile may not exist, use null
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", u.id)
+        .single();
+
+      profile = data;
+      console.log("STEP 2", profile);
+    } catch (err) {
+      console.log("STEP 2A - Profile not found");
     }
 
-    // For OAuth (Google) users — upsert profile and assign student role on first login
-    const isOAuthUser = u.app_metadata?.provider === "google" || (u.identities ?? []).some((i: any) => i.provider === "google");
-    if (isOAuthUser) {
-      const name = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split("@")[0] || "";
-      const avatar_url = u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
-      await supabase.from("profiles").upsert(
-        { user_id: u.id, name, email: u.email, avatar_url },
-        { onConflict: "user_id" }
+    const isGoogleUser =
+      u.app_metadata?.provider === "google";
+
+    console.log("STEP 3", isGoogleUser);
+
+    if (isGoogleUser) {
+      const name =
+        u.user_metadata?.full_name ||
+        u.user_metadata?.name ||
+        u.email?.split("@")[0] ||
+        "";
+
+      const avatar =
+        u.user_metadata?.avatar_url ||
+        u.user_metadata?.picture ||
+        null;
+
+      console.log("STEP 4 - Profile upsert");
+
+      const { error: profileError } =
+        await supabase
+          .from("profiles")
+          .upsert(
+            {
+              user_id: u.id,
+              name,
+              email: u.email,
+              avatar_url: avatar,
+            },
+            {
+              onConflict: "user_id",
+            }
+          );
+
+      console.log("STEP 5", profileError);
+
+      const { error: roleError } =
+        await supabase
+          .from("user_roles")
+          .upsert(
+            {
+              user_id: u.id,
+              role: "student",
+            },
+            {
+              onConflict: "user_id,role",
+            }
+          );
+
+      console.log("STEP 6", roleError);
+    }
+
+    console.log("STEP 7 - Loading roles");
+
+    const { data: roleData, error: roleFetchError } =
+      await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", u.id);
+
+    console.log("STEP 8", roleData, roleFetchError);
+
+    const isAdmin =
+  Array.isArray(roleData) &&
+  roleData.some((r: any) => r.role === "admin");
+
+const isTeacher =
+  Array.isArray(roleData) &&
+  roleData.some((r: any) => r.role === "teacher");
+
+    const isSuperAdmin =
+      SUPER_ADMIN_EMAILS.includes(
+        (u.email ?? "").toLowerCase()
       );
-      if (!profile) {
-        await supabase.from("user_roles").upsert(
-          { user_id: u.id, role: "student" },
-          { onConflict: "user_id,role" }
-        );
-      }
-      if (!profile) profile = { name, avatar_url };
-    }
 
-    const [{ data: roleData }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", u.id),
-    ]);
+    const role: Role =
+      isSuperAdmin
+        ? "super_admin"
+        : isAdmin
+        ? "admin"
+        : isTeacher
+        ? "teacher"
+        : "student";
 
-    const isAdmin = roleData?.some((r) => r.role === "admin") ?? false;
-    const isTeacher = roleData?.some((r) => (r.role as string) === "teacher") ?? false;
-    const isSuperAdmin = SUPER_ADMIN_EMAILS.includes((u.email ?? "").toLowerCase());
-    const role: Role = isSuperAdmin ? "super_admin" : isAdmin ? "admin" : isTeacher ? "teacher" : "student";
+    console.log("STEP 9 - Setting auth");
 
     setAuth({
       isLoggedIn: true,
       role,
-      user: { name: profile?.name || u.email?.split("@")[0] || "", email: u.email || "", id: u.id },
+      user: {
+        id: u.id,
+        email: u.email || "",
+        name:
+          profile?.name ||
+          u.user_metadata?.full_name ||
+          u.email?.split("@")[0] ||
+          "",
+      },
       loading: false,
     });
-  };
+
+    console.log("STEP 10 - SUCCESS");
+  } catch (err) {
+    console.error("setUserFromSession failed", err);
+
+    setAuth({
+      isLoggedIn: false,
+      role: "student",
+      user: null,
+      loading: false,
+    });
+  }
+};
 
   useEffect(() => {
     let mounted = true;
