@@ -45,19 +45,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isOAuthCallback = useRef(false);
   
   useEffect(() => {
+    // Check both query parameters AND hash fragments
     const urlParams = new URLSearchParams(window.location.search);
-    const hasCode = urlParams.has('code');
-    const hasAccessToken = urlParams.has('access_token');
-    const hasRefreshToken = urlParams.has('refresh_token');
-    const hasState = urlParams.has('state');
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
     
-    if (hasCode || hasAccessToken || hasRefreshToken || hasState) {
+    const hasCode = urlParams.has('code') || hashParams.has('code');
+    const hasAccessToken = urlParams.has('access_token') || hashParams.has('access_token');
+    const hasRefreshToken = urlParams.has('refresh_token') || hashParams.has('refresh_token');
+    const hasState = urlParams.has('state') || hashParams.has('state');
+    const hasError = urlParams.has('error') || hashParams.has('error') || hashParams.has('error_description');
+    
+    if (hasCode || hasAccessToken || hasRefreshToken || hasState || hasError) {
       console.log("=== OAuth callback detected ===");
       console.log("Current URL:", window.location.href);
+      console.log("Search params:", window.location.search);
+      console.log("Hash fragment:", window.location.hash);
       console.log("Has code:", hasCode);
       console.log("Has access_token:", hasAccessToken);
       console.log("Has refresh_token:", hasRefreshToken);
       console.log("Has state:", hasState);
+      console.log("Has error:", hasError);
+      
+      if (hasError) {
+        const error = urlParams.get('error') || hashParams.get('error') || hashParams.get('error_description');
+        console.error("OAuth error:", error);
+      }
+      
       isOAuthCallback.current = true;
       setAuth(prev => ({ ...prev, isProcessingOAuth: true }));
     }
