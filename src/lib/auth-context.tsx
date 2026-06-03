@@ -35,129 +35,109 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading: true,
   });
 
-  // Prevent duplicate calls when both onAuthStateChange + getSession fire
+  // Track initialization state to prevent timeout from firing during OAuth
+  const isInitializing = useRef(true);
   const lastSessionToken = useRef<string | null>("__init__");
 
   const setUserFromSession = async (session: Session | null) => {
-  try {
-    const token = session?.access_token ?? null;
-
-    console.log("=== setUserFromSession ===");
-
-    if (lastSessionToken.current === token) {
-      console.log("Token unchanged, skipping");
-      return;
-    }
-
-    lastSessionToken.current = token;
-
-    if (!session?.user) {
-      console.log("STEP 0 - No session");
-      setAuth({
-        isLoggedIn: false,
-        role: "student",
-        user: null,
-        loading: false,
-      });
-      return;
-    }
-
-    const u = session.user;
-
-    console.log("STEP 1", u.email);
-
-    let profile: any = null;
-
     try {
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", u.id)
-        .single();
+      const token = session?.access_token ?? null;
+      console.log("=== setUserFromSession ===");
+      console.log("Session exists:", !!session);
+      console.log("Token exists:", !!token);
+      console.log("Last token:", lastSessionToken.current?.substring(0, 20) + "...");
+      console.log("Current token:", token?.substring(0, 20) + "...");
 
-      profile = data;
-      console.log("STEP 2", profile);
-    } catch (err) {
-      console.log("STEP 2A - Profile not found");
-    }
+      // Allow re-processing if we're in OAuth flow (token changed from null to value)
+      if (lastSessionToken.current === token && token !== null) {
+        console.log("Token unchanged, skipping");
+        return;
+      }
+      lastSessionToken.current = token;
 
-    const isGoogleUser =
-      u.app_metadata?.provider === "google";
+      if (!session?.user) {
+        console.log("STEP 0 - No session");
+        setAuth({
+          isLoggedIn: false,
+          role: "student",
+          user: null,
+          loading: false,
+        });
+        return;
+      }
 
-    console.log("STEP 3", isGoogleUser);
+      const u = session.user;
+      console.log("STEP 1 - User found:", u.email);
+      console.log("User ID:", u.id);
+      console.log("Provider:", u.app_metadata?.provider);
+      console.log("Identities:", u.identities?.map((i: any) => i.provider));
 
-    if (isGoogleUser) {
-      const name =
-        u.user_metadata?.full_name ||
-        u.user_metadata?.name ||
-        u.email?.split("@")[0] ||
-        "";
+      let profile: any = null;
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", u.id)
+          .single();
+        profile = data;
+        console.log("STEP 2 - Profile found:", !!profile);
+      } catch (err) {
+        console.log("STEP 2A - Profile not found, will create");
+      }
 
-      const avatar =
-        u.user_metadata?.avatar_url ||
-        u.user_metadata?.picture ||
-        null;
+      const isGoogleUser =
+        u.app_metadata?.provider === "google" ||
+        (u.identities ?? []).some((i: any) => i.provider === "google");
+      console.log("STEP 3 - Is Google user:", isGoogleUser);
 
-      console.log("STEP 4 - Profile upsert");
+      if (isGoogleUser) {
+        const name =
+          u.user_metadata?.full_name ||
+          u.user_metadata?.name ||
+          u.email?.split("@")[0] ||
+          "";
+        const avatar =
+          u.user_metadata?.avatar_url ||
+          u.user_metadata?.picture ||
+          null;
 
-      const { error: profileError } =
-        await supabase
+        console.log("STEP 4 - Upserting profile for Google user");
+        const { error: profileError } = await supabase
           .from("profiles")
           .upsert(
-            {
-              user_id: u.id,
-              name,
-              email: u.email,
-              avatar_url: avatar,
-            },
-            {
-              onConflict: "user_id",
-            }
+            { user_id: u.id, name, email: u.email, avatar_url: avatar },
+            { onConflict: "user_id" }
           );
+        console.log("STEP 5 - Profile upsert result:", profileError?.message || "success");
 
-      console.log("STEP 5", profileError);
+        if (!profile) {
+          console.log("STEP 6 - Assigning student role");
+          const { error: roleError } = await supabase
+            .from("user_roles")
+            .upsert(
+              { user_id: u.id, role: "student" },
+              { onConflict: "user_id,role" }
+            );
+          console.log("STEP 7 - Role upsert result:", roleError?.message || "success");
+        }
+      }
 
-      const { error: roleError } =
-        await supabase
-          .from("user_roles")
-          .upsert(
-            {
-              user_id: u.id,
-              role: "student",
-            },
-            {
-              onConflict: "user_id,role",
-            }
-          );
-
-      console.log("STEP 6", roleError);
-    }
-
-    console.log("STEP 7 - Loading roles");
-
-    const { data: roleData, error: roleFetchError } =
-      await supabase
+      console.log("STEP 8 - Fetching user roles");
+      const { data: roleData, error: roleFetchError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", u.id);
+      console.log("STEP 9 - Roles:", roleData, roleFetchError?.message);
 
-    console.log("STEP 8", roleData, roleFetchError);
-
-    const isAdmin =
-  Array.isArray(roleData) &&
-  roleData.some((r: any) => r.role === "admin");
-
-const isTeacher =
-  Array.isArray(roleData) &&
-  roleData.some((r: any) => r.role === "teacher");
-
-    const isSuperAdmin =
-      SUPER_ADMIN_EMAILS.includes(
+      const isAdmin =
+        Array.isArray(roleData) && roleData.some((r: any) => r.role === "admin");
+      const isTeacher =
+        Array.isArray(roleData) && roleData.some((r: any) => r.role === "teacher");
+      const isSuperAdmin = SUPER_ADMIN_EMAILS.includes(
         (u.email ?? "").toLowerCase()
       );
 
-    const role: Role =
-      isSuperAdmin
+      const role: Role = isSuperAdmin
         ? "super_admin"
         : isAdmin
         ? "admin"
@@ -165,63 +145,81 @@ const isTeacher =
         ? "teacher"
         : "student";
 
-    console.log("STEP 9 - Setting auth");
+      console.log("STEP 10 - Final role:", role);
+      console.log("STEP 11 - Setting auth state to logged in");
 
-    setAuth({
-      isLoggedIn: true,
-      role,
-      user: {
-        id: u.id,
-        email: u.email || "",
-        name:
-          profile?.name ||
-          u.user_metadata?.full_name ||
-          u.email?.split("@")[0] ||
-          "",
-      },
-      loading: false,
-    });
+      setAuth({
+        isLoggedIn: true,
+        role,
+        user: {
+          id: u.id,
+          email: u.email || "",
+          name:
+            profile?.name ||
+            u.user_metadata?.full_name ||
+            u.email?.split("@")[0] ||
+            "",
+        },
+        loading: false,
+      });
 
-    console.log("STEP 10 - SUCCESS");
-  } catch (err) {
-    console.error("setUserFromSession failed", err);
-
-    setAuth({
-      isLoggedIn: false,
-      role: "student",
-      user: null,
-      loading: false,
-    });
-  }
-};
+      console.log("STEP 12 - SUCCESS");
+    } catch (err) {
+      console.error("setUserFromSession failed:", err);
+      setAuth({
+        isLoggedIn: false,
+        role: "student",
+        user: null,
+        loading: false,
+      });
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
     let timeoutId: NodeJS.Timeout;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setUserFromSession(session);
-    });
+    console.log("=== AuthProvider initializing ===");
+    console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+    console.log("Current origin:", window.location.origin);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("=== onAuthStateChange ===");
+        console.log("Event:", event);
+        console.log("Session exists:", !!session);
+        console.log("User:", session?.user?.email);
+        console.log("Access token:", session?.access_token?.substring(0, 20) + "...");
+        
+        if (mounted) setUserFromSession(session);
+      }
+    );
 
     // getSession covers the case where onAuthStateChange hasn't fired yet
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("=== getSession result ===");
+      console.log("Session exists:", !!session);
+      console.log("User:", session?.user?.email);
       if (mounted) setUserFromSession(session);
+      isInitializing.current = false;
     }).catch((err) => {
-      console.error('Auth session error:', err);
+      console.error("Auth session error:", err);
       if (mounted) {
         setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
       }
+      isInitializing.current = false;
     });
 
-    // Timeout to prevent infinite loading if Supabase fails
+    // Increased timeout to 15s for OAuth flow, only fires if still initializing
     timeoutId = setTimeout(() => {
-      if (mounted && auth.loading) {
-        console.warn('Auth initialization timeout - forcing render');
+      if (mounted && auth.loading && isInitializing.current) {
+        console.warn("Auth initialization timeout - forcing render");
         setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
       }
-    }, 5000);
+    }, 15000);
 
     return () => {
+      console.log("=== AuthProvider cleanup ===");
       mounted = false;
       clearTimeout(timeoutId);
       subscription.unsubscribe();
@@ -351,10 +349,19 @@ const isTeacher =
   const signInWithGoogle = async (): Promise<boolean> => {
     try {
       const redirectUrl = `${window.location.origin}/`;
+      console.log("=== signInWithGoogle ===");
+      console.log("Redirect URL:", redirectUrl);
+      console.log("Origin:", window.location.origin);
+      console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
@@ -364,6 +371,7 @@ const isTeacher =
         return false;
       }
 
+      console.log('OAuth initiated successfully, redirecting to Google');
       return true;
     } catch (err) {
       console.error('Google sign-in error:', err);
