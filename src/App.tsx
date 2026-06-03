@@ -60,7 +60,21 @@ const PageLoader = () => (
 const queryClient = new QueryClient();
 
 function AppRoutes() {
-  const { isLoggedIn, role } = useAuth();
+  const { isLoggedIn, role, loading, isProcessingOAuth } = useAuth();
+
+  // Show loading screen while initializing or processing OAuth callback
+  if (loading || isProcessingOAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F7F7FA]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-600 font-medium">
+            {isProcessingOAuth ? "Completing sign-in..." : "Loading..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return (

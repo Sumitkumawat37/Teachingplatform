@@ -13,6 +13,7 @@ interface AuthState {
   role: Role;
   user: { name: string; email: string; id: string } | null;
   loading: boolean;
+  isProcessingOAuth: boolean;
 }
 
 interface AuthContextType extends AuthState {
@@ -33,11 +34,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: "student",
     user: null,
     loading: true,
+    isProcessingOAuth: false,
   });
 
   // Track initialization state to prevent timeout from firing during OAuth
   const isInitializing = useRef(true);
   const lastSessionToken = useRef<string | null>("__init__");
+
+  // Detect OAuth callback in URL
+  const isOAuthCallback = useRef(false);
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasCode = urlParams.has('code');
+    const hasAccessToken = urlParams.has('access_token');
+    const hasRefreshToken = urlParams.has('refresh_token');
+    const hasState = urlParams.has('state');
+    
+    if (hasCode || hasAccessToken || hasRefreshToken || hasState) {
+      console.log("=== OAuth callback detected ===");
+      console.log("Current URL:", window.location.href);
+      console.log("Has code:", hasCode);
+      console.log("Has access_token:", hasAccessToken);
+      console.log("Has refresh_token:", hasRefreshToken);
+      console.log("Has state:", hasState);
+      isOAuthCallback.current = true;
+      setAuth(prev => ({ ...prev, isProcessingOAuth: true }));
+    }
+  }, []);
 
   const setUserFromSession = async (session: Session | null) => {
     try {
@@ -57,11 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!session?.user) {
         console.log("STEP 0 - No session");
+        // Don't set loading=false if we're processing OAuth callback
         setAuth({
           isLoggedIn: false,
           role: "student",
           user: null,
-          loading: false,
+          loading: isOAuthCallback.current,
+          isProcessingOAuth: isOAuthCallback.current,
         });
         return;
       }
@@ -161,6 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             "",
         },
         loading: false,
+        isProcessingOAuth: false,
       });
 
       console.log("STEP 12 - SUCCESS");
@@ -171,6 +198,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: "student",
         user: null,
         loading: false,
+        isProcessingOAuth: false,
       });
     }
   };
@@ -182,6 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log("=== AuthProvider initializing ===");
     console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
     console.log("Current origin:", window.location.origin);
+    console.log("Flow type: pkce");
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -191,32 +220,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log("User:", session?.user?.email);
         console.log("Access token:", session?.access_token?.substring(0, 20) + "...");
         
+        // When OAuth completes successfully, clear the processing flag
+        if (event === 'SIGNED_IN' && session) {
+          console.log("OAuth completed successfully, clearing processing flag");
+          isOAuthCallback.current = false;
+          setAuth(prev => ({ ...prev, isProcessingOAuth: false }));
+        }
+        
         if (mounted) setUserFromSession(session);
       }
     );
 
     // getSession covers the case where onAuthStateChange hasn't fired yet
+    // For PKCE, this is critical - it will exchange the code for tokens
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log("=== getSession result ===");
       console.log("Session exists:", !!session);
       console.log("User:", session?.user?.email);
+      console.log("Access token:", session?.access_token?.substring(0, 20) + "...");
+      
       if (mounted) setUserFromSession(session);
       isInitializing.current = false;
+      
+      // If we were processing OAuth and got no session, log the error
+      if (isOAuthCallback.current && !session) {
+        console.error("OAuth callback detected but no session after PKCE exchange");
+        console.error("Current URL:", window.location.href);
+        setAuth(prev => ({ ...prev, isProcessingOAuth: false }));
+      }
     }).catch((err) => {
       console.error("Auth session error:", err);
+      console.error("Error details:", JSON.stringify(err, null, 2));
       if (mounted) {
-        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
+        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false, isProcessingOAuth: false });
       }
       isInitializing.current = false;
     });
 
-    // Increased timeout to 15s for OAuth flow, only fires if still initializing
+    // Increased timeout to 20s for PKCE flow, only fires if still initializing
     timeoutId = setTimeout(() => {
       if (mounted && auth.loading && isInitializing.current) {
         console.warn("Auth initialization timeout - forcing render");
-        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
+        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false, isProcessingOAuth: false });
       }
-    }, 15000);
+    }, 20000);
 
     return () => {
       console.log("=== AuthProvider cleanup ===");
@@ -338,7 +385,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     // Instantly clear UI state, then sign out in background
     lastSessionToken.current = null;
-    setAuth({ isLoggedIn: false, role: "student", user: null, loading: false });
+    setAuth({ isLoggedIn: false, role: "student", user: null, loading: false, isProcessingOAuth: false });
     supabase.auth.signOut();
   };
 
