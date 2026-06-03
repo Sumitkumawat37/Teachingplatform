@@ -59,9 +59,12 @@ ALTER TABLE public.user_roles DISABLE ROW LEVEL SECURITY;
 -- FIX: DROP PROBLEMATIC TRIGGER IF EXISTS
 -- ============================================
 
--- Drop trigger if it exists (this will allow OAuth to work without trigger)
+-- Drop trigger first (it depends on the function)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP TRIGGER IF EXISTS handle_new_user ON auth.users;
-DROP FUNCTION IF EXISTS public.handle_new_user();
+
+-- Then drop the function
+DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 
 -- ============================================
 -- FIX: CREATE SIMPLE TRIGGER (OPTIONAL)
@@ -91,8 +94,8 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create trigger
-DROP TRIGGER IF EXISTS handle_new_user ON auth.users;
-CREATE TRIGGER handle_new_user
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
