@@ -251,14 +251,23 @@ const HomePage = () => {
                 className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
                 style={{ background: '#F3EEFF' }}
               >
-                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 shrink-0 shadow-sm">
-                  <img
-                    src={teacher.avatar_url || teacherBanner}
-                    alt={teacher.name || "Teacher"}
-                    className="w-full h-full object-cover object-top"
-                    loading="lazy"
-                    onError={(e) => { (e.target as HTMLImageElement).src = teacherBanner; }}
-                  />
+                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 shrink-0 shadow-sm bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center">
+                  {teacher.avatar_url ? (
+                    <img
+                      src={teacher.avatar_url}
+                      alt={teacher.name || "Teacher"}
+                      className="w-full h-full object-cover object-top"
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.currentTarget.style.display = 'none');
+                        (e.currentTarget.parentElement!.innerHTML = `<span class="text-violet-600 font-bold text-lg">${(teacher.name || "T").split(" ").map(n => n[0]).join("").slice(0, 2)}</span>`);
+                      }}
+                    />
+                  ) : (
+                    <span className="text-violet-600 font-bold text-lg">
+                      {(teacher.name || "T").split(" ").map(n => n[0]).join("").slice(0, 2)}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
