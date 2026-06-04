@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-import { Play, FileText, Trophy, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked } from "lucide-react";
+import { Play, FileText, Trophy, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +13,8 @@ import { useCourses, useAnnouncements, useLiveClasses } from "@/lib/supabase-dat
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+
+import { supabase } from "@/integrations/supabase/client";
 
 import teacherBanner from "../assets/teacher-banner.jpg";
 
@@ -76,6 +78,8 @@ const HomePage = () => {
 
   const { data: liveClasses = [] } = useLiveClasses();
 
+  const [teacherProfiles, setTeacherProfiles] = useState<any[]>([]);
+
 
 
   const upcomingLive = liveClasses.filter((c) => c.status === "upcoming");
@@ -87,6 +91,30 @@ const HomePage = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const scrollRef = useScrollReveal();
+
+  useEffect(() => {
+    const fetchTeacherProfiles = async () => {
+      try {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("user_id")
+          .eq("role", "teacher" as any);
+        
+        const teacherIds = roleData?.map((r: any) => r.user_id) || [];
+        
+        if (teacherIds.length > 0) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .in("user_id", teacherIds);
+          setTeacherProfiles(data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching teacher profiles:", err);
+      }
+    };
+    fetchTeacherProfiles();
+  }, []);
 
 
 
@@ -209,6 +237,48 @@ const HomePage = () => {
         ))}
 
       </div>
+
+
+
+      {/* ══ MEET YOUR MENTORS ══ */}
+      {teacherProfiles.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-slate-800 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Meet Your Mentors</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {teacherProfiles.map((teacher) => (
+              <div
+                key={teacher.user_id}
+                className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
+                style={{ background: '#F3EEFF' }}
+              >
+                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 shrink-0 shadow-sm">
+                  <img
+                    src={teacher.avatar_url || teacherBanner}
+                    alt={teacher.name || "Teacher"}
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = teacherBanner; }}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-semibold text-sm text-slate-800 truncate">{teacher.name || "Teacher"}</h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-100 text-violet-600 shrink-0">Faculty</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5 truncate">{teacher.subject || "UPSC Expert & Course Instructor"}</p>
+                  {teacher.bio && <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">{teacher.bio}</p>}
+                  {teacher.email && (
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <Mail className="w-3 h-3 text-violet-400" />
+                      <span className="text-[10px] text-slate-400 truncate">{teacher.email}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
 
 
