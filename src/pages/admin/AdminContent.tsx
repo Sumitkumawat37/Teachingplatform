@@ -55,6 +55,13 @@ const AdminContent = () => {
   const [lecUploading, setLecUploading] = useState(false);
   const lecFileInputRef = useRef<HTMLInputElement>(null);
 
+  // YouTube Playlist Import
+  const [showPlaylistImport, setShowPlaylistImport] = useState(false);
+  const [playlistUrl, setPlaylistUrl] = useState("");
+  const [playlistCourseId, setPlaylistCourseId] = useState("");
+  const [playlistChapterId, setPlaylistChapterId] = useState("");
+  const [importingPlaylist, setImportingPlaylist] = useState(false);
+
   // Note form
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteTitle, setNoteTitle] = useState("");
@@ -247,6 +254,85 @@ const AdminContent = () => {
     toast.success(`Selected: ${file.name}`);
   };
 
+  // Extract playlist ID from YouTube URL
+  const extractPlaylistId = (url: string): string | null => {
+    const match = url.match(/[?&]list=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  // Import YouTube playlist
+  const handleImportPlaylist = async () => {
+    if (!playlistUrl || !playlistCourseId || !playlistChapterId) {
+      return toast.error("Fill all fields");
+    }
+
+    const playlistId = extractPlaylistId(playlistUrl);
+    if (!playlistId) {
+      return toast.error("Invalid YouTube playlist URL");
+    }
+
+    setImportingPlaylist(true);
+    try {
+      // Fetch playlist videos using YouTube Data API
+      const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+      if (!apiKey) {
+        throw new Error("YouTube API key not configured");
+      }
+
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error.message);
+      }
+
+      const videos = data.items || [];
+      if (videos.length === 0) {
+        toast.warning("No videos found in playlist");
+        setImportingPlaylist(false);
+        return;
+      }
+
+      // Create lectures for each video
+      let successCount = 0;
+      const sortOrder = lectures.filter((l) => l.chapter_id === playlistChapterId).length;
+
+      for (let i = 0; i < videos.length; i++) {
+        const video = videos[i];
+        const videoId = video.snippet?.resourceId?.videoId;
+        const title = video.snippet?.title || `Video ${i + 1}`;
+        
+        if (videoId) {
+          try {
+            await createLecture.mutateAsync({
+              course_id: playlistCourseId,
+              chapter_id: playlistChapterId,
+              title,
+              youtube_id: videoId,
+              duration: "10:00",
+              free_preview: false,
+              sort_order: sortOrder + i,
+            } as any);
+            successCount++;
+          } catch (error) {
+            console.error(`Failed to create lecture for video ${i + 1}:`, error);
+          }
+        }
+      }
+
+      toast.success(`Imported ${successCount}/${videos.length} videos from playlist`);
+      setShowPlaylistImport(false);
+      setPlaylistUrl("");
+    } catch (error: any) {
+      console.error("Playlist import error:", error);
+      toast.error(error.message || "Failed to import playlist");
+    } finally {
+      setImportingPlaylist(false);
+    }
+  };
+
   return (
     <div className="space-y-4 animate-slide-up">
       <div className="flex items-center justify-between">
@@ -359,112 +445,150 @@ const AdminContent = () => {
 
         {/* LECTURES TAB */}
         <TabsContent value="videos" className="space-y-3 mt-3">
-          <Dialog open={showLectureForm} onOpenChange={setShowLectureForm}>
-            <DialogTrigger asChild><Button className="w-full"><Upload className="w-4 h-4 mr-2" /> Add Video Lecture</Button></DialogTrigger>
-            <DialogContent className="overflow-y-auto max-h-[85vh]">
-              <DialogHeader><DialogTitle>Add Video Lecture</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Course *</Label>
-                  <Select value={lecCourseId} onValueChange={(v) => { setLecCourseId(v); setLecChapterId(""); }}>
-                    <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
-                    <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.thumbnail_emoji} {c.title}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                {lecCourseId && (
+          <div className="flex gap-2">
+            <Dialog open={showLectureForm} onOpenChange={setShowLectureForm}>
+              <DialogTrigger asChild><Button className="flex-1"><Upload className="w-4 h-4 mr-2" /> Add Video Lecture</Button></DialogTrigger>
+              <DialogContent className="overflow-y-auto max-h-[85vh]">
+                <DialogHeader><DialogTitle>Add Video Lecture</DialogTitle></DialogHeader>
+                <div className="space-y-3">
                   <div className="space-y-1">
-                    <Label className="text-xs">Chapter *</Label>
-                    <Select value={lecChapterId} onValueChange={setLecChapterId}>
-                      <SelectTrigger><SelectValue placeholder="Select chapter" /></SelectTrigger>
-                      <SelectContent>{filteredChaptersForLecture.map((ch) => <SelectItem key={ch.id} value={ch.id}>{ch.title}</SelectItem>)}</SelectContent>
+                    <Label className="text-xs">Course *</Label>
+                    <Select value={lecCourseId} onValueChange={(v) => { setLecCourseId(v); setLecChapterId(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
+                      <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.thumbnail_emoji} {c.title}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
-                )}
-                <div className="space-y-1"><Label className="text-xs">Lecture Title *</Label><Input placeholder="e.g. Introduction to Algebra" value={lecTitle} onChange={(e) => setLecTitle(e.target.value)} /></div>
-                
-                {/* Video Source Options */}
-                <div className="space-y-2 p-3 bg-accent/30 rounded-lg">
-                  <p className="text-xs font-medium">Video Source (choose one)</p>
-                  
-                  {/* Option 1: YouTube URL */}
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Option 1: YouTube Link</Label>
-                    <Input 
-                      placeholder="https://youtube.com/watch?v=..." 
-                      value={lecYoutubeUrl} 
-                      onChange={(e) => { setLecYoutubeUrl(e.target.value); setLecVideoUrl(""); setLecVideoFile(null); }}
-                      disabled={!!lecVideoFile || !!lecVideoUrl}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center gap-2 py-1">
-                    <div className="flex-1 h-px bg-border" />
-                    <span className="text-[10px] text-muted-foreground">OR</span>
-                    <div className="flex-1 h-px bg-border" />
-                  </div>
-                  
-                  {/* Option 2: Upload Video */}
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Option 2: Upload Video</Label>
-                    <input ref={videoFileInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoFileSelect} />
-                    {lecVideoFile ? (
-                      <div className="flex items-center gap-2 p-2 bg-success/10 rounded-lg">
-                        <Video className="w-4 h-4 text-success" />
-                        <span className="text-xs flex-1 truncate">{lecVideoFile.name}</span>
-                        <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setLecVideoFile(null)}>Remove</Button>
-                      </div>
-                    ) : (
-                      <Button 
-                        variant="outline" 
-                        className="w-full h-9 text-xs" 
-                        onClick={() => videoFileInputRef.current?.click()}
-                        disabled={!!lecYoutubeUrl}
-                      >
-                        <Upload className="w-3 h-3 mr-1" /> Select Video File
-                      </Button>
-                    )}
-                    <p className="text-[10px] text-muted-foreground">Max 500MB. MP4, WebM, MOV supported.</p>
-                  </div>
-                  
-                  {/* Option 3: Video URL */}
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Or paste video URL</Label>
-                    <Input 
-                      placeholder="https://your-video-host.com/video.mp4" 
-                      value={lecVideoUrl} 
-                      onChange={(e) => { setLecVideoUrl(e.target.value); setLecYoutubeUrl(""); setLecVideoFile(null); }}
-                      disabled={!!lecVideoFile || !!lecYoutubeUrl}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Video Thumbnail</Label>
-                  <input ref={lecFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLecThumbnailSelect} />
-                  {lecThumbnailPreview ? (
-                    <div className="relative">
-                      <img src={lecThumbnailPreview} alt="Preview" className="w-full h-24 object-cover rounded-lg border border-border" />
-                      <Button size="sm" variant="secondary" className="absolute top-1 right-1 h-6 text-[10px]" onClick={() => { setLecThumbnailFile(null); setLecThumbnailPreview(""); }}>Remove</Button>
-                    </div>
-                  ) : (
-                    <div className="w-full h-24 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => lecFileInputRef.current?.click()}>
-                      <ImagePlus className="w-5 h-5 text-muted-foreground" />
-                      <span className="text-[10px] text-muted-foreground">Upload thumbnail (optional)</span>
+                  {lecCourseId && (
+                    <div className="space-y-1">
+                      <Label className="text-xs">Chapter *</Label>
+                      <Select value={lecChapterId} onValueChange={setLecChapterId}>
+                        <SelectTrigger><SelectValue placeholder="Select chapter" /></SelectTrigger>
+                        <SelectContent>{filteredChaptersForLecture.map((ch) => <SelectItem key={ch.id} value={ch.id}>{ch.title}</SelectItem>)}</SelectContent>
+                      </Select>
                     </div>
                   )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1"><Label className="text-xs">Duration</Label><Input placeholder="10:00" value={lecDuration} onChange={(e) => setLecDuration(e.target.value)} /></div>
-                  <div className="space-y-1 flex items-end gap-2 pb-0.5">
-                    <Switch checked={lecFreePreview} onCheckedChange={setLecFreePreview} />
-                    <Label className="text-xs">Free Preview</Label>
+                  <div className="space-y-1"><Label className="text-xs">Lecture Title *</Label><Input placeholder="e.g. Introduction to Algebra" value={lecTitle} onChange={(e) => setLecTitle(e.target.value)} /></div>
+                  
+                  {/* Video Source Options */}
+                  <div className="space-y-2 p-3 bg-accent/30 rounded-lg">
+                    <p className="text-xs font-medium">Video Source (choose one)</p>
+                    
+                    {/* Option 1: YouTube URL */}
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Option 1: YouTube Link</Label>
+                      <Input 
+                        placeholder="https://youtube.com/watch?v=..." 
+                        value={lecYoutubeUrl} 
+                        onChange={(e) => { setLecYoutubeUrl(e.target.value); setLecVideoUrl(""); setLecVideoFile(null); }}
+                        disabled={!!lecVideoFile || !!lecVideoUrl}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-2 py-1">
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-[10px] text-muted-foreground">OR</span>
+                      <div className="flex-1 h-px bg-border" />
+                    </div>
+                    
+                    {/* Option 2: Upload Video */}
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Option 2: Upload Video</Label>
+                      <input ref={videoFileInputRef} type="file" accept="video/*" className="hidden" onChange={handleVideoFileSelect} />
+                      {lecVideoFile ? (
+                        <div className="flex items-center gap-2 p-2 bg-success/10 rounded-lg">
+                          <Video className="w-4 h-4 text-success" />
+                          <span className="text-xs flex-1 truncate">{lecVideoFile.name}</span>
+                          <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setLecVideoFile(null)}>Remove</Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          className="w-full h-9 text-xs" 
+                          onClick={() => videoFileInputRef.current?.click()}
+                          disabled={!!lecYoutubeUrl}
+                        >
+                          <Upload className="w-3 h-3 mr-1" /> Select Video File
+                        </Button>
+                      )}
+                      <p className="text-[10px] text-muted-foreground">Max 500MB. MP4, WebM, MOV supported.</p>
+                    </div>
+                    
+                    {/* Option 3: Video URL */}
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Or paste video URL</Label>
+                      <Input 
+                        placeholder="https://your-video-host.com/video.mp4" 
+                        value={lecVideoUrl} 
+                        onChange={(e) => { setLecVideoUrl(e.target.value); setLecYoutubeUrl(""); setLecVideoFile(null); }}
+                        disabled={!!lecVideoFile || !!lecYoutubeUrl}
+                      />
+                    </div>
                   </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Video Thumbnail</Label>
+                    <input ref={lecFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLecThumbnailSelect} />
+                    {lecThumbnailPreview ? (
+                      <div className="relative">
+                        <img src={lecThumbnailPreview} alt="Preview" className="w-full h-24 object-cover rounded-lg border border-border" />
+                        <Button size="sm" variant="secondary" className="absolute top-1 right-1 h-6 text-[10px]" onClick={() => { setLecThumbnailFile(null); setLecThumbnailPreview(""); }}>Remove</Button>
+                      </div>
+                    ) : (
+                      <div className="w-full h-24 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => lecFileInputRef.current?.click()}>
+                        <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">Upload thumbnail (optional)</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Duration</Label><Input placeholder="10:00" value={lecDuration} onChange={(e) => setLecDuration(e.target.value)} /></div>
+                    <div className="space-y-1 flex items-end gap-2 pb-0.5">
+                      <Switch checked={lecFreePreview} onCheckedChange={setLecFreePreview} />
+                      <Label className="text-xs">Free Preview</Label>
+                    </div>
+                  </div>
+                  <Button className="w-full" onClick={handleCreateLecture} disabled={createLecture.isPending || lecUploading || lecVideoUploading}>
+                    {lecVideoUploading ? "Uploading video..." : lecUploading ? "Uploading thumbnail..." : createLecture.isPending ? "Adding..." : "Add Lecture"}
+                  </Button>
                 </div>
-                <Button className="w-full" onClick={handleCreateLecture} disabled={createLecture.isPending || lecUploading || lecVideoUploading}>
-                  {lecVideoUploading ? "Uploading video..." : lecUploading ? "Uploading thumbnail..." : createLecture.isPending ? "Adding..." : "Add Lecture"}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={showPlaylistImport} onOpenChange={setShowPlaylistImport}>
+              <DialogTrigger asChild><Button variant="secondary" className="flex-1"><Video className="w-4 h-4 mr-2" /> Import YouTube Playlist</Button></DialogTrigger>
+              <DialogContent className="overflow-y-auto max-h-[85vh]">
+                <DialogHeader><DialogTitle>Import YouTube Playlist</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Course *</Label>
+                    <Select value={playlistCourseId} onValueChange={(v) => { setPlaylistCourseId(v); setPlaylistChapterId(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
+                      <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.thumbnail_emoji} {c.title}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  {playlistCourseId && (
+                    <div className="space-y-1">
+                      <Label className="text-xs">Chapter *</Label>
+                      <Select value={playlistChapterId} onValueChange={setPlaylistChapterId}>
+                        <SelectTrigger><SelectValue placeholder="Select chapter" /></SelectTrigger>
+                        <SelectContent>{chapters.filter((c) => c.course_id === playlistCourseId).map((ch) => <SelectItem key={ch.id} value={ch.id}>{ch.title}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  <div className="space-y-1">
+                    <Label className="text-xs">YouTube Playlist URL *</Label>
+                    <Input 
+                      placeholder="https://www.youtube.com/playlist?list=..." 
+                      value={playlistUrl} 
+                      onChange={(e) => setPlaylistUrl(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">Paste the full YouTube playlist URL. All videos will be imported as lectures.</p>
+                  </div>
+                  <Button className="w-full" onClick={handleImportPlaylist} disabled={importingPlaylist}>
+                    {importingPlaylist ? "Importing..." : "Import Playlist"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           {lectures.map((l) => (
             <Card key={l.id} className="p-3 flex items-center gap-3">
               {(l as any).thumbnail_url ? (

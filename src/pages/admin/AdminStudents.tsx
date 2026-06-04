@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { Mail, RefreshCw, UserCheck, Download, Upload, Trash2, CheckSquare, Square, X, Lock as LockIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 
 const AdminStudents = () => {
+  const { user, role } = useAuth();
   const [studentProfiles, setStudentProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
@@ -21,7 +23,7 @@ const AdminStudents = () => {
         .select("user_id, role");
       
       const nonStudentUserIds = userRoles
-        ?.filter((r: any) => r.role === "admin" || r.role === "super_admin")
+        ?.filter((r: any) => r.role === "admin" || r.role === "super_admin" || r.role === "teacher")
         .map((r: any) => r.user_id) || [];
       
       // Get all profiles
@@ -31,7 +33,33 @@ const AdminStudents = () => {
         .order("name", { ascending: true });
 
       // Filter profiles to exclude non-students
-      const students = (profiles || []).filter((p: any) => !nonStudentUserIds.includes(p.user_id));
+      let students = (profiles || []).filter((p: any) => !nonStudentUserIds.includes(p.user_id));
+      
+      // If teacher, filter to only students enrolled in their courses
+      if (role === "teacher" && user?.id) {
+        // Get courses taught by this teacher
+        const { data: teacherCourses } = await supabase
+          .from("courses")
+          .select("id")
+          .eq("teacher_id", user.id);
+        
+        const teacherCourseIds = teacherCourses?.map((c: any) => c.id) || [];
+        
+        if (teacherCourseIds.length > 0) {
+          // Get enrollments for these courses
+          const { data: enrollments } = await supabase
+            .from("enrollments")
+            .select("user_id")
+            .in("course_id", teacherCourseIds);
+          
+          const enrolledStudentIds = enrollments?.map((e: any) => e.user_id) || [];
+          students = students.filter((s: any) => enrolledStudentIds.includes(s.user_id));
+        } else {
+          // Teacher has no courses, show no students
+          students = [];
+        }
+      }
+      
       setStudentProfiles(students);
     } catch (error) {
       console.error("Error fetching students:", error);

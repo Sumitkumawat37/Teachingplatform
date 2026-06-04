@@ -260,7 +260,10 @@ const HomePage = () => {
                       loading="lazy"
                       onError={(e) => {
                         (e.currentTarget.style.display = 'none');
-                        (e.currentTarget.parentElement!.innerHTML = `<span class="text-violet-600 font-bold text-lg">${(teacher.name || "T").split(" ").map(n => n[0]).join("").slice(0, 2)}</span>`);
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<span class="text-violet-600 font-bold text-lg">${(teacher.name || "T").split(" ").map(n => n[0]).join("").slice(0, 2)}</span>`;
+                        }
                       }}
                     />
                   ) : (

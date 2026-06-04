@@ -52,9 +52,12 @@ const AdminLiveClasses = () => {
 
   const handleSchedule = () => {
     if (!title || !selectedCourse || !selectedChapter || !scheduledDate || !meetingLink) return toast.error("Fill all fields");
+    // Handle timezone correctly - datetime-local gives local time, convert to ISO
+    const scheduledDateObj = new Date(scheduledDate);
+    const scheduled_at = scheduledDateObj.toISOString();
     createLiveClass.mutate({
       course_id: selectedCourse, chapter_id: selectedChapter, title,
-      scheduled_at: new Date(scheduledDate).toISOString(), meeting_link: meetingLink, duration,
+      scheduled_at, meeting_link: meetingLink, duration,
     }, {
       onSuccess: () => { toast.success("Live class scheduled!"); setTitle(""); setMeetingLink(""); setScheduledDate(""); },
     });
