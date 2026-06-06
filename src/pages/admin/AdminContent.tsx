@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useCourses, useLectures, useNotes, useChapters } from "@/lib/supabase-data";
-import { useCreateCourse, useDeleteCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useUpdateLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
+import { useCreateCourse, useDeleteCourse, useUpdateCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useUpdateLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus, ImagePlus, HardDrive, X, Lock as LockIcon } from "lucide-react";
@@ -21,6 +21,8 @@ const AdminContent = () => {
   
   // Course form
   const [showCourseForm, setShowCourseForm] = useState(false);
+  const [showEditCourseForm, setShowEditCourseForm] = useState(false);
+  const [editingCourseId, setEditingCourseId] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
   const [courseDesc, setCourseDesc] = useState("");
   const [coursePrice, setCoursePrice] = useState("");
@@ -81,6 +83,7 @@ const AdminContent = () => {
 
   const createCourse = useCreateCourse();
   const deleteCourse = useDeleteCourse();
+  const updateCourse = useUpdateCourse();
   const createChapter = useCreateChapter();
   const deleteChapter = useDeleteChapter();
   const createLecture = useCreateLecture();
@@ -128,6 +131,44 @@ const AdminContent = () => {
         setCourseTitle(""); setCourseDesc(""); setCoursePrice(""); setCourseCategory(""); setCourseInstructor(""); setCourseThumbnailUrl("");
         setThumbnailFile(null); setThumbnailPreview("");
       },
+    });
+  };
+
+  const handleEditCourse = (course: any) => {
+    setEditingCourseId(course.id);
+    setCourseTitle(course.title);
+    setCourseDesc(course.description || "");
+    setCoursePrice(course.price?.toString() || "");
+    setCourseCategory(course.category || "");
+    setCourseInstructor(course.instructor || "");
+    setCourseEmoji(course.thumbnail_emoji || "📚");
+    setCourseThumbnailUrl(course.thumbnail_url || "");
+    setThumbnailPreview(course.thumbnail_url || "");
+    setThumbnailFile(null);
+    setShowEditCourseForm(true);
+  };
+
+  const handleUpdateCourse = async () => {
+    if (!courseTitle) return toast.error("Course title is required");
+    const thumbUrl = await uploadThumbnail();
+    updateCourse.mutate({
+      id: editingCourseId,
+      title: courseTitle,
+      description: courseDesc,
+      price: parseInt(coursePrice) || 0,
+      category: courseCategory,
+      instructor: courseInstructor || "Rajesh Kumar",
+      thumbnail_emoji: courseEmoji,
+      ...(thumbUrl ? { thumbnail_url: thumbUrl } : {}),
+    }, {
+      onSuccess: () => {
+        toast.success("Course updated!");
+        setShowEditCourseForm(false);
+        setEditingCourseId("");
+        setCourseTitle(""); setCourseDesc(""); setCoursePrice(""); setCourseCategory(""); setCourseInstructor(""); setCourseThumbnailUrl("");
+        setThumbnailFile(null); setThumbnailPreview("");
+      },
+      onError: (error: any) => toast.error("Failed to update course: " + error.message)
     });
   };
 
@@ -389,6 +430,49 @@ const AdminContent = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            <Dialog open={showEditCourseForm} onOpenChange={setShowEditCourseForm}>
+              <DialogContent className="overflow-y-auto max-h-[85vh]">
+                <DialogHeader><DialogTitle>Edit Course</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1"><Label className="text-xs">Course Title *</Label><Input placeholder="e.g. Advanced Mathematics" value={courseTitle} onChange={(e) => setCourseTitle(e.target.value)} /></div>
+                  <div className="space-y-1"><Label className="text-xs">Description</Label><Textarea placeholder="Course description..." rows={2} value={courseDesc} onChange={(e) => setCourseDesc(e.target.value)} /></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Price (₹)</Label><Input type="number" placeholder="999" value={coursePrice} onChange={(e) => setCoursePrice(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Category</Label><Input placeholder="e.g. Mathematics" value={courseCategory} onChange={(e) => setCourseCategory(e.target.value)} /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Instructor</Label><Input placeholder="Rajesh Kumar" value={courseInstructor} onChange={(e) => setCourseInstructor(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Emoji Icon</Label><Input placeholder="📚" value={courseEmoji} onChange={(e) => setCourseEmoji(e.target.value)} /></div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Course Thumbnail</Label>
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleThumbnailSelect} />
+                    {thumbnailPreview ? (
+                      <div className="relative">
+                        <img src={thumbnailPreview} alt="Preview" className="w-full h-28 object-cover rounded-lg border border-border" />
+                        <Button size="sm" variant="secondary" className="absolute top-1 right-1 h-6 text-[10px]" onClick={() => { setThumbnailFile(null); setThumbnailPreview(""); }}>Remove</Button>
+                      </div>
+                    ) : (
+                      <div
+                        className="w-full h-28 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary/50 transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <ImagePlus className="w-6 h-6 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground">Click to upload image</span>
+                      </div>
+                    )}
+                    <p className="text-[10px] text-muted-foreground">Or paste a URL:</p>
+                    <Input placeholder="https://..." value={courseThumbnailUrl} onChange={(e) => { setCourseThumbnailUrl(e.target.value); setThumbnailFile(null); setThumbnailPreview(""); }} />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={handleUpdateCourse} disabled={updateCourse.isPending || uploading}>
+                      {uploading ? "Uploading image..." : updateCourse.isPending ? "Updating..." : "Update Course"}
+                    </Button>
+                    <Button variant="secondary" onClick={() => setShowEditCourseForm(false)}>Cancel</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Dialog open={showChapterForm} onOpenChange={setShowChapterForm}>
               <DialogTrigger asChild><Button variant="secondary"><FolderPlus className="w-4 h-4 mr-2" /> Chapter</Button></DialogTrigger>
               <DialogContent className="overflow-y-auto max-h-[85vh]">
@@ -423,8 +507,14 @@ const AdminContent = () => {
                     <p className="text-xs text-muted-foreground">₹{c.price} · {courseChapters.length} ch · {courseLectures.length} lec</p>
                   </div>
                   <Badge variant="secondary" className="text-[10px] shrink-0">{c.category}</Badge>
+                  <Button size="sm" variant="ghost" className="shrink-0" onClick={() => handleEditCourse(c)}><Eye className="w-3.5 h-3.5" /></Button>
                   <Button size="sm" variant="ghost" className="text-destructive shrink-0" onClick={() => {
-                    if (confirm("Delete this course and all its content?")) deleteCourse.mutate(c.id);
+                    if (confirm("Delete this course and all its content?")) {
+                      deleteCourse.mutate(c.id, {
+                        onSuccess: () => toast.success("Course deleted successfully"),
+                        onError: (error: any) => toast.error("Failed to delete course: " + error.message)
+                      });
+                    }
                   }}><Trash2 className="w-3.5 h-3.5" /></Button>
                 </div>
                 {courseChapters.length > 0 && (
@@ -433,7 +523,12 @@ const AdminContent = () => {
                       <div key={ch.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="font-medium">{ch.title}</span>
                         <span>({lectures.filter((l) => l.chapter_id === ch.id).length} lectures)</span>
-                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0 text-destructive" onClick={() => deleteChapter.mutate(ch.id)}><Trash2 className="w-3 h-3" /></Button>
+                        <Button size="sm" variant="ghost" className="h-5 w-5 p-0 text-destructive" onClick={() => {
+                          deleteChapter.mutate(ch.id, {
+                            onSuccess: () => toast.success("Chapter deleted successfully"),
+                            onError: (error: any) => toast.error("Failed to delete chapter: " + error.message)
+                          });
+                        }}><Trash2 className="w-3 h-3" /></Button>
                       </div>
                     ))}
                   </div>
@@ -608,7 +703,12 @@ const AdminContent = () => {
                 />
                 <span className="text-[10px] text-muted-foreground">{l.free_preview ? "Free" : "Locked"}</span>
               </div>
-              <Button size="sm" variant="ghost" className="text-destructive shrink-0" onClick={() => deleteLecture.mutate(l.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+              <Button size="sm" variant="ghost" className="text-destructive shrink-0" onClick={() => {
+                deleteLecture.mutate(l.id, {
+                  onSuccess: () => toast.success("Lecture deleted successfully"),
+                  onError: (error: any) => toast.error("Failed to delete lecture: " + error.message)
+                });
+              }}><Trash2 className="w-3.5 h-3.5" /></Button>
             </Card>
           ))}
         </TabsContent>
