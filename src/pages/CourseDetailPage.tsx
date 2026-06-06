@@ -23,9 +23,21 @@ const CourseDetailPage = memo(() => {
   const deleteFeedback = useDeleteFeedback();
   const { data: reviewVideos = [] } = useCourseReviewVideos(courseId);
 
-  // Review video gallery (manual trigger)
+  // Auto-popup review videos with animation
   const [showReviewGallery, setShowReviewGallery] = useState(false);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
+  const [hasSeenReviewGallery, setHasSeenReviewGallery] = useState(false);
+
+  useEffect(() => {
+    if (reviewVideos.length > 0 && !hasSeenReviewGallery) {
+      // Auto-popup after 2 seconds with animation
+      const timer = setTimeout(() => {
+        setShowReviewGallery(true);
+        setHasSeenReviewGallery(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [reviewVideos, hasSeenReviewGallery]);
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
@@ -356,15 +368,27 @@ const CourseDetailPage = memo(() => {
         )}
       </div>
 
-      {/* Review Videos Section */}
+      {/* Review Videos Section - Gallery Type */}
       {reviewVideos.length > 0 && (
         <div className="mt-6 space-y-4">
-          <h3 className="font-semibold text-base text-slate-800">Course Review Videos</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-base text-slate-800">Course Review Videos</h3>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setSelectedVideoIndex(0);
+                setShowReviewGallery(true);
+              }}
+            >
+              <Play className="w-4 h-4 mr-2" /> View All
+            </Button>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {reviewVideos.map((rv: any, index: number) => (
               <Card
                 key={rv.id}
-                className="cursor-pointer overflow-hidden hover:shadow-md transition-shadow"
+                className="cursor-pointer overflow-hidden hover:shadow-md transition-shadow shrink-0 w-40"
                 onClick={() => {
                   setSelectedVideoIndex(index);
                   setShowReviewGallery(true);
@@ -378,7 +402,7 @@ const CourseDetailPage = memo(() => {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
-                    <Play className="w-8 h-8 text-white fill-white" />
+                    <Play className="w-6 h-6 text-white fill-white" />
                   </div>
                 </div>
                 <div className="p-2">
