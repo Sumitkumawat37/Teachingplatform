@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { useCourses, useLectures, useNotes, useChapters } from "@/lib/supabase-data";
-import { useCreateCourse, useDeleteCourse, useUpdateCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useUpdateLecture, useCreateNote, useDeleteNote } from "@/lib/supabase-mutations";
+import { useCourses, useLectures, useNotes, useChapters, useCourseReviewVideos } from "@/lib/supabase-data";
+import { useCreateCourse, useDeleteCourse, useUpdateCourse, useCreateChapter, useDeleteChapter, useCreateLecture, useDeleteLecture, useUpdateLecture, useCreateNote, useDeleteNote, useCreateReviewVideo, useDeleteReviewVideo } from "@/lib/supabase-mutations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Video, FileText, Plus, Upload, BookOpen, Eye, Trash2, FolderPlus, ImagePlus, HardDrive, X, Lock as LockIcon } from "lucide-react";
@@ -71,6 +71,13 @@ const AdminContent = () => {
   const [quickCourseId, setQuickCourseId] = useState("");
   const [quickChapterId, setQuickChapterId] = useState("");
 
+  // Review Videos
+  const [showReviewVideoForm, setShowReviewVideoForm] = useState(false);
+  const [reviewVideoUrl, setReviewVideoUrl] = useState("");
+  const [reviewVideoTitle, setReviewVideoTitle] = useState("");
+  const [reviewVideoCourseId, setReviewVideoCourseId] = useState("");
+  const { data: reviewVideos = [] } = useCourseReviewVideos(reviewVideoCourseId || undefined);
+
   // Note form
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteTitle, setNoteTitle] = useState("");
@@ -98,6 +105,8 @@ const AdminContent = () => {
   const updateLecture = useUpdateLecture();
   const createNote = useCreateNote();
   const deleteNote = useDeleteNote();
+  const createReviewVideo = useCreateReviewVideo();
+  const deleteReviewVideo = useDeleteReviewVideo();
 
   const filteredChaptersForLecture = chapters.filter((c) => c.course_id === lecCourseId);
   const filteredChaptersForNote = chapters.filter((c) => c.course_id === noteCourseId);
@@ -285,6 +294,26 @@ const AdminContent = () => {
     });
   };
 
+  const handleAddReviewVideo = () => {
+    if (!reviewVideoUrl || !reviewVideoTitle || !reviewVideoCourseId) {
+      return toast.error("Fill all fields");
+    }
+    const sortOrder = reviewVideos.length;
+    createReviewVideo.mutate({
+      course_id: reviewVideoCourseId,
+      youtube_id: reviewVideoUrl,
+      title: reviewVideoTitle,
+      sort_order: sortOrder,
+    }, {
+      onSuccess: () => {
+        toast.success("Review video added!");
+        setReviewVideoUrl("");
+        setReviewVideoTitle("");
+      },
+      onError: () => toast.error("Failed to add review video"),
+    });
+  };
+
   const handleCreateNote = () => {
     if (!noteTitle || !noteCourseId || !noteChapterId) return toast.error("Fill all fields");
     createNote.mutate({
@@ -416,6 +445,7 @@ const AdminContent = () => {
         <TabsList className="w-full">
           <TabsTrigger value="courses" className="flex-1"><BookOpen className="w-4 h-4 mr-1" /> Courses</TabsTrigger>
           <TabsTrigger value="videos" className="flex-1"><Video className="w-4 h-4 mr-1" /> Lectures</TabsTrigger>
+          <TabsTrigger value="review-videos" className="flex-1"><Video className="w-4 h-4 mr-1" /> Review Videos</TabsTrigger>
           <TabsTrigger value="notes" className="flex-1"><FileText className="w-4 h-4 mr-1" /> Notes</TabsTrigger>
         </TabsList>
 
@@ -773,6 +803,66 @@ const AdminContent = () => {
               }}><Trash2 className="w-3.5 h-3.5" /></Button>
             </Card>
           ))}
+        </TabsContent>
+
+        {/* REVIEW VIDEOS TAB */}
+        <TabsContent value="review-videos" className="space-y-3 mt-3">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Select value={reviewVideoCourseId} onValueChange={setReviewVideoCourseId}>
+                <SelectTrigger><SelectValue placeholder="Select course to manage review videos" /></SelectTrigger>
+                <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.thumbnail_emoji} {c.title}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <Dialog open={showReviewVideoForm} onOpenChange={setShowReviewVideoForm}>
+              <DialogTrigger asChild><Button disabled={!reviewVideoCourseId}><Plus className="w-4 h-4 mr-2" /> Add Review Video</Button></DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Add Review Video</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1"><Label className="text-xs">YouTube URL *</Label><Input placeholder="https://youtube.com/watch?v=..." value={reviewVideoUrl} onChange={(e) => setReviewVideoUrl(e.target.value)} /></div>
+                  <div className="space-y-1"><Label className="text-xs">Video Title *</Label><Input placeholder="Review video title" value={reviewVideoTitle} onChange={(e) => setReviewVideoTitle(e.target.value)} /></div>
+                  <Button className="w-full" onClick={handleAddReviewVideo} disabled={createReviewVideo.isPending}>
+                    {createReviewVideo.isPending ? "Adding..." : "Add Video"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          {reviewVideoCourseId && (
+            <div className="space-y-3">
+              {reviewVideos.length > 0 ? (
+                reviewVideos.map((rv: any) => (
+                  <Card key={rv.id} className="p-3 flex items-center gap-3">
+                    <div className="w-32 h-20 rounded-lg bg-slate-900 flex items-center justify-center shrink-0">
+                      <iframe
+                        width="128"
+                        height="80"
+                        src={`https://www.youtube.com/embed/${rv.youtube_id}`}
+                        title={rv.title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{rv.title}</p>
+                      <p className="text-xs text-muted-foreground">Order: {rv.sort_order + 1}</p>
+                    </div>
+                    <Button size="sm" variant="ghost" className="text-destructive shrink-0" onClick={() => {
+                      if (confirm("Delete this review video?")) {
+                        deleteReviewVideo.mutate(rv.id, {
+                          onSuccess: () => toast.success("Review video deleted"),
+                          onError: () => toast.error("Failed to delete review video"),
+                        });
+                      }
+                    }}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  </Card>
+                ))
+              ) : (
+                <p className="text-sm text-slate-400 text-center py-4">No review videos for this course yet.</p>
+              )}
+            </div>
+          )}
         </TabsContent>
 
         {/* NOTES TAB */}

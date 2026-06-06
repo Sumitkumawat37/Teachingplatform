@@ -1,13 +1,14 @@
-import { useCourses, useLectures, useChapters, useCourseFeedback, useCreateFeedback, useDeleteFeedback } from "@/lib/supabase-data";
+import { useCourses, useLectures, useChapters, useCourseFeedback, useCreateFeedback, useDeleteFeedback, useCourseReviewVideos } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { useParams, useNavigate } from "react-router-dom";
 import { Play, ChevronLeft, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star, Trash2, Send } from "lucide-react";
 import { toast } from "sonner";
-import { memo, useState } from "react";
+import { memo, useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { ReviewVideoGallery } from "@/components/ReviewVideoGallery";
 
 const CourseDetailPage = memo(() => {
   const { courseId } = useParams();
@@ -20,6 +21,22 @@ const CourseDetailPage = memo(() => {
   const { data: feedback = [] } = useCourseFeedback(courseId);
   const createFeedback = useCreateFeedback();
   const deleteFeedback = useDeleteFeedback();
+  const { data: reviewVideos = [] } = useCourseReviewVideos(courseId);
+
+  // Auto-popup review videos
+  const [showReviewGallery, setShowReviewGallery] = useState(false);
+  const [hasSeenReviewGallery, setHasSeenReviewGallery] = useState(false);
+
+  useEffect(() => {
+    if (reviewVideos.length > 0 && !hasSeenReviewGallery) {
+      // Auto-popup after 2 seconds
+      const timer = setTimeout(() => {
+        setShowReviewGallery(true);
+        setHasSeenReviewGallery(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [reviewVideos, hasSeenReviewGallery]);
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
@@ -349,6 +366,13 @@ const CourseDetailPage = memo(() => {
           <p className="text-sm text-slate-400 text-center py-4">No feedback yet. Be the first to share your experience!</p>
         )}
       </div>
+
+      {/* Review Video Gallery - Auto-popup */}
+      <ReviewVideoGallery
+        videos={reviewVideos}
+        open={showReviewGallery}
+        onOpenChange={setShowReviewGallery}
+      />
     </div>
   );
 });

@@ -281,7 +281,7 @@ export function useCourseFeedback(courseId?: string) {
     queryKey: ["course_feedback", courseId],
     enabled: !!courseId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("course_feedback")
         .select("*, profiles(name, avatar_url)")
         .eq("course_id", courseId!)
@@ -301,7 +301,7 @@ export function useCreateFeedback() {
       rating: number;
       comment: string;
     }) => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("course_feedback")
         .insert(feedback)
         .select()
@@ -317,9 +317,26 @@ export function useDeleteFeedback() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("course_feedback").delete().eq("id", id);
+      const { error } = await (supabase as any).from("course_feedback").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["course_feedback"] }),
+  });
+}
+
+// Course Review Videos
+export function useCourseReviewVideos(courseId?: string) {
+  return useQuery({
+    queryKey: ["course_review_videos", courseId],
+    enabled: !!courseId,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("course_review_videos")
+        .select("*")
+        .eq("course_id", courseId!)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
   });
 }

@@ -324,3 +324,36 @@ export function useDeleteAnnouncement() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["announcements"] }),
   });
 }
+
+// Course Review Videos
+export function useCreateReviewVideo() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (video: {
+      course_id: string;
+      youtube_id: string;
+      title: string;
+      sort_order?: number;
+    }) => {
+      const { data, error } = await (supabase as any)
+        .from("course_review_videos")
+        .insert(video)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["course_review_videos"] }),
+  });
+}
+
+export function useDeleteReviewVideo() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any).from("course_review_videos").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["course_review_videos"] }),
+  });
+}
