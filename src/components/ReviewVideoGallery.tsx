@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
@@ -7,23 +7,17 @@ interface ReviewVideoGalleryProps {
   videos: Array<{ id: string; youtube_id: string; title: string }>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  startIndex?: number;
 }
 
-export function ReviewVideoGallery({ videos, open, onOpenChange }: ReviewVideoGalleryProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 }: ReviewVideoGalleryProps) {
+  const [currentIndex, setCurrentIndex] = useState(startIndex);
 
   useEffect(() => {
-    if (open && autoPlay && videos.length > 0) {
-      timerRef.current = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % videos.length);
-      }, 30000); // Auto-play every 30 seconds
+    if (open) {
+      setCurrentIndex(startIndex);
     }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [open, autoPlay, videos.length]);
+  }, [open, startIndex]);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % videos.length);
@@ -56,7 +50,7 @@ export function ReviewVideoGallery({ videos, open, onOpenChange }: ReviewVideoGa
             <iframe
               width="100%"
               height="100%"
-              src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?autoplay=1&mute=0&controls=1`}
+              src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?autoplay=0&rel=0&modestbranding=1&showinfo=0`}
               title={currentVideo.title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

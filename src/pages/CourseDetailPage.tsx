@@ -23,20 +23,9 @@ const CourseDetailPage = memo(() => {
   const deleteFeedback = useDeleteFeedback();
   const { data: reviewVideos = [] } = useCourseReviewVideos(courseId);
 
-  // Auto-popup review videos
+  // Review video gallery (manual trigger)
   const [showReviewGallery, setShowReviewGallery] = useState(false);
-  const [hasSeenReviewGallery, setHasSeenReviewGallery] = useState(false);
-
-  useEffect(() => {
-    if (reviewVideos.length > 0 && !hasSeenReviewGallery) {
-      // Auto-popup after 2 seconds
-      const timer = setTimeout(() => {
-        setShowReviewGallery(true);
-        setHasSeenReviewGallery(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [reviewVideos, hasSeenReviewGallery]);
+  const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
@@ -367,11 +356,46 @@ const CourseDetailPage = memo(() => {
         )}
       </div>
 
-      {/* Review Video Gallery - Auto-popup */}
+      {/* Review Videos Section */}
+      {reviewVideos.length > 0 && (
+        <div className="mt-6 space-y-4">
+          <h3 className="font-semibold text-base text-slate-800">Course Review Videos</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {reviewVideos.map((rv: any, index: number) => (
+              <Card
+                key={rv.id}
+                className="cursor-pointer overflow-hidden hover:shadow-md transition-shadow"
+                onClick={() => {
+                  setSelectedVideoIndex(index);
+                  setShowReviewGallery(true);
+                }}
+              >
+                <div className="aspect-video bg-slate-900 relative">
+                  <img
+                    src={`https://img.youtube.com/vi/${rv.youtube_id}/mqdefault.jpg`}
+                    alt={rv.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
+                    <Play className="w-8 h-8 text-white fill-white" />
+                  </div>
+                </div>
+                <div className="p-2">
+                  <p className="text-xs font-medium text-slate-700 truncate">{rv.title}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Review Video Gallery - Manual trigger */}
       <ReviewVideoGallery
         videos={reviewVideos}
         open={showReviewGallery}
         onOpenChange={setShowReviewGallery}
+        startIndex={selectedVideoIndex}
       />
     </div>
   );
