@@ -298,10 +298,18 @@ const AdminContent = () => {
     if (!reviewVideoUrl || !reviewVideoTitle || !reviewVideoCourseId) {
       return toast.error("Fill all fields");
     }
+
+    // Extract YouTube video ID from URL
+    let youtubeId = reviewVideoUrl;
+    const match = reviewVideoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    if (match && match[1]) {
+      youtubeId = match[1];
+    }
+
     const sortOrder = reviewVideos.length;
     createReviewVideo.mutate({
       course_id: reviewVideoCourseId,
-      youtube_id: reviewVideoUrl,
+      youtube_id: youtubeId,
       title: reviewVideoTitle,
       sort_order: sortOrder,
     }, {
@@ -310,7 +318,7 @@ const AdminContent = () => {
         setReviewVideoUrl("");
         setReviewVideoTitle("");
       },
-      onError: () => toast.error("Failed to add review video"),
+      onError: (error: any) => toast.error("Failed to add review video: " + error.message),
     });
   };
 
