@@ -76,6 +76,9 @@ const AdminContent = () => {
   const [reviewVideoUrl, setReviewVideoUrl] = useState("");
   const [reviewVideoTitle, setReviewVideoTitle] = useState("");
   const [reviewVideoCourseId, setReviewVideoCourseId] = useState("");
+  const [showReviewPlaylistForm, setShowReviewPlaylistForm] = useState(false);
+  const [reviewPlaylistUrl, setReviewPlaylistUrl] = useState("");
+  const [importingReviewPlaylist, setImportingReviewPlaylist] = useState(false);
   const { data: reviewVideos = [] } = useCourseReviewVideos(reviewVideoCourseId || undefined);
 
   // Note form
@@ -320,6 +323,86 @@ const AdminContent = () => {
       },
       onError: (error: any) => toast.error("Failed to add review video: " + error.message),
     });
+  };
+
+  const extractReviewPlaylistId = (url: string): string | null => {
+    const match = url.match(/[?&]list=([^&]+)/);
+    return match ? match[1] : null;
+  };
+
+  const handleImportReviewPlaylist = async () => {
+    if (!reviewPlaylistUrl || !reviewVideoCourseId) {
+      return toast.error("Fill all fields");
+    }
+
+    const playlistId = extractReviewPlaylistId(reviewPlaylistUrl);
+    if (!playlistId) {
+      return toast.error("Invalid YouTube playlist URL");
+    }
+
+    setImportingReviewPlaylist(true);
+    try {
+      // Fetch playlist videos from YouTube Data API
+      const apiKey = process.env.VITE_YOUTUBE_API_KEY || "";
+      if (!apiKey) {
+        toast.error("YouTube API key not configured");
+        setImportingReviewPlaylist(false);
+        return;
+      }
+
+      const response = await fetch(
+        `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&key=${apiKey}`
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        toast.error("Failed to fetch playlist: " + data.error.message);
+        setImportingReviewPlaylist(false);
+        return;
+      }
+
+      const videos = data.items || [];
+      if (videos.length === 0) {
+        toast.error("No videos found in playlist");
+        setImportingReviewPlaylist(false);
+        return;
+      }
+
+      // Add each video as a review video
+      let addedCount = 0;
+      for (let i = 0; i < videos.length; i++) {
+        const video = videos[i];
+        const videoId = video.snippet.resourceId?.videoId;
+        const title = video.snippet.title;
+
+        if (videoId && title) {
+          createReviewVideo.mutate(
+            {
+              course_id: reviewVideoCourseId,
+              youtube_id: videoId,
+              title: title,
+              sort_order: reviewVideos.length + i,
+            },
+            {
+              onSuccess: () => {
+                addedCount++;
+                if (addedCount === videos.length) {
+                  toast.success(`Successfully imported ${addedCount} videos from playlist`);
+                  setReviewPlaylistUrl("");
+                  setShowReviewPlaylistForm(false);
+                }
+              },
+            }
+          );
+        }
+      }
+
+      setImportingReviewPlaylist(false);
+    } catch (error) {
+      console.error("Error importing playlist:", error);
+      toast.error("Failed to import playlist");
+      setImportingReviewPlaylist(false);
+    }
   };
 
   const handleCreateNote = () => {
@@ -823,7 +906,7 @@ const AdminContent = () => {
               </Select>
             </div>
             <Dialog open={showReviewVideoForm} onOpenChange={setShowReviewVideoForm}>
-              <DialogTrigger asChild><Button disabled={!reviewVideoCourseId}><Plus className="w-4 h-4 mr-2" /> Add Review Video</Button></DialogTrigger>
+              <DialogTrigger asChild><Button disabled={!reviewVideoCourseId}><Plus className="w-4 h-4 mr-2" /> Add Video</Button></DialogTrigger>
               <DialogContent>
                 <DialogHeader><DialogTitle>Add Review Video</DialogTitle></DialogHeader>
                 <div className="space-y-3">
@@ -831,6 +914,18 @@ const AdminContent = () => {
                   <div className="space-y-1"><Label className="text-xs">Video Title *</Label><Input placeholder="Review video title" value={reviewVideoTitle} onChange={(e) => setReviewVideoTitle(e.target.value)} /></div>
                   <Button className="w-full" onClick={handleAddReviewVideo} disabled={createReviewVideo.isPending}>
                     {createReviewVideo.isPending ? "Adding..." : "Add Video"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={showReviewPlaylistForm} onOpenChange={setShowReviewPlaylistForm}>
+              <DialogTrigger asChild><Button disabled={!reviewVideoCourseId} variant="outline"><FolderPlus className="w-4 h-4 mr-2" /> Import Playlist</Button></DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>Import YouTube Playlist</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1"><Label className="text-xs">Playlist URL *</Label><Input placeholder="https://youtube.com/playlist?list=..." value={reviewPlaylistUrl} onChange={(e) => setReviewPlaylistUrl(e.target.value)} /></div>
+                  <Button className="w-full" onClick={handleImportReviewPlaylist} disabled={importingReviewPlaylist}>
+                    {importingReviewPlaylist ? "Importing..." : "Import Playlist"}
                   </Button>
                 </div>
               </DialogContent>

@@ -30,6 +30,7 @@ const CourseDetailPage = memo(() => {
   const [showReviewGallery, setShowReviewGallery] = useState(false);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
   const [hasSeenReviewGallery, setHasSeenReviewGallery] = useState(false);
+  const [currentEmbeddedIndex, setCurrentEmbeddedIndex] = useState(0);
 
   useEffect(() => {
     if (reviewVideos.length > 0 && !hasSeenReviewGallery) {
@@ -41,6 +42,16 @@ const CourseDetailPage = memo(() => {
       return () => clearTimeout(timer);
     }
   }, [reviewVideos, hasSeenReviewGallery]);
+
+  // Auto-scroll embedded video every 5 seconds
+  useEffect(() => {
+    if (reviewVideos.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentEmbeddedIndex((prev) => (prev + 1) % reviewVideos.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [reviewVideos.length]);
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
@@ -371,17 +382,35 @@ const CourseDetailPage = memo(() => {
         )}
       </div>
 
-      {/* Review Videos Section - Single Gallery Button */}
+      {/* Review Videos Section - Gallery Box */}
       {reviewVideos.length > 0 && (
         <div className="mt-6">
+          <h3 className="font-semibold text-base text-slate-800 mb-3">Course Review Videos</h3>
+          <div className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden">
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${reviewVideos[currentEmbeddedIndex]?.youtube_id}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0`}
+              title={reviewVideos[currentEmbeddedIndex]?.title}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="object-cover"
+              key={currentEmbeddedIndex}
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+              <p className="text-white font-semibold text-sm">{reviewVideos[currentEmbeddedIndex]?.title}</p>
+              <p className="text-white/70 text-xs">{currentEmbeddedIndex + 1} / {reviewVideos.length}</p>
+            </div>
+          </div>
           <Button
-            className="w-full"
+            className="w-full mt-3"
             onClick={() => {
-              setSelectedVideoIndex(0);
+              setSelectedVideoIndex(currentEmbeddedIndex);
               setShowReviewGallery(true);
             }}
           >
-            <Play className="w-4 h-4 mr-2" /> View Course Review Videos ({reviewVideos.length})
+            <Play className="w-4 h-4 mr-2" /> View All Review Videos
           </Button>
         </div>
       )}
