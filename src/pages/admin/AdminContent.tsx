@@ -64,6 +64,13 @@ const AdminContent = () => {
   const [playlistChapterId, setPlaylistChapterId] = useState("");
   const [importingPlaylist, setImportingPlaylist] = useState(false);
 
+  // Quick YouTube Video
+  const [showQuickYoutube, setShowQuickYoutube] = useState(false);
+  const [quickYoutubeUrl, setQuickYoutubeUrl] = useState("");
+  const [quickYoutubeTitle, setQuickYoutubeTitle] = useState("");
+  const [quickCourseId, setQuickCourseId] = useState("");
+  const [quickChapterId, setQuickChapterId] = useState("");
+
   // Note form
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteTitle, setNoteTitle] = useState("");
@@ -249,6 +256,32 @@ const AdminContent = () => {
   const handleToggleFreePreview = (lectureId: string, currentValue: boolean) => {
     updateLecture.mutate({ id: lectureId, free_preview: !currentValue }, {
       onSuccess: () => toast.success(!currentValue ? "Marked as free preview" : "Removed free preview"),
+    });
+  };
+
+  const handleQuickYoutube = () => {
+    if (!quickYoutubeUrl || !quickYoutubeTitle || !quickCourseId || !quickChapterId) {
+      return toast.error("Fill all fields");
+    }
+    const sortOrder = lectures.filter((l) => l.chapter_id === quickChapterId).length;
+    createLecture.mutate({
+      course_id: quickCourseId,
+      chapter_id: quickChapterId,
+      title: quickYoutubeTitle,
+      youtube_id: quickYoutubeUrl,
+      duration: "10:00",
+      free_preview: false,
+      sort_order: sortOrder,
+    } as any, {
+      onSuccess: () => {
+        toast.success("YouTube video added!");
+        setShowQuickYoutube(false);
+        setQuickYoutubeUrl("");
+        setQuickYoutubeTitle("");
+        setQuickCourseId("");
+        setQuickChapterId("");
+      },
+      onError: () => toast.error("Failed to add YouTube video"),
     });
   };
 
@@ -679,6 +712,35 @@ const AdminContent = () => {
                   </div>
                   <Button className="w-full" onClick={handleImportPlaylist} disabled={importingPlaylist}>
                     {importingPlaylist ? "Importing..." : "Import Playlist"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={showQuickYoutube} onOpenChange={setShowQuickYoutube}>
+              <DialogTrigger asChild><Button variant="secondary" className="flex-1"><Video className="w-4 h-4 mr-2" /> Quick YouTube</Button></DialogTrigger>
+              <DialogContent className="overflow-y-auto max-h-[85vh]">
+                <DialogHeader><DialogTitle>Quick Add YouTube Video</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Course *</Label>
+                    <Select value={quickCourseId} onValueChange={(v) => { setQuickCourseId(v); setQuickChapterId(""); }}>
+                      <SelectTrigger><SelectValue placeholder="Select course" /></SelectTrigger>
+                      <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.thumbnail_emoji} {c.title}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  {quickCourseId && (
+                    <div className="space-y-1">
+                      <Label className="text-xs">Chapter *</Label>
+                      <Select value={quickChapterId} onValueChange={setQuickChapterId}>
+                        <SelectTrigger><SelectValue placeholder="Select chapter" /></SelectTrigger>
+                        <SelectContent>{chapters.filter((c) => c.course_id === quickCourseId).map((ch) => <SelectItem key={ch.id} value={ch.id}>{ch.title}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  <div className="space-y-1"><Label className="text-xs">YouTube URL *</Label><Input placeholder="https://youtube.com/watch?v=..." value={quickYoutubeUrl} onChange={(e) => setQuickYoutubeUrl(e.target.value)} /></div>
+                  <div className="space-y-1"><Label className="text-xs">Video Title *</Label><Input placeholder="Video title" value={quickYoutubeTitle} onChange={(e) => setQuickYoutubeTitle(e.target.value)} /></div>
+                  <Button className="w-full" onClick={handleQuickYoutube} disabled={createLecture.isPending}>
+                    {createLecture.isPending ? "Adding..." : "Add Video"}
                   </Button>
                 </div>
               </DialogContent>

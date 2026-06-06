@@ -1,20 +1,33 @@
-import { useCourses, useLectures, useChapters } from "@/lib/supabase-data";
+import { useCourses, useLectures, useChapters, useCourseFeedback, useCreateFeedback, useDeleteFeedback } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { useParams, useNavigate } from "react-router-dom";
-import { Play, ChevronLeft, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star } from "lucide-react";
+import { Play, ChevronLeft, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star, Trash2, Send } from "lucide-react";
 import { toast } from "sonner";
-import { memo } from "react";
+import { memo, useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
 
 const CourseDetailPage = memo(() => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { hasPurchased, purchaseCourse } = usePurchase();
+  const { user } = useAuth();
   const { data: courses = [] } = useCourses();
   const { data: lectures = [] } = useLectures(courseId);
   const { data: chapters = [] } = useChapters(courseId);
+  const { data: feedback = [] } = useCourseFeedback(courseId);
+  const createFeedback = useCreateFeedback();
+  const deleteFeedback = useDeleteFeedback();
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
+
+  // Feedback state
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [hoverRating, setHoverRating] = useState(0);
 
   const freeLectures = lectures.filter((l) => l.free_preview).length;
 
@@ -42,6 +55,44 @@ const CourseDetailPage = memo(() => {
       return;
     }
     navigate(`/courses/${courseId}/lecture/${lecture.id}`);
+  };
+
+  const handleSubmitFeedback = () => {
+    if (!user) {
+      toast.error("Please login to submit feedback");
+      return;
+    }
+    if (rating === 0) {
+      toast.error("Please select a rating");
+      return;
+    }
+    if (!comment.trim()) {
+      toast.error("Please write a comment");
+      return;
+    }
+
+    createFeedback.mutate({
+      course_id: courseId!,
+      user_id: user.id,
+      rating,
+      comment: comment.trim(),
+    }, {
+      onSuccess: () => {
+        toast.success("Feedback submitted!");
+        setRating(0);
+        setComment("");
+      },
+      onError: () => toast.error("Failed to submit feedback"),
+    });
+  };
+
+  const handleDeleteFeedback = (feedbackId: string) => {
+    if (confirm("Delete this feedback?")) {
+      deleteFeedback.mutate(feedbackId, {
+        onSuccess: () => toast.success("Feedback deleted"),
+        onError: () => toast.error("Failed to delete feedback"),
+      });
+    }
   };
 
   return (
@@ -203,6 +254,101 @@ const CourseDetailPage = memo(() => {
         ))}
       </div>{/* end right column */}
       </div>{/* end 2-col grid */}
+
+      {/* Feedback Section - Accessible to all students */}
+      <div className="mt-6 space-y-4">
+        <h3 className="font-semibold text-base text-slate-800">Course Feedback</h3>
+        
+        {/* Submit Feedback Form */}
+        {user && (
+          <Card className="p-4 space-y-3">
+            <div>
+              <p className="text-sm font-medium text-slate-700 mb-2">Rate this course</p>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setRating(star)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-6 h-6 ${
+                        star <= (hoverRating || rating)
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Textarea
+              placeholder="Share your experience with this course..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows={3}
+              className="text-sm"
+            />
+            <Button
+              onClick={handleSubmitFeedback}
+              disabled={createFeedback.isPending}
+              className="w-full"
+            >
+              {createFeedback.isPending ? "Submitting..." : <><Send className="w-4 h-4 mr-2" /> Submit Feedback</>}
+            </Button>
+          </Card>
+        )}
+
+        {/* Feedback List */}
+        {feedback.length > 0 ? (
+          <div className="space-y-3">
+            {feedback.map((fb: any) => (
+              <Card key={fb.id} className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                    {(fb.profiles?.name || "U").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold text-sm text-slate-800">{fb.profiles?.name || "Anonymous"}</p>
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-3 h-3 ${
+                              star <= fb.rating
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm text-slate-600 mt-1">{fb.comment}</p>
+                    <p className="text-[10px] text-slate-400 mt-1">
+                      {new Date(fb.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  {user && (fb.user_id === user.id) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive shrink-0"
+                      onClick={() => handleDeleteFeedback(fb.id)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-slate-400 text-center py-4">No feedback yet. Be the first to share your experience!</p>
+        )}
+      </div>
     </div>
   );
 });
