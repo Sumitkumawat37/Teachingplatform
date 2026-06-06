@@ -33,8 +33,8 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden">
-        <div className="relative">
+      <DialogContent className="max-w-md p-0 overflow-hidden h-[80vh]">
+        <div className="relative h-full flex flex-col">
           {/* Close button */}
           <Button
             variant="ghost"
@@ -45,16 +45,17 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
             <X className="w-5 h-5" />
           </Button>
 
-          {/* Video player */}
-          <div className="aspect-video bg-black">
+          {/* Video player - Vertical/Reel mode */}
+          <div className="flex-1 bg-black relative">
             <iframe
               width="100%"
               height="100%"
-              src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?autoplay=0&rel=0&modestbranding=1&showinfo=0`}
+              src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=1`}
               title={currentVideo.title}
               frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
+              className="object-cover"
             />
           </div>
 
@@ -81,9 +82,9 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
           )}
 
           {/* Video info */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-            <p className="text-white font-semibold">{currentVideo.title}</p>
-            <p className="text-white/70 text-sm">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+            <p className="text-white font-semibold text-sm">{currentVideo.title}</p>
+            <p className="text-white/70 text-xs">
               {currentIndex + 1} / {videos.length}
             </p>
           </div>
