@@ -275,7 +275,7 @@
   ═══════════════════════════════════════════ */
   .btn-primary {
     background: var(--gradient-primary);
-    color: white;
+    color: black;
     font-weight: 700;
     border-radius: var(--radius-button);
     padding: 14px 28px;
@@ -847,7 +847,7 @@ html {
 /* ── Reusable button styles (Design System) ── */
 .btn-primary {
   background: var(--gradient-primary);
-  color: white;
+  color: black;
   font-weight: 600;
   border-radius: var(--radius-button);
   padding: 12px 24px;
@@ -1037,7 +1037,7 @@ html {
 /* ── Action button ── */
 .btn-action {
   background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  color: white;
+  color: black;
   font-weight: 600;
   border-radius: 1rem;
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
@@ -1097,7 +1097,7 @@ html {
 /* ── Urgency banner ── */
 .urgency-banner {
   background: linear-gradient(135deg, #8B5CF6, #EC4899);
-  color: white;
+  color: black;
 }
 
 /* ── Stat counter card ── */

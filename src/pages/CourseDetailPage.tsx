@@ -21,6 +21,9 @@ const CourseDetailPage = memo(() => {
   const { data: feedback = [] } = useCourseFeedback(courseId);
   const createFeedback = useCreateFeedback();
   const deleteFeedback = useDeleteFeedback();
+
+  // Check if current user has already submitted feedback
+  const hasSubmittedFeedback = user && feedback.some((f: any) => f.user_id === user.id);
   const { data: reviewVideos = [] } = useCourseReviewVideos(courseId);
 
   // Auto-popup review videos with animation
@@ -368,49 +371,18 @@ const CourseDetailPage = memo(() => {
         )}
       </div>
 
-      {/* Review Videos Section - Gallery Type */}
+      {/* Review Videos Section - Single Gallery Button */}
       {reviewVideos.length > 0 && (
-        <div className="mt-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-base text-slate-800">Course Review Videos</h3>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setSelectedVideoIndex(0);
-                setShowReviewGallery(true);
-              }}
-            >
-              <Play className="w-4 h-4 mr-2" /> View All
-            </Button>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {reviewVideos.map((rv: any, index: number) => (
-              <Card
-                key={rv.id}
-                className="cursor-pointer overflow-hidden hover:shadow-md transition-shadow shrink-0 w-40"
-                onClick={() => {
-                  setSelectedVideoIndex(index);
-                  setShowReviewGallery(true);
-                }}
-              >
-                <div className="aspect-video bg-slate-900 relative">
-                  <img
-                    src={`https://img.youtube.com/vi/${rv.youtube_id}/mqdefault.jpg`}
-                    alt={rv.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
-                    <Play className="w-6 h-6 text-white fill-white" />
-                  </div>
-                </div>
-                <div className="p-2">
-                  <p className="text-xs font-medium text-slate-700 truncate">{rv.title}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
+        <div className="mt-6">
+          <Button
+            className="w-full"
+            onClick={() => {
+              setSelectedVideoIndex(0);
+              setShowReviewGallery(true);
+            }}
+          >
+            <Play className="w-4 h-4 mr-2" /> View Course Review Videos ({reviewVideos.length})
+          </Button>
         </div>
       )}
 
@@ -421,6 +393,117 @@ const CourseDetailPage = memo(() => {
         onOpenChange={setShowReviewGallery}
         startIndex={selectedVideoIndex}
       />
+
+      {/* Feedback Section */}
+      <div className="mt-6 space-y-4">
+        <h3 className="font-semibold text-base text-slate-800">Student Feedback</h3>
+
+        {/* Feedback Form - Only show if user hasn't submitted feedback */}
+        {user && !hasSubmittedFeedback && (
+          <Card className="p-4 space-y-3">
+            <div>
+              <label className="text-sm font-medium text-slate-700">Rate this course</label>
+              <div className="flex gap-1 mt-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    className="text-2xl"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                  >
+                    <Star
+                      className={`w-6 h-6 ${
+                        star <= (hoverRating || rating)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">Your feedback</label>
+              <Textarea
+                placeholder="Share your experience with this course..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={3}
+                className="mt-1"
+              />
+            </div>
+            <Button
+              onClick={handleSubmitFeedback}
+              disabled={!rating || !comment || createFeedback.isPending}
+              className="w-full"
+            >
+              {createFeedback.isPending ? "Submitting..." : "Submit Feedback"}
+            </Button>
+          </Card>
+        )}
+
+        {/* Feedback List */}
+        <div className="space-y-3">
+          {feedback.length > 0 ? (
+            feedback.map((f: any) => (
+              <Card key={f.id} className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    {f.profiles?.avatar_url ? (
+                      <img
+                        src={f.profiles.avatar_url}
+                        alt={f.profiles.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
+                        <span className="text-sm font-medium text-slate-600">
+                          {(f.profiles?.name || "U").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-medium text-sm text-slate-800">{f.profiles?.name || "Anonymous"}</p>
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-3 h-3 ${
+                              star <= f.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {user && f.user_id === user.id && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive"
+                      onClick={() => {
+                        if (confirm("Delete your feedback?")) {
+                          handleDeleteFeedback(f.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+                {f.comment && (
+                  <p className="text-sm text-slate-600 mt-2">{f.comment}</p>
+                )}
+              </Card>
+            ))
+          ) : (
+            <p className="text-sm text-slate-400 text-center py-4">No feedback yet. Be the first to share your experience!</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 });
