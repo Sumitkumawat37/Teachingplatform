@@ -150,57 +150,6 @@ export function useDeleteNote() {
   });
 }
 
-// Quizzes
-export function useCreateQuiz() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (quiz: {
-      course_id: string; chapter_id: string; title: string; duration?: string; status?: string;
-    }) => {
-      const { data, error } = await supabase.from("quizzes").insert(quiz).select().single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["quizzes"] }),
-  });
-}
-
-export function useDeleteQuiz() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("quizzes").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["quizzes"] }),
-  });
-}
-
-// Quiz Questions
-export function useCreateQuizQuestion() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (q: {
-      quiz_id: string; question: string; options: string[]; correct_index: number; sort_order?: number;
-    }) => {
-      const { data, error } = await supabase.from("quiz_questions").insert(q).select().single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["quiz_questions"] }),
-  });
-}
-
-export function useDeleteQuizQuestion() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("quiz_questions").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["quiz_questions"] }),
-  });
-}
 
 // Live Classes
 export function useCreateLiveClass() {

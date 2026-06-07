@@ -72,57 +72,6 @@ export function useNotes(courseId?: string) {
   });
 }
 
-// Quizzes
-export function useQuizzes() {
-  return useQuery({
-    queryKey: ["quizzes"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("quizzes").select("*, courses(title), chapters(title)").order("created_at");
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-// Quiz questions
-export function useQuizQuestions(quizId?: string) {
-  return useQuery({
-    queryKey: ["quiz_questions", quizId],
-    enabled: !!quizId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("quiz_questions")
-        .select("*")
-        .eq("quiz_id", quizId!)
-        .order("sort_order");
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-// Quiz attempts
-export function useQuizAttempts() {
-  return useQuery({
-    queryKey: ["quiz_attempts"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("quiz_attempts").select("*, quizzes(title, course_id)").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-export function useSubmitQuizAttempt() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (attempt: { quiz_id: string; user_id: string; score: number; total: number; answers: number[] }) => {
-      const { error } = await supabase.from("quiz_attempts").insert(attempt);
-      if (error) throw error;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["quiz_attempts"] }),
-  });
-}
 
 // Purchases
 export function usePurchases() {
