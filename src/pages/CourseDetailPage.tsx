@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ReviewVideoGallery } from "@/components/ReviewVideoGallery";
 
 const CourseDetailPage = memo(() => {
@@ -31,6 +32,7 @@ const CourseDetailPage = memo(() => {
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
   const [hasSeenReviewGallery, setHasSeenReviewGallery] = useState(false);
   const [currentEmbeddedIndex, setCurrentEmbeddedIndex] = useState(0);
+  const [showReviewVideoList, setShowReviewVideoList] = useState(false);
 
   useEffect(() => {
     if (reviewVideos.length > 0 && !hasSeenReviewGallery) {
@@ -42,16 +44,6 @@ const CourseDetailPage = memo(() => {
       return () => clearTimeout(timer);
     }
   }, [reviewVideos, hasSeenReviewGallery]);
-
-  // Auto-scroll embedded video every 5 seconds
-  useEffect(() => {
-    if (reviewVideos.length > 1) {
-      const timer = setInterval(() => {
-        setCurrentEmbeddedIndex((prev) => (prev + 1) % reviewVideos.length);
-      }, 5000);
-      return () => clearInterval(timer);
-    }
-  }, [reviewVideos.length]);
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
@@ -405,10 +397,7 @@ const CourseDetailPage = memo(() => {
           </div>
           <Button
             className="w-full mt-3"
-            onClick={() => {
-              setSelectedVideoIndex(currentEmbeddedIndex);
-              setShowReviewGallery(true);
-            }}
+            onClick={() => setShowReviewVideoList(true)}
           >
             <Play className="w-4 h-4 mr-2" /> View All Review Videos
           </Button>
@@ -422,6 +411,44 @@ const CourseDetailPage = memo(() => {
         onOpenChange={setShowReviewGallery}
         startIndex={selectedVideoIndex}
       />
+
+      {/* Review Video List Dialog */}
+      <Dialog open={showReviewVideoList} onOpenChange={setShowReviewVideoList}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Course Review Videos</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+            {reviewVideos.map((rv: any, index: number) => (
+              <Card
+                key={rv.id}
+                className="cursor-pointer overflow-hidden hover:shadow-md transition-shadow"
+                onClick={() => {
+                  setSelectedVideoIndex(index);
+                  setShowReviewVideoList(false);
+                  setShowReviewGallery(true);
+                }}
+              >
+                <div className="aspect-video bg-slate-900 relative">
+                  <img
+                    src={`https://img.youtube.com/vi/${rv.youtube_id}/mqdefault.jpg`}
+                    alt={rv.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
+                    <Play className="w-8 h-8 text-white fill-white" />
+                  </div>
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-medium text-slate-700 truncate">{rv.title}</p>
+                  <p className="text-xs text-slate-500 mt-1">Video {index + 1}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Feedback Section */}
       <div className="mt-6 space-y-4">
