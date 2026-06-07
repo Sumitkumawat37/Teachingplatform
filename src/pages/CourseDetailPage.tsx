@@ -382,12 +382,12 @@ const CourseDetailPage = memo(() => {
             <iframe
               width="100%"
               height="100%"
-              src={`https://www.youtube.com/embed/${reviewVideos[currentEmbeddedIndex]?.youtube_id}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&hl=en&widget_referrer=${encodeURIComponent(window.location.href)}`}
+              src={`https://www.youtube.com/embed/${reviewVideos[currentEmbeddedIndex]?.youtube_id}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&hl=en&widget_referrer=${encodeURIComponent(window.location.href)}&nologo=1&origin=${encodeURIComponent(window.location.origin)}`}
               title={reviewVideos[currentEmbeddedIndex]?.title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="object-cover"
+              className="object-cover pointer-events-none"
               key={currentEmbeddedIndex}
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
@@ -450,54 +450,9 @@ const CourseDetailPage = memo(() => {
         </DialogContent>
       </Dialog>
 
-      {/* Feedback Section */}
+      {/* Feedback Section - Read Only */}
       <div className="mt-6 space-y-4">
         <h3 className="font-semibold text-base text-slate-800">Student Feedback</h3>
-
-        {/* Feedback Form - Only show if user hasn't submitted feedback */}
-        {user && !hasSubmittedFeedback && (
-          <Card className="p-4 space-y-3">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Rate this course</label>
-              <div className="flex gap-1 mt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    className="text-2xl"
-                    onClick={() => setRating(star)}
-                    onMouseEnter={() => setHoverRating(star)}
-                    onMouseLeave={() => setHoverRating(0)}
-                  >
-                    <Star
-                      className={`w-6 h-6 ${
-                        star <= (hoverRating || rating)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300"
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-700">Your feedback</label>
-              <Textarea
-                placeholder="Share your experience with this course..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-            <Button
-              onClick={handleSubmitFeedback}
-              disabled={!rating || !comment || createFeedback.isPending}
-              className="w-full"
-            >
-              {createFeedback.isPending ? "Submitting..." : "Submit Feedback"}
-            </Button>
-          </Card>
-        )}
 
         {/* Feedback List */}
         <div className="space-y-3">
@@ -535,20 +490,6 @@ const CourseDetailPage = memo(() => {
                       </div>
                     </div>
                   </div>
-                  {user && f.user_id === user.id && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-destructive"
-                      onClick={() => {
-                        if (confirm("Delete your feedback?")) {
-                          handleDeleteFeedback(f.id);
-                        }
-                      }}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  )}
                 </div>
                 {f.comment && (
                   <p className="text-sm text-slate-600 mt-2">{f.comment}</p>
@@ -556,7 +497,7 @@ const CourseDetailPage = memo(() => {
               </Card>
             ))
           ) : (
-            <p className="text-sm text-slate-400 text-center py-4">No feedback yet. Be the first to share your experience!</p>
+            <p className="text-sm text-slate-400 text-center py-4">No feedback yet.</p>
           )}
         </div>
       </div>
