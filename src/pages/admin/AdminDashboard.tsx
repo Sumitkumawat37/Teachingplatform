@@ -1,9 +1,9 @@
 import { Card } from "@/components/ui/card";
-import { useCourses, useLectures, useQuizzes, useAnnouncements, useDoubts, useProfiles } from "@/lib/supabase-data";
+import { useCourses, useLectures, useAnnouncements, useDoubts, useProfiles } from "@/lib/supabase-data";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
-import { Users, BookOpen, Trophy, Megaphone, TrendingUp, Video, MessageCircle, ShoppingCart, Calendar, Clock, UserCheck, BarChart3, Activity, Mail, Phone, MapPin, Award, Edit } from "lucide-react";
+import { Users, BookOpen, Megaphone, TrendingUp, Video, MessageCircle, ShoppingCart, Calendar, Clock, UserCheck, BarChart3, Activity, Mail, Phone, MapPin, Award, Edit } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useNavigate } from "react-router-dom";
 
@@ -17,7 +17,6 @@ const AdminDashboard = () => {
   const { user, role } = useAuth();
   const { data: courses = [] } = useCourses();
   const { data: lectures = [] } = useLectures();
-  const { data: quizzes = [] } = useQuizzes();
   const { data: announcements = [] } = useAnnouncements();
   const { data: doubts = [] } = useDoubts();
   const { data: profiles = [] } = useProfiles();
@@ -46,7 +45,6 @@ const AdminDashboard = () => {
   const stats = [
     { icon: Users, label: "Students", value: studentProfiles.length, color: "gradient-primary", subtext: "Total enrolled", to: "/admin/students" },
     { icon: BookOpen, label: "Courses", value: courses.length, color: "gradient-info", subtext: "Available", to: "/admin/content" },
-    { icon: Trophy, label: "Quizzes", value: quizzes.length, color: "gradient-warning", subtext: "Created", to: "/admin/quizzes" },
     { icon: Video, label: "Lectures", value: lectures.length, color: "gradient-success", subtext: "Published", to: "/admin/content" },
     { icon: Megaphone, label: "Announcements", value: announcements.length, color: "gradient-primary", subtext: "Active", to: "/admin/announcements" },
     { icon: MessageCircle, label: "Pending Doubts", value: pendingDoubts, color: "gradient-warning", subtext: "Need reply", to: "/admin/doubts" },

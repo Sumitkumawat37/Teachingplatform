@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { usePurchase } from "@/lib/purchase-context";
-import { useCourses, useQuizAttempts, useLectureProgress } from "@/lib/supabase-data";
+import { useCourses, useLectureProgress } from "@/lib/supabase-data";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, BookOpen, Trophy, Video, CheckCircle, ChevronRight, LogOut } from "lucide-react";
+import { User, Mail, BookOpen, Video, CheckCircle, ChevronRight, LogOut } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const ProfilePage = () => {
@@ -13,13 +13,9 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { purchasedCourses } = usePurchase();
   const { data: courses = [] } = useCourses();
-  const { data: attempts = [] } = useQuizAttempts();
   const { data: progress = [] } = useLectureProgress();
 
   const completedLectures = progress.filter((p) => p.completed).length;
-  const avgScore = attempts.length > 0
-    ? Math.round(attempts.reduce((a, b) => a + (b.total > 0 ? (b.score / b.total) * 100 : 0), 0) / attempts.length)
-    : 0;
 
   const handleLogout = async () => {
     await logout();
@@ -47,27 +43,16 @@ const ProfilePage = () => {
           <p className="text-lg font-bold text-slate-800">{purchasedCourses.length}</p>
           <p className="text-[10px] text-slate-400">Courses</p>
         </Card>
-        <Card className="p-3 text-center border border-amber-100/40 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#FFF8E7' }}>
-          <Trophy className="w-5 h-5 text-amber-500 mx-auto mb-1" />
-          <p className="text-lg font-bold text-slate-800">{avgScore}%</p>
-          <p className="text-[10px] text-slate-400">Avg Score</p>
-        </Card>
         <Card className="p-3 text-center border border-sky-100/40 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#EAF6FF' }}>
           <Video className="w-5 h-5 text-blue-500 mx-auto mb-1" />
           <p className="text-lg font-bold text-slate-800">{completedLectures}</p>
           <p className="text-[10px] text-slate-400">Lectures Done</p>
-        </Card>
-        <Card className="p-3 text-center border border-emerald-100/40 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#ECFFF3' }}>
-          <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
-          <p className="text-lg font-bold text-slate-800">{attempts.length}</p>
-          <p className="text-[10px] text-slate-400">Quizzes Done</p>
         </Card>
       </div>
 
       <div className="space-y-1">
         {[
           { label: "My Dashboard", to: "/dashboard" },
-          { label: "Test Results", to: "/results" },
           { label: "Live Classes", to: "/live-classes" },
           { label: "My Doubts", to: "/doubts" },
           { label: "Notifications", to: "/notifications" },

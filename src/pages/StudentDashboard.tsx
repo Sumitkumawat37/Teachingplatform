@@ -1,10 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
-import { useCourses, useQuizAttempts, useLectures } from "@/lib/supabase-data";
+import { useCourses, useLectures } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { useAuth } from "@/lib/auth-context";
 import { useNavigate } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
-import { BookOpen, Trophy, Video, CheckCircle, TrendingUp, ChevronRight, Flame, Target, Star, AlertTriangle } from "lucide-react";
+import { BookOpen, Video, CheckCircle, TrendingUp, ChevronRight, Flame, Target, Star, AlertTriangle } from "lucide-react";
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ const StudentDashboard = () => {
   const { hasPurchased } = usePurchase();
   const { data: courses = [] } = useCourses();
   const { data: lectures = [] } = useLectures();
-  const { data: attempts = [] } = useQuizAttempts();
 
   const [stats, setStats] = useState<any>(null);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -38,29 +36,20 @@ const StudentDashboard = () => {
   const completedLectures = stats?.completedLectures || 0;
   const totalLectures = lectures.length;
   const lecturePercent = totalLectures > 0 ? Math.round((completedLectures / totalLectures) * 100) : 0;
-  const avgQuizScore = stats?.avgAccuracy || 0;
 
   const purchasedCourses = courses.filter((c) => hasPurchased(c.id));
 
-  const chartData = attempts.slice(0, 6).reverse().map((a, i) => ({
-    quiz: `Q${i + 1}`,
-    score: a.total > 0 ? Math.round((a.score / a.total) * 100) : 0,
-  }));
-
   const statCards = [
     { icon: BookOpen,     label: "Courses",      value: purchasedCourses.length.toString(), grad: "from-sky-400 to-cyan-500",     delay: 0 },
-    { icon: Trophy,       label: "Avg Score",    value: `${avgQuizScore}%`,                 grad: "from-emerald-400 to-teal-500",delay: 70 },
     { icon: Video,        label: "Lectures",     value: `${completedLectures}/${totalLectures}`, grad: "from-violet-400 to-purple-500", delay: 140 },
-    { icon: CheckCircle,  label: "Quizzes",      value: (stats?.totalQuizzes || attempts.length).toString(), grad: "from-amber-400 to-orange-500",delay: 210 },
+    { icon: CheckCircle,  label: "Completed",   value: completedLectures.toString(),           grad: "from-emerald-400 to-teal-500",delay: 70 },
   ];
-
-  const barColors = ["#0ea5e9", "#06b6d4", "#8b5cf6", "#10b981", "#f59e0b", "#f43f5e"];
 
   // Streak
   const streakDays = stats?.studyStreak || 0;
 
   // XP system
-  const totalXP = completedLectures * 50 + (stats?.totalQuizzes || attempts.length) * 100;
+  const totalXP = completedLectures * 50;
   const xpLevel = Math.floor(totalXP / 500) + 1;
   const xpInLevel = totalXP % 500;
   const xpPercent = Math.round((xpInLevel / 500) * 100);
@@ -205,27 +194,6 @@ const StudentDashboard = () => {
           </div>
           <p className="text-[11px] text-slate-400 mt-2">{completedLectures} of {totalLectures} lectures completed</p>
         </div>
-
-        {chartData.length > 0 ? (
-          <div className="rounded-2xl p-5 shadow-sm border border-emerald-100/40" style={{ background: '#ECFFF3' }}>
-            <h3 className="font-semibold text-sm text-slate-800 mb-3">Performance Trend</h3>
-            <ResponsiveContainer width="100%" height={140}>
-              <BarChart data={chartData} barCategoryGap="30%">
-                <XAxis dataKey="quiz" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                <YAxis hide />
-                <Tooltip
-                  contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.06)', fontSize: 12, color: '#334155' }}
-                  cursor={{ fill: 'rgba(139,92,246,0.05)' }}
-                />
-                <Bar dataKey="score" radius={[8, 8, 0, 0]}>
-                  {chartData.map((_, index) => (
-                    <Cell key={index} fill={barColors[index % barColors.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        ) : <div />}
       </div>
 
       {/* ── ENROLLED COURSES ── */}
