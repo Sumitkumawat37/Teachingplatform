@@ -229,16 +229,39 @@ const AdminContent = () => {
     setLecYoutubeUrl(""); // Clear YouTube URL when uploading video
   };
 
-  const uploadVideoFile = async (): Promise<string | undefined> => {
-    if (!lecVideoFile) return lecVideoUrl || undefined;
+  const uploadVideoFile = async (): Promise<{ url: string; duration: string } | undefined> => {
+    if (!lecVideoFile) return lecVideoUrl ? { url: lecVideoUrl, duration: lecDuration } : undefined;
     setLecVideoUploading(true);
+    
+    // Detect video duration before upload
+    let detectedDuration = lecDuration;
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    const url = URL.createObjectURL(lecVideoFile);
+    
+    await new Promise<void>((resolve) => {
+      video.onloadedmetadata = () => {
+        const duration = video.duration;
+        const mins = Math.floor(duration / 60);
+        const secs = Math.floor(duration % 60);
+        detectedDuration = `${mins}:${secs.toString().padStart(2, '0')}`;
+        URL.revokeObjectURL(url);
+        resolve();
+      };
+      video.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve();
+      };
+      video.src = url;
+    });
+    
     const ext = lecVideoFile.name.split(".").pop();
     const path = `videos/${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("videos").upload(path, lecVideoFile);
     setLecVideoUploading(false);
     if (error) { toast.error("Video upload failed: " + error.message); return undefined; }
     const { data: urlData } = supabase.storage.from("videos").getPublicUrl(path);
-    return urlData.publicUrl;
+    return { url: urlData.publicUrl, duration: detectedDuration };
   };
 
   const handleCreateLecture = async () => {
@@ -246,14 +269,17 @@ const AdminContent = () => {
     if (!lecYoutubeUrl && !lecVideoUrl && !lecVideoFile) return toast.error("Add a YouTube link or upload a video");
     
     const thumbUrl = await uploadLecThumbnail();
-    const videoUrl = await uploadVideoFile();
+    const videoData = await uploadVideoFile();
     const sortOrder = lectures.filter((l) => l.chapter_id === lecChapterId).length;
     
     createLecture.mutate({
       course_id: lecCourseId, chapter_id: lecChapterId, title: lecTitle,
-      youtube_id: lecYoutubeUrl || "", duration: lecDuration, free_preview: lecFreePreview, sort_order: sortOrder,
+      youtube_id: lecYoutubeUrl || "", 
+      duration: videoData?.duration || lecDuration, 
+      free_preview: lecFreePreview, 
+      sort_order: sortOrder,
       ...(thumbUrl ? { thumbnail_url: thumbUrl } : {}),
-      ...(videoUrl ? { video_url: videoUrl } : {}),
+      ...(videoData?.url ? { video_url: videoData.url } : {}),
     } as any, {
       onSuccess: () => {
         toast.success("Lecture added!");

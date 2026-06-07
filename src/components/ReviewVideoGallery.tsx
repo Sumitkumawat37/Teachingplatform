@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { CustomVideoPlayer } from "./CustomVideoPlayer";
 
 interface ReviewVideoGalleryProps {
   videos: Array<{ id: string; youtube_id: string; title: string }>;
@@ -47,23 +48,11 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
 
           {/* Video player - Vertical/Reel mode */}
           <div className="flex-1 bg-black relative">
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${currentVideo.youtube_id}?autoplay=1&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=1&iv_load_policy=3&disablekb=0&fs=0&cc_load_policy=0&hl=en&widget_referrer=${encodeURIComponent(window.location.href)}&nologo=1&origin=${encodeURIComponent(window.location.origin)}`}
+            <CustomVideoPlayer
+              youtubeId={currentVideo.youtube_id}
               title={currentVideo.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              className="object-cover"
+              autoplay={true}
             />
-            {/* Custom overlay to hide YouTube logo */}
-            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/95 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
-            {/* Hide YouTube button in bottom right */}
-            <div className="absolute bottom-0 right-0 w-32 h-16 bg-black pointer-events-none" />
-            {/* Hide caption at top header */}
-            <div className="absolute top-12 left-0 right-0 h-8 bg-black pointer-events-none" />
           </div>
 
           {/* Navigation buttons */}

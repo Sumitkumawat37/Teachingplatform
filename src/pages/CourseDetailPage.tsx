@@ -1,4 +1,5 @@
 import { useCourses, useLectures, useChapters, useCourseFeedback, useCreateFeedback, useDeleteFeedback, useCourseReviewVideos } from "@/lib/supabase-data";
+import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
 import { usePurchase } from "@/lib/purchase-context";
 import { useParams, useNavigate } from "react-router-dom";
 import { Play, ChevronLeft, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star, Trash2, Send } from "lucide-react";
@@ -369,28 +370,15 @@ const CourseDetailPage = memo(() => {
       {reviewVideos.length > 0 && (
         <div className="mt-6">
           <h3 className="font-semibold text-base text-slate-800 mb-3">Course Review Videos</h3>
-          <div className="relative aspect-video bg-slate-900 rounded-lg overflow-hidden">
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${reviewVideos[currentEmbeddedIndex]?.youtube_id}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=1&iv_load_policy=3&disablekb=0&fs=0&cc_load_policy=0&hl=en&widget_referrer=${encodeURIComponent(window.location.href)}&nologo=1&origin=${encodeURIComponent(window.location.origin)}`}
+          <div className="relative">
+            <CustomVideoPlayer
+              youtubeId={reviewVideos[currentEmbeddedIndex]?.youtube_id}
               title={reviewVideos[currentEmbeddedIndex]?.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="object-cover"
-              key={currentEmbeddedIndex}
+              autoplay={false}
             />
-            {/* Custom overlay to hide YouTube logo */}
-            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/95 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
-            {/* Hide YouTube button in bottom right */}
-            <div className="absolute bottom-0 right-0 w-32 h-16 bg-black pointer-events-none" />
-            {/* Hide caption at top header */}
-            <div className="absolute top-12 left-0 right-0 h-8 bg-black pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-              <p className="text-white font-semibold text-sm">{reviewVideos[currentEmbeddedIndex]?.title}</p>
-              <p className="text-white/70 text-xs">{currentEmbeddedIndex + 1} / {reviewVideos.length}</p>
+            <div className="mt-2 flex items-center justify-between">
+              <p className="text-sm text-slate-600">{reviewVideos[currentEmbeddedIndex]?.title}</p>
+              <p className="text-xs text-slate-400">{currentEmbeddedIndex + 1} / {reviewVideos.length}</p>
             </div>
           </div>
           <Button
