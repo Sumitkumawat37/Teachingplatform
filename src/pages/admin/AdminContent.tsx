@@ -262,6 +262,7 @@ const AdminContent = () => {
         setLecThumbnailFile(null); setLecThumbnailPreview("");
         setLecVideoFile(null);
       },
+      onError: (error: any) => toast.error("Failed to add lecture: " + error.message),
     });
   };
 

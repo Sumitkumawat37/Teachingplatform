@@ -19,6 +19,7 @@ const StudentDashboard = lazy(() => import("./pages/StudentDashboard"));
 const CoursesPage = lazy(() => import("./pages/CoursesPage"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const VideoPlayerPage = lazy(() => import("./pages/VideoPlayerPage"));
+const LecturePage = lazy(() => import("./pages/LecturePage"));
 const NotesPage = lazy(() => import("./pages/NotesPage"));
 const PersonalNotesPage = lazy(() => import("./pages/PersonalNotesPage"));
 const QuizzesPage = lazy(() => import("./pages/QuizzesPage"));
@@ -119,7 +120,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><StudentDashboard /></Suspense>} />
         <Route path="/courses" element={<Suspense fallback={<PageLoader />}><CoursesPage /></Suspense>} />
         <Route path="/courses/:courseId" element={<Suspense fallback={<PageLoader />}><CourseDetailPage /></Suspense>} />
-        <Route path="/courses/:courseId/lecture/:lectureId" element={<Suspense fallback={<PageLoader />}><VideoPlayerPage /></Suspense>} />
+        <Route path="/courses/:courseId/lecture/:lectureId" element={<Suspense fallback={<PageLoader />}><LecturePage /></Suspense>} />
         <Route path="/notes" element={<Suspense fallback={<PageLoader />}><NotesPage /></Suspense>} />
         <Route path="/personal-notes" element={<Suspense fallback={<PageLoader />}><PersonalNotesPage /></Suspense>} />
         <Route path="/quizzes" element={<Suspense fallback={<PageLoader />}><QuizzesPage /></Suspense>} />
