@@ -343,7 +343,7 @@ const AdminContent = () => {
     setImportingReviewPlaylist(true);
     try {
       // Fetch playlist videos from YouTube Data API
-      const apiKey = process.env.VITE_YOUTUBE_API_KEY || "";
+      const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY || "";
       if (!apiKey) {
         toast.error("YouTube API key not configured");
         setImportingReviewPlaylist(false);
