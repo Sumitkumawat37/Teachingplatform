@@ -65,13 +65,16 @@ const LecturePage = () => {
           <iframe
             width="100%"
             height="100%"
-            src={`https://www.youtube.com/embed/${lecture.youtube_id}?autoplay=1&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=1`}
+            src={`https://www.youtube.com/embed/${lecture.youtube_id}?autoplay=1&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&hl=en&widget_referrer=${encodeURIComponent(window.location.href)}&nologo=1&origin=${encodeURIComponent(window.location.origin)}`}
             title={lecture.title}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="object-cover"
+            className="object-cover pointer-events-none"
           />
+          {/* Custom overlay to hide YouTube logo */}
+          <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/90 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
         </div>
 
         {/* Lecture Info */}

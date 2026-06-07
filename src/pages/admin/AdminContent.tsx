@@ -941,11 +941,12 @@ const AdminContent = () => {
                       <iframe
                         width="128"
                         height="80"
-                        src={`https://www.youtube.com/embed/${rv.youtube_id}`}
+                        src={`https://www.youtube.com/embed/${rv.youtube_id}?autoplay=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&hl=en&nologo=1`}
                         title={rv.title}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
+                        className="pointer-events-none"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
