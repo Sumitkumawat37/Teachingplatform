@@ -57,6 +57,8 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
               allowFullScreen
               className="object-cover pointer-events-none"
             />
+            {/* Custom overlay to hide YouTube logo */}
+            <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/90 to-transparent pointer-events-none" />
           </div>
 
           {/* Navigation buttons */}

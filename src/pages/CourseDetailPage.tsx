@@ -34,16 +34,7 @@ const CourseDetailPage = memo(() => {
   const [currentEmbeddedIndex, setCurrentEmbeddedIndex] = useState(0);
   const [showReviewVideoList, setShowReviewVideoList] = useState(false);
 
-  useEffect(() => {
-    if (reviewVideos.length > 0 && !hasSeenReviewGallery) {
-      // Auto-popup after 2 seconds with animation
-      const timer = setTimeout(() => {
-        setShowReviewGallery(true);
-        setHasSeenReviewGallery(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [reviewVideos, hasSeenReviewGallery]);
+  // Disabled auto-popup - user must manually click to play videos
 
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
@@ -390,6 +381,8 @@ const CourseDetailPage = memo(() => {
               className="object-cover pointer-events-none"
               key={currentEmbeddedIndex}
             />
+            {/* Custom overlay to hide YouTube logo */}
+            <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/90 to-transparent pointer-events-none" />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
               <p className="text-white font-semibold text-sm">{reviewVideos[currentEmbeddedIndex]?.title}</p>
               <p className="text-white/70 text-xs">{currentEmbeddedIndex + 1} / {reviewVideos.length}</p>
