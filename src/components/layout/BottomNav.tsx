@@ -1,4 +1,4 @@
-import { Home, BookOpen, Trophy, User, LayoutDashboard, Users, Video, UserCog } from "lucide-react";
+import { Home, BookOpen, User, LayoutDashboard, Users, Video, UserCog } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 
@@ -6,14 +6,12 @@ const studentNav = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/courses", icon: BookOpen, label: "Courses" },
   { to: "/live-classes", icon: Video, label: "Live" },
-  { to: "/quizzes", icon: Trophy, label: "Quizzes" },
   { to: "/profile", icon: User, label: "Profile" },
 ];
 
 const adminNav = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/admin/content", icon: BookOpen, label: "Content" },
-  { to: "/admin/quizzes", icon: Trophy, label: "Quizzes" },
   { to: "/admin/students", icon: Users, label: "Students" },
   { to: "/admin/live", icon: Video, label: "Live" },
 ];

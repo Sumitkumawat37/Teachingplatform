@@ -22,9 +22,6 @@ const VideoPlayerPage = lazy(() => import("./pages/VideoPlayerPage"));
 const LecturePage = lazy(() => import("./pages/LecturePage"));
 const NotesPage = lazy(() => import("./pages/NotesPage"));
 const PersonalNotesPage = lazy(() => import("./pages/PersonalNotesPage"));
-const QuizzesPage = lazy(() => import("./pages/QuizzesPage"));
-const QuizPlayPage = lazy(() => import("./pages/QuizPlayPage"));
-const ResultsPage = lazy(() => import("./pages/ResultsPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const LiveClassesPage = lazy(() => import("./pages/LiveClassesPage"));
@@ -36,7 +33,6 @@ const StudyPlannerPage = lazy(() => import("./pages/StudyPlannerPage"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
 const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
-const AdminQuizzes = lazy(() => import("./pages/admin/AdminQuizzes"));
 const AdminStudents = lazy(() => import("./pages/admin/AdminStudents"));
 const AdminAnnouncements = lazy(() => import("./pages/admin/AdminAnnouncements"));
 const AdminLiveClasses = lazy(() => import("./pages/admin/AdminLiveClasses"));
@@ -123,9 +119,6 @@ function AppRoutes() {
         <Route path="/courses/:courseId/lecture/:lectureId" element={<Suspense fallback={<PageLoader />}><LecturePage /></Suspense>} />
         <Route path="/notes" element={<Suspense fallback={<PageLoader />}><NotesPage /></Suspense>} />
         <Route path="/personal-notes" element={<Suspense fallback={<PageLoader />}><PersonalNotesPage /></Suspense>} />
-        <Route path="/quizzes" element={<Suspense fallback={<PageLoader />}><QuizzesPage /></Suspense>} />
-        <Route path="/quiz/:quizId" element={<Suspense fallback={<PageLoader />}><QuizPlayPage /></Suspense>} />
-        <Route path="/results" element={<Suspense fallback={<PageLoader />}><ResultsPage /></Suspense>} />
         <Route path="/notifications" element={<Suspense fallback={<PageLoader />}><NotificationsPage /></Suspense>} />
         <Route path="/profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
         <Route path="/live-classes" element={<Suspense fallback={<PageLoader />}><LiveClassesPage /></Suspense>} />
@@ -139,7 +132,6 @@ function AppRoutes() {
         <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
         <Route path="/admin/profile" element={<Suspense fallback={<PageLoader />}><AdminProfile /></Suspense>} />
         <Route path="/admin/content" element={<Suspense fallback={<PageLoader />}><AdminContent /></Suspense>} />
-        <Route path="/admin/quizzes" element={<Suspense fallback={<PageLoader />}><AdminQuizzes /></Suspense>} />
         <Route path="/admin/students" element={<Suspense fallback={<PageLoader />}><AdminStudents /></Suspense>} />
         <Route path="/admin/announcements" element={<Suspense fallback={<PageLoader />}><AdminAnnouncements /></Suspense>} />
         <Route path="/admin/live" element={<Suspense fallback={<PageLoader />}><AdminLiveClasses /></Suspense>} />

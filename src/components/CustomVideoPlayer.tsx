@@ -68,7 +68,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         iv_load_policy: 3,
         disablekb: 1,
         fs: 0,
-        cc_load_policy: 0,
+        cc_load_policy: 3,
         hl: "en",
         playsinline: 1,
       },
@@ -237,12 +237,11 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
       <div id="youtube-player" className="absolute inset-0 w-full h-full" />
       
       {/* Comprehensive overlays to hide YouTube branding */}
-      <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/95 via-black/80 to-transparent pointer-events-none z-10" />
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/90 via-black/70 to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 left-0 w-40 h-20 bg-black pointer-events-none z-10" />
-      <div className="absolute top-0 right-0 w-32 h-20 bg-black pointer-events-none z-10" />
-      <div className="absolute bottom-0 right-0 w-40 h-24 bg-black pointer-events-none z-10" />
-      <div className="absolute top-20 left-0 right-0 h-10 bg-black pointer-events-none z-10" />
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/95 via-black/80 to-transparent pointer-events-none z-10" />
+      <div className="absolute top-0 left-0 w-48 h-24 bg-black pointer-events-none z-10" />
+      <div className="absolute top-0 right-0 w-40 h-24 bg-black pointer-events-none z-10" />
+      <div className="absolute top-20 left-0 right-0 h-12 bg-black pointer-events-none z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/90 via-black/70 to-transparent pointer-events-none z-10" />
 
       {/* Custom Controls */}
       <div

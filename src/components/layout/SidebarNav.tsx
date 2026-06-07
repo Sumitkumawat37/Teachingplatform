@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, BookOpen, FileText, Trophy, User, LayoutDashboard, Users, Megaphone, Video, MessageCircle, Bell, BarChart3, GraduationCap, LogOut, Lock, UserCog, Crown, Mail } from "lucide-react";
+import { Home, BookOpen, FileText, User, LayoutDashboard, Users, Megaphone, Video, MessageCircle, Bell, BarChart3, GraduationCap, LogOut, Lock, UserCog, Crown, Mail } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { useProfiles } from "@/lib/supabase-data";
@@ -10,7 +10,6 @@ const studentNav = [
   { to: "/courses",      icon: BookOpen,      label: "Courses",       end: false },
   { to: "/live-classes", icon: Video,         label: "Live Classes",  end: false },
   { to: "/notes",        icon: FileText,      label: "Notes",         end: false },
-  { to: "/quizzes",      icon: Trophy,        label: "Quizzes",       end: false },
   { to: "/doubts",       icon: MessageCircle, label: "Doubts",        end: false },
   { to: "/notifications",icon: Bell,          label: "Notifications", end: false },
   { to: "/profile",      icon: User,          label: "Profile",       end: false },
@@ -24,7 +23,6 @@ const superAdminOwnNav = [
 const superAdminMgmtNav = [
   { to: "/admin/content",       icon: BookOpen,      label: "Course",        end: false },
   { to: "/admin/students",      icon: Users,         label: "Students",      end: false },
-  { to: "/admin/quizzes",       icon: Trophy,        label: "Quizzes",       end: false },
   { to: "/notes",               icon: FileText,      label: "Notes",         end: false },
   { to: "/admin/email-center",  icon: Mail,          label: "Email Center",  end: false },
   { to: "/admin/live",          icon: Video,         label: "Live Classes",  end: false },
@@ -37,7 +35,6 @@ const adminNav = [
   { to: "/admin",                icon: LayoutDashboard, label: "Dashboard",     end: true },
   { to: "/admin/profile",        icon: User,            label: "My Profile",    end: false },
   { to: "/admin/content",        icon: BookOpen,        label: "Course",        end: false },
-  { to: "/admin/quizzes",        icon: Trophy,          label: "Quizzes",       end: false },
   { to: "/notes",                icon: FileText,        label: "Notes",         end: false },
   { to: "/admin/students",       icon: Users,           label: "Students",      end: false },
   { to: "/admin/email-center",   icon: Mail,            label: "Email Center",  end: false },

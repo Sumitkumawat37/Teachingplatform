@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Play, FileText, Trophy, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail } from "lucide-react";
+import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -41,8 +41,6 @@ const programs = [
   { icon: BookOpen, label: "Video Courses", desc: "Self-paced recorded lectures, rewatch anytime", grad: "from-violet-500 to-purple-500", path: "/courses", badge: null, bg: "#EAF6FF" },
 
   { icon: FileText, label: "Study Notes",   desc: "Curated notes, PYQs & PDF downloads",       grad: "from-pink-500 to-rose-500", path: "/notes",        badge: "500+ Notes", bg: "#FFEAF4" },
-
-  { icon: Trophy,   label: "Mock Quizzes",  desc: "Weekly tests, auto-evaluated with analytics", grad: "from-amber-500 to-orange-500", path: "/quizzes",      badge: "200+ Tests", bg: "#FFF8E7" },
 
 ];
 
@@ -550,7 +548,7 @@ const HomePage = () => {
 
             <button
 
-              onClick={() => navigate('/live-classes')}
+              onClick={() => navigate('/courses')}
 
               className="bg-white/15 text-white text-sm font-semibold px-6 py-3 rounded-full border border-white/25 hover:bg-white/25 transition-all"
 
@@ -561,42 +559,6 @@ const HomePage = () => {
             </button>
 
           </div>
-
-        </div>
-
-      </div>
-
-
-
-      {/* ══ MY RESULTS ══ */}
-
-      <div
-
-        className="rounded-2xl p-4 cursor-pointer flex items-center gap-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
-
-        style={{ background: '#F3EEFF' }}
-
-        onClick={() => navigate("/results")}
-
-      >
-
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center shadow-sm shrink-0">
-
-          <TrendingUp className="w-5 h-5 text-white" />
-
-        </div>
-
-        <div className="flex-1 min-w-0">
-
-          <h4 className="font-semibold text-sm text-slate-800">My Performance</h4>
-
-          <p className="text-slate-400 text-xs">Track quiz scores & analytics</p>
-
-        </div>
-
-        <div className="w-8 h-8 rounded-full bg-violet-50 flex items-center justify-center">
-
-          <ChevronRight className="w-4 h-4 text-violet-600" />
 
         </div>
 
