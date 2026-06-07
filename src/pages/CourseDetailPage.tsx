@@ -390,7 +390,7 @@ const CourseDetailPage = memo(() => {
             <iframe
               width="100%"
               height="100%"
-              src={`https://www.youtube.com/embed/${reviewVideos[currentEmbeddedIndex]?.youtube_id}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0`}
+              src={`https://www.youtube.com/embed/${reviewVideos[currentEmbeddedIndex]?.youtube_id}?autoplay=1&mute=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&hl=en&widget_referrer=${encodeURIComponent(window.location.href)}`}
               title={reviewVideos[currentEmbeddedIndex]?.title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
