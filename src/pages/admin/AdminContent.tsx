@@ -967,7 +967,7 @@ const AdminContent = () => {
                       <iframe
                         width="128"
                         height="80"
-                        src={`https://www.youtube.com/embed/${rv.youtube_id}?autoplay=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&hl=en&nologo=1`}
+                        src={`https://www.youtube-nocookie.com/embed/${rv.youtube_id}?autoplay=0&rel=0&modestbranding=1&showinfo=0&playsinline=1&controls=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=3&hl=en&origin=${encodeURIComponent(window.location.origin)}&widget_referrer=${encodeURIComponent(window.location.href)}`}
                         title={rv.title}
                         frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

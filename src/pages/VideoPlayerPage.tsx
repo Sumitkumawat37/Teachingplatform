@@ -301,16 +301,16 @@ const VideoPlayerPage = () => {
     const params = new URLSearchParams({
       modestbranding: "1",
       rel: "0",
-      controls: "1",
-      playsinline: "0",
+      controls: "0",
+      playsinline: "1",
       showinfo: "0",
       iv_load_policy: "3",
       fs: "0",
-      cc_load_policy: "0",
+      cc_load_policy: "3",
       disablekb: "1",
       enablejsapi: "1",
       origin: window.location.origin,
-      widgetid: "1",
+      widget_referrer: window.location.href,
     });
     return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
   };
@@ -405,16 +405,8 @@ const VideoPlayerPage = () => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                 allowFullScreen={false}
               />
-              {/* Top overlay - gradient to hide YouTube header completely */}
-              <div className="absolute top-0 left-0 right-0 h-24 z-[5] pointer-events-none" style={{ background: 'linear-gradient(to bottom, #000 80%, transparent)' }} />
-              {/* Bottom overlay - gradient to hide YouTube footer */}
-              <div className="absolute bottom-0 left-0 right-0 h-28 z-[5] pointer-events-none" style={{ background: 'linear-gradient(to top, #000 70%, transparent)' }} />
-              {/* Bottom-right - blocks Watch on YouTube button */}
-              <div className="absolute bottom-0 right-0 w-56 h-24 bg-black z-[6] pointer-events-auto" />
-              {/* Top-right - blocks YouTube menu button */}
-              <div className="absolute top-0 right-0 w-24 h-20 bg-black z-[6] pointer-events-auto" />
-              {/* Top-left - blocks YouTube logo completely */}
-              <div className="absolute top-0 left-0 w-32 h-20 bg-black z-[6] pointer-events-auto" />
+              {/* Single caption cover overlay */}
+              <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-[5]" />
               
               {/* Custom Play Button Overlay - shows when YouTube video is paused */}
               {!ytPlaying && (

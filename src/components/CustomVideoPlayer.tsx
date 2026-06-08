@@ -71,6 +71,8 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         cc_load_policy: 3,
         hl: "en",
         playsinline: 1,
+        origin: window.location.origin,
+        widget_referrer: window.location.href,
       },
       events: {
         onReady: (event: any) => {
@@ -236,12 +238,8 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
       {/* YouTube Player */}
       <div id="youtube-player" className="absolute inset-0 w-full h-full" />
       
-      {/* Comprehensive overlays to hide YouTube branding */}
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/95 via-black/80 to-transparent pointer-events-none z-10" />
-      <div className="absolute top-0 left-0 w-56 h-32 bg-black pointer-events-none z-10" />
-      <div className="absolute top-0 right-0 w-48 h-32 bg-black pointer-events-none z-10" />
-      <div className="absolute top-28 left-0 right-0 h-8 bg-black pointer-events-none z-10" />
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/90 via-black/70 to-transparent pointer-events-none z-10" />
+      {/* Single caption cover overlay */}
+      <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-10" />
 
       {/* Custom Controls */}
       <div
