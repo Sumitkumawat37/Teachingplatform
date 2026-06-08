@@ -238,8 +238,10 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
       {/* YouTube Player */}
       <div id="youtube-player" className="absolute inset-0 w-full h-full" />
       
-      {/* Single caption cover overlay - responsive for lecture videos */}
+      {/* Top overlay to hide YouTube title and captions */}
       <div className="absolute top-0 left-0 right-0 h-12 sm:h-14 md:h-16 bg-black pointer-events-none z-10" />
+      {/* Bottom-right overlay to hide YouTube logo */}
+      <div className="absolute bottom-12 sm:bottom-14 md:bottom-16 right-0 w-16 sm:w-20 md:w-24 h-8 sm:h-10 md:h-12 bg-black pointer-events-none z-10" />
 
       {/* Custom Controls */}
       <div
@@ -252,9 +254,9 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
           {!isPlaying && (
             <button
               onClick={togglePlay}
-              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 pointer-events-auto"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 pointer-events-auto"
             >
-              <Play className="w-8 h-8 text-white fill-white ml-1" />
+              <Play className="w-7 h-7 sm:w-8 sm:h-8 text-white fill-white ml-1" />
             </button>
           )}
         </div>

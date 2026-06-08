@@ -111,7 +111,7 @@ const VideoPlayerPage = () => {
     if (!isDriveVideo || !videoUrl) return "";
     const match = videoUrl.match(/\/file\/d\/([^\/]+)/);
     if (match) {
-      return `https://drive.google.com/file/d/${match[1]}/preview?rm=minimal`;
+      return "https://drive.google.com/file/d/" + match[1] + "/preview?rm=minimal";
     }
     return videoUrl;
   };
@@ -234,7 +234,7 @@ const VideoPlayerPage = () => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return mins + ":" + secs.toString().padStart(2, '0');
   };
 
   const ytProgressPercent = ytProgress.duration > 0 ? (ytProgress.currentTime / ytProgress.duration) * 100 : 0;
@@ -262,7 +262,7 @@ const VideoPlayerPage = () => {
           <p className="text-slate-500 text-sm mt-2">Purchase this course to unlock all lectures.</p>
           <button
             className="bg-gradient-to-r from-violet-600 to-pink-500 text-white mt-5 px-6 py-3 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all"
-            onClick={() => navigate(`/courses/${courseId}`)}
+            onClick={() => navigate("/courses/" + courseId)}
           >
             View Course →
           </button>
@@ -312,7 +312,7 @@ const VideoPlayerPage = () => {
       origin: window.location.origin,
       widget_referrer: window.location.href,
     });
-    return `https://www.youtube-nocookie.com/embed/${youtubeId}?${params.toString()}`;
+    return "https://www.youtube-nocookie.com/embed/" + youtubeId + "?" + params.toString();
   };
 
   return (
@@ -345,15 +345,11 @@ const VideoPlayerPage = () => {
       {/* PREMIUM VIDEO PLAYER */}
       <div
         ref={videoContainerRef}
-        className={`relative overflow-hidden shadow-2xl transition-all duration-300 ${
-          isFullscreen
-            ? "fixed inset-0 z-50 rounded-none bg-black flex items-center justify-center"
-            : "rounded-2xl bg-black border border-slate-200 shadow-sm w-full"
-        }`}
+        className={"relative overflow-hidden shadow-2xl transition-all duration-300 " + (isFullscreen ? "fixed inset-0 z-50 rounded-none bg-black flex items-center justify-center" : "rounded-2xl bg-black border border-slate-200 shadow-sm w-full max-w-full")}
         data-protected
         onContextMenu={(e) => e.preventDefault()}
       >
-        <div className={`bg-black relative w-full ${isFullscreen ? "h-full" : "aspect-video"}`}>
+        <div className={"bg-black relative w-full " + (isFullscreen ? "h-full" : "aspect-video max-w-full")}>
           {hasUploadedVideo ? (
             isDriveVideo ? (
               <div className="relative w-full h-full overflow-hidden">
@@ -395,18 +391,14 @@ const VideoPlayerPage = () => {
                 ref={iframeRef}
                 src={getYoutubeEmbedUrl()}
                 title={lecture.title}
-                className="absolute w-full h-full"
-                style={{
-                  top: '-100px',
-                  left: 0,
-                  width: '100%',
-                  height: 'calc(100% + 200px)',
-                }}
+                className="absolute inset-0 w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                 allowFullScreen={false}
               />
-              {/* Single caption cover overlay - responsive for lecture videos */}
+              {/* Top overlay to hide YouTube title and captions */}
               <div className="absolute top-0 left-0 right-0 h-12 sm:h-14 md:h-16 bg-black pointer-events-none z-[5]" />
+              {/* Bottom-right overlay to hide YouTube logo */}
+              <div className="absolute bottom-12 sm:bottom-14 md:bottom-16 right-0 w-16 sm:w-20 md:w-24 h-8 sm:h-10 md:h-12 bg-black pointer-events-none z-[5]" />
               
               {/* Custom Play Button Overlay - shows when YouTube video is paused */}
               {!ytPlaying && (
@@ -420,27 +412,25 @@ const VideoPlayerPage = () => {
                         );
                       }
                     }}
-                    className="w-20 h-20 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center transition-transform hover:scale-110 shadow-lg"
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center transition-transform hover:scale-110 shadow-lg"
                   >
-                    <Play className="w-10 h-10 text-white ml-1" />
+                    <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" />
                   </button>
                 </div>
               )}
-              {/* Additional overlay for YouTube title area - responsive */}
-              <div className="absolute top-12 sm:top-14 md:top-20 left-0 right-0 h-10 sm:h-11 md:h-12 bg-black z-[6] pointer-events-auto" />
               
               {/* Custom Progress Bar */}
-              <div className="absolute bottom-0 left-0 right-0 z-[8] px-3 pb-4 pointer-events-none">
-                <div className="flex items-center gap-2">
+              <div className="absolute bottom-0 left-0 right-0 z-[8] px-2 sm:px-3 pb-3 sm:pb-4 pointer-events-none">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                   {/* Time display */}
-                  <span className="text-[10px] text-white/90 font-medium min-w-[70px]">
+                  <span className="text-[9px] sm:text-[10px] text-white/90 font-medium min-w-[60px] sm:min-w-[70px]">
                     {formatTime(ytProgress.currentTime)} / {formatTime(ytProgress.duration)}
                   </span>
                   {/* Progress bar */}
                   <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
-                      style={{ width: `${ytProgressPercent}%` }}
+                      style={{ width: ytProgressPercent + "%" }}
                     />
                   </div>
                 </div>
@@ -481,9 +471,7 @@ const VideoPlayerPage = () => {
                           handlePlaybackSpeedChange(speed);
                           setShowSpeedMenu(false);
                         }}
-                        className={`w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                          speed === playbackSpeed ? "bg-primary text-white" : "text-gray-300 hover:bg-white/10"
-                        }`}
+                        className={"w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors " + (speed === playbackSpeed ? "bg-primary text-white" : "text-gray-300 hover:bg-white/10")}
                       >
                         {speed}x
                       </button>
@@ -496,7 +484,7 @@ const VideoPlayerPage = () => {
             {/* Auto-Next Toggle */}
             <button
               onClick={() => setAutoNextEnabled(!autoNextEnabled)}
-              className={`bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors ${autoNextEnabled ? "text-primary" : "text-gray-400"}`}
+              className={"bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors " + (autoNextEnabled ? "text-primary" : "text-gray-400")}
               title="Auto-play next lecture"
             >
               <FastForward className="w-4 h-4" />
