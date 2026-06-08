@@ -10,8 +10,8 @@ ON CONFLICT (email) DO NOTHING;
 -- Insert into public.profiles table
 INSERT INTO public.profiles (user_id, name, avatar_url, subject, bio, created_at, updated_at)
 VALUES 
-  ('nadiya-khan-id', 'Nadiya Khan', NULL, 'Polity & Law', 'NET qualified Faculty and criminal lawyer with expertise in UPSC preparation', NOW(), NOW()),
-  ('shivam-saxena-id', 'Shivam Saxena', '/shivam-saxena.png', 'General Studies', '2-times UPSC CSE mains qualified with extensive teaching experience', NOW(), NOW())
+  ('nadiya-khan-id', 'Nadiya Khan', '/nadiya-maam.jpg', 'Polity & Law', 'NET qualified Faculty and criminal lawyer with expertise in UPSC preparation', NOW(), NOW()),
+  ('shivam-saxena-id', 'Shivam Saxena', '/shivam-sir.jpg', 'General Studies', '2-times UPSC CSE mains qualified with extensive teaching experience', NOW(), NOW())
 ON CONFLICT (user_id) DO UPDATE SET
   name = EXCLUDED.name,
   avatar_url = EXCLUDED.avatar_url,

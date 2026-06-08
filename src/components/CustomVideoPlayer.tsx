@@ -230,7 +230,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video bg-black rounded-xl overflow-hidden group"
+      className="relative w-full aspect-video bg-black rounded-xl overflow-hidden group max-w-full"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
@@ -238,12 +238,12 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
       {/* YouTube Player */}
       <div id="youtube-player" className="absolute inset-0 w-full h-full" />
       
-      {/* Single caption cover overlay */}
-      <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-10" />
+      {/* Single caption cover overlay - responsive for lecture videos */}
+      <div className="absolute top-0 left-0 right-0 h-12 sm:h-14 md:h-16 bg-black pointer-events-none z-10" />
 
       {/* Custom Controls */}
       <div
-        className={`absolute bottom-0 left-0 right-0 p-4 z-20 transition-opacity duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 z-20 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -260,17 +260,17 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         </div>
 
         {/* Control Bar */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Play/Pause */}
           <button
             onClick={togglePlay}
-            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
           >
-            {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white fill-white ml-0.5" />}
+            {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />}
           </button>
 
           {/* Volume */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 hidden sm:flex">
             <button onClick={toggleMute} className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all">
               {isMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
             </button>
@@ -280,13 +280,13 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               max="100"
               value={isMuted ? 0 : volume}
               onChange={handleVolumeChange}
-              className="w-20 h-1 bg-white/30 rounded-full appearance-none cursor-pointer"
+              className="w-16 sm:w-20 h-1 bg-white/30 rounded-full appearance-none cursor-pointer"
             />
           </div>
 
           {/* Progress Bar */}
           <div className="flex-1 flex items-center gap-2">
-            <span className="text-white text-xs font-medium min-w-[40px]">{formatTime(currentTime)}</span>
+            <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(currentTime)}</span>
             <input
               type="range"
               min="0"
@@ -296,18 +296,18 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               onChange={handleSeek}
               className="flex-1 h-1.5 bg-white/30 rounded-full appearance-none cursor-pointer"
             />
-            <span className="text-white text-xs font-medium min-w-[40px]">{formatTime(duration)}</span>
+            <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(duration)}</span>
           </div>
 
           {/* Playback Speed */}
           <div className="relative flex-shrink-0">
             <button
               onClick={() => handleSpeedChange(playbackSpeed === 2 ? 0.5 : playbackSpeed + 0.25)}
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all"
             >
-              <FastForward className="w-4 h-4 text-white" />
+              <FastForward className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             </button>
-            <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-white text-[10px] font-bold bg-black/70 px-1.5 py-0.5 rounded">
+            <span className="absolute -bottom-4 sm:-bottom-5 left-1/2 -translate-x-1/2 text-white text-[9px] sm:text-[10px] font-bold bg-black/70 px-1.5 py-0.5 rounded">
               {playbackSpeed}x
             </span>
           </div>
@@ -315,9 +315,9 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
           {/* Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
           >
-            {isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />}
+            {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
           </button>
         </div>
       </div>

@@ -348,12 +348,12 @@ const VideoPlayerPage = () => {
         className={`relative overflow-hidden shadow-2xl transition-all duration-300 ${
           isFullscreen
             ? "fixed inset-0 z-50 rounded-none bg-black flex items-center justify-center"
-            : "rounded-2xl bg-black border border-slate-200 shadow-sm"
+            : "rounded-2xl bg-black border border-slate-200 shadow-sm w-full"
         }`}
         data-protected
         onContextMenu={(e) => e.preventDefault()}
       >
-        <div className={`bg-black relative ${isFullscreen ? "w-full h-full" : "w-full aspect-video"}`}>
+        <div className={`bg-black relative w-full ${isFullscreen ? "h-full" : "aspect-video"}`}>
           {hasUploadedVideo ? (
             isDriveVideo ? (
               <div className="relative w-full h-full overflow-hidden">
@@ -405,8 +405,8 @@ const VideoPlayerPage = () => {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                 allowFullScreen={false}
               />
-              {/* Single caption cover overlay */}
-              <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-[5]" />
+              {/* Single caption cover overlay - responsive for lecture videos */}
+              <div className="absolute top-0 left-0 right-0 h-12 sm:h-14 md:h-16 bg-black pointer-events-none z-[5]" />
               
               {/* Custom Play Button Overlay - shows when YouTube video is paused */}
               {!ytPlaying && (
@@ -426,8 +426,8 @@ const VideoPlayerPage = () => {
                   </button>
                 </div>
               )}
-              {/* Additional overlay for YouTube title area */}
-              <div className="absolute top-20 left-0 right-0 h-12 bg-black z-[6] pointer-events-auto" />
+              {/* Additional overlay for YouTube title area - responsive */}
+              <div className="absolute top-12 sm:top-14 md:top-20 left-0 right-0 h-10 sm:h-11 md:h-12 bg-black z-[6] pointer-events-auto" />
               
               {/* Custom Progress Bar */}
               <div className="absolute bottom-0 left-0 right-0 z-[8] px-3 pb-4 pointer-events-none">
