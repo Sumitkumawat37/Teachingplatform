@@ -202,13 +202,17 @@ const StudentDashboard = () => {
         <div className="grid grid-cols-2 gap-3">
           {/* Nadiya Khan */}
           <div className="rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#F3EEFF' }}>
-            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 mx-auto mb-3 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 mx-auto mb-3 shadow-sm bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center">
               <img
                 src="/nadiya-maam.jpg"
                 alt="Nadiya Khan"
                 className="w-full h-full object-cover object-top"
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
+                  (e.currentTarget.style.display = 'none');
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `<span class="text-violet-600 font-bold text-lg">NK</span>`;
+                  }
                 }}
               />
             </div>
@@ -219,13 +223,17 @@ const StudentDashboard = () => {
 
           {/* Shivam Saxena */}
           <div className="rounded-2xl p-4 shadow-sm border border-pink-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#FFEAF4' }}>
-            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-pink-200 mx-auto mb-3 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-pink-200 mx-auto mb-3 shadow-sm bg-gradient-to-br from-pink-100 to-violet-100 flex items-center justify-center">
               <img
                 src="/shivam-sir.jpg"
                 alt="Shivam Saxena"
                 className="w-full h-full object-cover object-top"
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
+                  (e.currentTarget.style.display = 'none');
+                  const parent = e.currentTarget.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `<span class="text-pink-600 font-bold text-lg">SS</span>`;
+                  }
                 }}
               />
             </div>

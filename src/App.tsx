@@ -46,6 +46,7 @@ const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"));
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const ReviewVideosPage = lazy(() => import("./pages/ReviewVideosPage"));
+const MentoringPage = lazy(() => import("./pages/MentoringPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading component for lazy loaded routes
@@ -129,6 +130,7 @@ function AppRoutes() {
         <Route path="/mains-writing" element={<Suspense fallback={<PageLoader />}><MainsWritingPage /></Suspense>} />
         <Route path="/study-planner" element={<Suspense fallback={<PageLoader />}><StudyPlannerPage /></Suspense>} />
         <Route path="/review-videos" element={<Suspense fallback={<PageLoader />}><ReviewVideosPage /></Suspense>} />
+        <Route path="/mentoring" element={<Suspense fallback={<PageLoader />}><MentoringPage /></Suspense>} />
 
         {/* Admin (Teacher) Routes */}
         <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />
