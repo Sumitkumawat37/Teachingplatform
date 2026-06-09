@@ -196,6 +196,46 @@ const StudentDashboard = () => {
         </div>
       </div>
 
+      {/* ── YOUR TEACHERS ── */}
+      <div>
+        <h3 className="font-semibold text-base text-slate-800 mb-3">Your Teachers</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Nadiya Khan */}
+          <div className="rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#F3EEFF' }}>
+            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 mx-auto mb-3 shadow-sm">
+              <img
+                src="/nadiya-maam.jpg"
+                alt="Nadiya Khan"
+                className="w-full h-full object-cover object-top"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+            <h4 className="font-semibold text-sm text-slate-800 text-center">Nadiya Khan</h4>
+            <p className="text-[11px] text-violet-600 text-center font-medium mt-0.5">Faculty</p>
+            <p className="text-[10px] text-slate-400 text-center mt-1">Polity & GS-2 Expert</p>
+          </div>
+
+          {/* Shivam Saxena */}
+          <div className="rounded-2xl p-4 shadow-sm border border-pink-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ background: '#FFEAF4' }}>
+            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-pink-200 mx-auto mb-3 shadow-sm">
+              <img
+                src="/shivam-sir.jpg"
+                alt="Shivam Saxena"
+                className="w-full h-full object-cover object-top"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+            <h4 className="font-semibold text-sm text-slate-800 text-center">Shivam Saxena</h4>
+            <p className="text-[11px] text-pink-600 text-center font-medium mt-0.5">Faculty</p>
+            <p className="text-[10px] text-slate-400 text-center mt-1">History & GS-1 Expert</p>
+          </div>
+        </div>
+      </div>
+
       {/* ── ENROLLED COURSES ── */}
       <div>
         <div className="flex items-center justify-between mb-3">

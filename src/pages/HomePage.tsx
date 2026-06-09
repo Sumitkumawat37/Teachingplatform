@@ -548,13 +548,13 @@ const HomePage = () => {
 
             <button
 
-              onClick={() => navigate('/courses')}
+              onClick={() => navigate('/review-videos')}
 
               className="bg-white/15 text-white text-sm font-semibold px-6 py-3 rounded-full border border-white/25 hover:bg-white/25 transition-all"
 
             >
 
-              Watch Demo
+              Watch Review
 
             </button>
 
