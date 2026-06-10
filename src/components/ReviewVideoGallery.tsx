@@ -13,6 +13,7 @@ interface ReviewVideoGalleryProps {
 
 export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 }: ReviewVideoGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(startIndex);
+  const [autoNextEnabled, setAutoNextEnabled] = useState(true);
 
   useEffect(() => {
     if (open) {
@@ -28,13 +29,19 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
     setCurrentIndex((prev) => (prev - 1 + videos.length) % videos.length);
   };
 
+  const handleVideoEnded = () => {
+    if (autoNextEnabled && videos.length > 1) {
+      handleNext();
+    }
+  };
+
   const currentVideo = videos[currentIndex];
 
   if (!currentVideo) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm p-0 overflow-hidden h-[60vh]">
+      <DialogContent className="max-w-6xl p-0 overflow-hidden h-[90vh]">
         <div className="relative h-full flex flex-col">
           {/* Close button */}
           <Button
@@ -46,12 +53,13 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
             <X className="w-4 h-4" />
           </Button>
 
-          {/* Video player - Vertical/Reel mode */}
+          {/* Video player */}
           <div className="flex-1 bg-black relative">
             <CustomVideoPlayer
               youtubeId={currentVideo.youtube_id}
               title={currentVideo.title}
               autoplay={true}
+              onEnded={handleVideoEnded}
             />
           </div>
 
