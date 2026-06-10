@@ -119,7 +119,7 @@ const HomePage = () => {
     const fetchReviewVideos = async () => {
       try {
         const { data } = await supabase
-          .from("review_videos" as any)
+          .from("course_review_videos" as any)
           .select("*")
           .order("created_at", { ascending: false })
           .limit(6);
