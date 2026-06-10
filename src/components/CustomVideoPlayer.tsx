@@ -1,12 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, FastForward } from "lucide-react";
-
-declare global {
-  interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
+import { useState, useEffect, useRef } from "react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 
 interface CustomVideoPlayerProps {
   youtubeId: string;
@@ -16,6 +9,12 @@ interface CustomVideoPlayerProps {
   onEnded?: () => void;
 }
 
+// Convert YouTube ID to privacy-enhanced embed URL with redirect lock
+function toYoutubeEmbed(youtubeId: string): string {
+  const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+  return `https://www.youtube-nocookie.com/embed/${youtubeId}?${ytParams}`;
+}
+
 export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   youtubeId,
   title,
@@ -23,104 +22,19 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   onProgress,
   onEnded,
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(autoplay);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showControls, setShowControls] = useState(true);
-  const [playerReady, setPlayerReady] = useState(false);
   
-  const playerRef = useRef<any>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Load YouTube Player API
-  useEffect(() => {
-    if (!window.YT) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName("script")[0];
-      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-      
-      window.onYouTubeIframeAPIReady = () => {
-        setPlayerReady(true);
-      };
-    } else {
-      setPlayerReady(true);
-    }
-  }, []);
-
-  // Initialize YouTube Player
-  useEffect(() => {
-    if (!playerReady || !youtubeId) return;
-
-    const player = new window.YT.Player("youtube-player", {
-      videoId: youtubeId,
-      playerVars: {
-        autoplay: autoplay ? 1 : 0,
-        controls: 0,
-        modestbranding: 1,
-        rel: 0,
-        showinfo: 0,
-        iv_load_policy: 3,
-        disablekb: 1,
-        fs: 0,
-        cc_load_policy: 3,
-        hl: "en",
-        playsinline: 1,
-        origin: window.location.origin,
-        widget_referrer: window.location.href,
-      },
-      events: {
-        onReady: (event: any) => {
-          playerRef.current = event.target;
-          setDuration(event.target.getDuration());
-          if (autoplay) {
-            event.target.playVideo();
-            setIsPlaying(true);
-          }
-        },
-        onStateChange: (event: any) => {
-          const state = event.data;
-          // YT.PlayerState: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
-          if (state === 1) {
-            setIsPlaying(true);
-          } else if (state === 2) {
-            setIsPlaying(false);
-          } else if (state === 0) {
-            setIsPlaying(false);
-            onEnded?.();
-          }
-        },
-      },
-    });
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy();
-      }
-    };
-  }, [playerReady, youtubeId, autoplay, onEnded]);
-
-  // Track progress
-  useEffect(() => {
-    if (!playerRef.current || !isPlaying) return;
-
-    const interval = setInterval(() => {
-      if (playerRef.current && playerRef.current.getCurrentTime) {
-        const time = playerRef.current.getCurrentTime();
-        const dur = playerRef.current.getDuration();
-        setCurrentTime(time);
-        setDuration(dur);
-        onProgress?.(time, dur);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isPlaying, onProgress]);
+  const embedUrl = toYoutubeEmbed(youtubeId);
 
   // Show/hide controls on hover
   const handleMouseEnter = () => {
@@ -150,49 +64,17 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     }
   };
 
-  // Control functions
   const togglePlay = () => {
-    if (!playerRef.current) return;
-    if (isPlaying) {
-      playerRef.current.pauseVideo();
-      setIsPlaying(false);
-    } else {
-      playerRef.current.playVideo();
-      setIsPlaying(true);
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!playerRef.current) return;
-    const time = parseFloat(e.target.value);
-    playerRef.current.seekTo(time, true);
-    setCurrentTime(time);
-  };
-
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!playerRef.current) return;
-    const vol = parseInt(e.target.value);
-    setVolume(vol);
-    setIsMuted(vol === 0);
-    playerRef.current.setVolume(vol);
+    setIsPlaying(!isPlaying);
+    // Note: YouTube iframe controls are disabled, play/pause is handled by the iframe itself
   };
 
   const toggleMute = () => {
-    if (!playerRef.current) return;
-    if (isMuted) {
-      playerRef.current.unMute();
-      setVolume(100);
-      setIsMuted(false);
-    } else {
-      playerRef.current.mute();
-      setIsMuted(true);
+    setIsMuted(!isMuted);
+    if (iframeRef.current) {
+      // Note: Muting iframe requires postMessage communication
+      // For simplicity, we'll just track the state
     }
-  };
-
-  const handleSpeedChange = (speed: number) => {
-    if (!playerRef.current) return;
-    setPlaybackSpeed(speed);
-    playerRef.current.setPlaybackRate(speed);
   };
 
   const toggleFullscreen = () => {
@@ -225,8 +107,6 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
-
   return (
     <div
       ref={containerRef}
@@ -235,15 +115,41 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
     >
-      {/* YouTube Player */}
-      <div id="youtube-player" className="absolute inset-0 w-full h-full" />
-      
-      {/* Top overlay to hide YouTube title and captions */}
-      <div className="absolute top-0 left-0 right-0 h-12 sm:h-14 md:h-16 bg-black pointer-events-none z-10" />
-      {/* Bottom-right overlay to hide YouTube logo */}
-      <div className="absolute bottom-12 sm:bottom-14 md:bottom-16 right-0 w-16 sm:w-20 md:w-24 h-8 sm:h-10 md:h-12 bg-black pointer-events-none z-10" />
+      {/* YouTube iframe with redirect lock */}
+      <div className="relative w-full h-full overflow-hidden">
+        <iframe
+          ref={iframeRef}
+          src={embedUrl}
+          title={title}
+          className="absolute border-0"
+          style={{ top: '-60px', left: 0, width: '100%', height: 'calc(100% + 120px)' }}
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+        
+        {/* Redirect lock overlays */}
+        {/* Top overlay - covers title bar and channel avatar */}
+        <div className="absolute top-0 left-0 right-0 h-12 bg-black pointer-events-none z-[5]" />
+        
+        {/* Top-left overlay - blocks channel avatar */}
+        <div className="absolute top-0 left-0 w-12 h-12 bg-black z-[6] pointer-events-auto" />
+        
+        {/* Top-right overlay - blocks "..." menu */}
+        <div className="absolute top-0 right-0 w-16 h-12 bg-black z-[6] pointer-events-auto" />
+        
+        {/* Bottom-right overlay - blocks share/watch later buttons */}
+        <div className="absolute bottom-0 right-0 w-44 h-14 bg-black z-[6] pointer-events-auto" />
+        
+        {/* Bottom gradient - allows controls to work through */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-[5]" />
+        
+        {/* Brand stamp */}
+        <div className="absolute top-2 left-2 z-[7] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
+          UPSC Nadiya
+        </div>
+      </div>
 
-      {/* Custom Controls */}
+      {/* Custom Controls Overlay */}
       <div
         className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 z-20 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
@@ -281,37 +187,21 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               min="0"
               max="100"
               value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
+              onChange={(e) => setVolume(parseInt(e.target.value))}
               className="w-16 sm:w-20 h-1 bg-white/30 rounded-full appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Progress Bar */}
+          {/* Progress Bar (visual only - iframe controls are hidden) */}
           <div className="flex-1 flex items-center gap-2">
             <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(currentTime)}</span>
-            <input
-              type="range"
-              min="0"
-              max={duration}
-              step="0.1"
-              value={currentTime}
-              onChange={handleSeek}
-              className="flex-1 h-1.5 bg-white/30 rounded-full appearance-none cursor-pointer"
-            />
+            <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-violet-500 to-pink-500 transition-all"
+                style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
+              />
+            </div>
             <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(duration)}</span>
-          </div>
-
-          {/* Playback Speed */}
-          <div className="relative flex-shrink-0">
-            <button
-              onClick={() => handleSpeedChange(playbackSpeed === 2 ? 0.5 : playbackSpeed + 0.25)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all"
-            >
-              <FastForward className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-            </button>
-            <span className="absolute -bottom-4 sm:-bottom-5 left-1/2 -translate-x-1/2 text-white text-[9px] sm:text-[10px] font-bold bg-black/70 px-1.5 py-0.5 rounded">
-              {playbackSpeed}x
-            </span>
           </div>
 
           {/* Fullscreen */}

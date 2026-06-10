@@ -295,24 +295,11 @@ const VideoPlayerPage = () => {
     setNewDoubt("");
   };
 
-  // Build YouTube embed URL with privacy-enhanced mode and hidden branding
+  // Build YouTube embed URL with privacy-enhanced mode and redirect lock
   const getYoutubeEmbedUrl = () => {
     if (!hasYoutubeVideo) return "";
-    const params = new URLSearchParams({
-      modestbranding: "1",
-      rel: "0",
-      controls: "0",
-      playsinline: "1",
-      showinfo: "0",
-      iv_load_policy: "3",
-      fs: "0",
-      cc_load_policy: "3",
-      disablekb: "1",
-      enablejsapi: "1",
-      origin: window.location.origin,
-      widget_referrer: window.location.href,
-    });
-    return "https://www.youtube-nocookie.com/embed/" + youtubeId + "?" + params.toString();
+    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+    return "https://www.youtube-nocookie.com/embed/" + youtubeId + "?" + ytParams;
   };
 
   return (
@@ -391,14 +378,32 @@ const VideoPlayerPage = () => {
                 ref={iframeRef}
                 src={getYoutubeEmbedUrl()}
                 title={lecture.title}
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-                allowFullScreen={false}
+                className="absolute border-0"
+                style={{ top: '-60px', left: 0, width: '100%', height: 'calc(100% + 120px)' }}
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
               />
-              {/* Top overlay to hide YouTube title and captions */}
-              <div className="absolute top-0 left-0 right-0 h-12 sm:h-14 md:h-16 bg-black pointer-events-none z-[5]" />
-              {/* Bottom-right overlay to hide YouTube logo */}
-              <div className="absolute bottom-12 sm:bottom-14 md:bottom-16 right-0 w-16 sm:w-20 md:w-24 h-8 sm:h-10 md:h-12 bg-black pointer-events-none z-[5]" />
+              
+              {/* Redirect lock overlays */}
+              {/* Top overlay - covers title bar and channel avatar */}
+              <div className="absolute top-0 left-0 right-0 h-12 bg-black pointer-events-none z-[5]" />
+              
+              {/* Top-left overlay - blocks channel avatar */}
+              <div className="absolute top-0 left-0 w-12 h-12 bg-black z-[6] pointer-events-auto" />
+              
+              {/* Top-right overlay - blocks "..." menu */}
+              <div className="absolute top-0 right-0 w-16 h-12 bg-black z-[6] pointer-events-auto" />
+              
+              {/* Bottom-right overlay - blocks share/watch later buttons */}
+              <div className="absolute bottom-0 right-0 w-44 h-14 bg-black z-[6] pointer-events-auto" />
+              
+              {/* Bottom gradient - allows controls to work through */}
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-[5]" />
+              
+              {/* Brand stamp */}
+              <div className="absolute top-2 left-2 z-[7] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
+                UPSC Nadiya
+              </div>
               
               {/* Custom Play Button Overlay - shows when YouTube video is paused */}
               {!ytPlaying && (
