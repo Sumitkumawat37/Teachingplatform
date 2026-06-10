@@ -35,6 +35,7 @@ const superAdminMgmtNav = [
 const adminNav = [
   { to: "/admin",                icon: LayoutDashboard, label: "Dashboard",     end: true },
   { to: "/admin/profile",        icon: User,            label: "My Profile",    end: false },
+  { to: "/admin/teachers",       icon: GraduationCap,   label: "Teachers",      end: false },
   { to: "/admin/content",        icon: BookOpen,        label: "Course",        end: false },
   { to: "/notes",                icon: FileText,        label: "Notes",         end: false },
   { to: "/admin/students",       icon: Users,           label: "Students",      end: false },

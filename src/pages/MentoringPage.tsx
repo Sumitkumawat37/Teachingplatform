@@ -35,16 +35,16 @@ const MentoringPage = () => {
   const mentors = [
     {
       name: "Nadiya Khan",
-      subject: "Polity & GS Expert",
-      bio: "Expert in Indian Polity, Governance, and GS papers with 8+ years of teaching experience. Guided 45+ students to clear UPSC.",
-      email: "nadiya@upscwithnadiya.in",
+      subject: "Polity & Governance",
+      bio: "Net qualified faculty / Criminal Lawyer .",
+      email: "nadiyakhan0205@gmail.com",
       photo: teacherBanner
     },
     {
       name: "Shivam Saxena",
-      subject: "History & Current Affairs",
-      bio: "Specialist in Modern History, Art & Culture, and Current Affairs. Known for simplified teaching methods and strategic approach.",
-      email: "shivam@upscwithnadiya.in",
+      subject: "Mentoring & Polity",
+      bio: "2 Times UPSC-CSE mains Qualified.",
+      email: "shivam24892@gmail.com",
       photo: shivamSaxena
     }
   ];
