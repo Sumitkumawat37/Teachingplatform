@@ -125,7 +125,7 @@ const HomePage = () => {
   // Hardcoded faculties to ensure both are always shown
   const hardcodedFaculties = [
     {
-      name: "Nadiya Ma'am",
+      name: "Nadiya Khan",
       subject: "Polity & GS Expert",
       bio: "Expert in Indian Polity, Governance, and GS papers with 8+ years of teaching experience. Guided 45+ students to clear UPSC.",
       email: "nadiya@upscwithnadiya.in"
