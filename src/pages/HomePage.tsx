@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail } from "lucide-react";
+import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail, Youtube } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -77,6 +77,7 @@ const HomePage = () => {
   const { data: liveClasses = [] } = useLiveClasses();
 
   const [teacherProfiles, setTeacherProfiles] = useState<any[]>([]);
+  const [reviewVideos, setReviewVideos] = useState<any[]>([]);
 
 
 
@@ -112,6 +113,22 @@ const HomePage = () => {
       }
     };
     fetchTeacherProfiles();
+  }, []);
+
+  useEffect(() => {
+    const fetchReviewVideos = async () => {
+      try {
+        const { data } = await supabase
+          .from("review_videos" as any)
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(6);
+        setReviewVideos(data || []);
+      } catch (err) {
+        console.error("Error fetching review videos:", err);
+      }
+    };
+    fetchReviewVideos();
   }, []);
 
 
@@ -394,6 +411,50 @@ const HomePage = () => {
 
         </div>
 
+      )}
+
+
+
+      {/* ══ REVIEW VIDEOS ══ */}
+      {reviewVideos.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Review Videos</h2>
+            <button onClick={() => navigate('/review-videos')} className="text-violet-600 text-xs font-semibold flex items-center gap-1">
+              View all <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {reviewVideos.slice(0, 6).map((video) => (
+              <div
+                key={video.id}
+                className="rounded-2xl overflow-hidden shadow-sm border border-slate-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 cursor-pointer"
+                onClick={() => navigate('/review-videos')}
+                style={{ background: '#F3EEFF' }}
+              >
+                <div className="relative aspect-video bg-black">
+                  <img
+                    src={`https://img.youtube.com/vi/${video.youtube_id}/mqdefault.jpg`}
+                    alt={video.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                      <Play className="w-5 h-5 text-violet-600 ml-0.5" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <h4 className="font-semibold text-xs text-slate-800 line-clamp-2">{video.title}</h4>
+                  {video.description && (
+                    <p className="text-slate-400 text-[10px] mt-1 line-clamp-2">{video.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
 
