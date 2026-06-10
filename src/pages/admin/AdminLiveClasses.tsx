@@ -55,11 +55,19 @@ const AdminLiveClasses = () => {
     // Handle timezone correctly - datetime-local gives local time, convert to ISO
     const scheduledDateObj = new Date(scheduledDate);
     const scheduled_at = scheduledDateObj.toISOString();
+    console.log("Scheduling live class:", { title, course_id: selectedCourse, chapter_id: selectedChapter, scheduled_at, meeting_link: meetingLink, duration });
     createLiveClass.mutate({
       course_id: selectedCourse, chapter_id: selectedChapter, title,
       scheduled_at, meeting_link: meetingLink, duration,
     }, {
-      onSuccess: () => { toast.success("Live class scheduled!"); setTitle(""); setMeetingLink(""); setScheduledDate(""); },
+      onSuccess: () => { 
+        toast.success("Live class scheduled!"); 
+        setTitle(""); setMeetingLink(""); setScheduledDate(""); setSelectedCourse(""); setSelectedChapter("");
+      },
+      onError: (error: any) => {
+        console.error("Error scheduling live class:", error);
+        toast.error(`Failed to schedule: ${error.message || "Unknown error"}`);
+      },
     });
   };
 
