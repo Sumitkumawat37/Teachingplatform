@@ -27,7 +27,7 @@ function toYoutubeEmbed(url: string): string | null {
   try {
     const u = new URL(url);
     const host = u.hostname.toLowerCase().replace(/^www\./, "");
-    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=0&playsinline=1&cc_load_policy=3&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
     if (host === "youtu.be") {
       const id = u.pathname.slice(1);
       if (id) return `https://www.youtube-nocookie.com/embed/${id}?${ytParams}`;
@@ -141,8 +141,11 @@ export function LiveMeetingFrame({ url, title }: LiveMeetingFrameProps) {
                 allow="autoplay; encrypted-media; picture-in-picture"
                 onLoad={handleLoad}
               />
-              {/* Single caption cover overlay */}
+              {/* YouTube redirect lock - hide UI elements */}
               <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-[5]" />
+              <div className="absolute top-0 left-0 w-32 h-12 bg-black pointer-events-none z-[6]" />
+              <div className="absolute top-0 right-0 w-32 h-12 bg-black pointer-events-none z-[6]" />
+              <div className="absolute bottom-0 right-0 w-48 h-12 bg-black pointer-events-none z-[6]" />
               <div className="absolute top-2 left-2 z-[7] px-2 py-0.5 rounded bg-primary/90 text-primary-foreground text-[10px] font-semibold pointer-events-none">
                 EduMaster Live
               </div>
