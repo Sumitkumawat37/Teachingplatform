@@ -77,7 +77,7 @@ const HomePage = () => {
   const { data: liveClasses = [] } = useLiveClasses();
 
   const [teacherProfiles, setTeacherProfiles] = useState<any[]>([]);
-  const [reviewVideos, setReviewVideos] = useState<any[]>([]);
+  const [reviewVideosByCourse, setReviewVideosByCourse] = useState<any[]>([]);
 
 
 
@@ -120,10 +120,26 @@ const HomePage = () => {
       try {
         const { data } = await supabase
           .from("course_review_videos" as any)
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(6);
-        setReviewVideos(data || []);
+          .select("*, courses(title)")
+          .order("created_at", { ascending: false });
+        
+        // Group by course
+        const grouped = data?.reduce((acc: any, video: any) => {
+          const courseName = video.courses?.title || "General";
+          if (!acc[courseName]) {
+            acc[courseName] = [];
+          }
+          acc[courseName].push(video);
+          return acc;
+        }, {}) || {};
+
+        // Convert to array format
+        const groupedArray = Object.entries(grouped).map(([courseName, videos]: [string, any]) => ({
+          courseName,
+          videos: videos.slice(0, 4) // Limit to 4 videos per course
+        }));
+
+        setReviewVideosByCourse(groupedArray);
       } catch (err) {
         console.error("Error fetching review videos:", err);
       }
@@ -416,7 +432,7 @@ const HomePage = () => {
 
 
       {/* ══ REVIEW VIDEOS ══ */}
-      {reviewVideos.length > 0 && (
+      {reviewVideosByCourse.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Review Videos</h2>
@@ -424,32 +440,34 @@ const HomePage = () => {
               View all <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {reviewVideos.slice(0, 6).map((video) => (
+          <div className="space-y-4">
+            {reviewVideosByCourse.slice(0, 3).map((courseGroup) => (
               <div
-                key={video.id}
-                className="rounded-2xl overflow-hidden shadow-sm border border-slate-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 cursor-pointer"
-                onClick={() => navigate('/review-videos')}
+                key={courseGroup.courseName}
+                className="rounded-2xl p-4 shadow-sm border border-slate-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 cursor-pointer"
                 style={{ background: '#F3EEFF' }}
+                onClick={() => navigate('/review-videos')}
               >
-                <div className="relative aspect-video bg-black">
-                  <img
-                    src={`https://img.youtube.com/vi/${video.youtube_id}/mqdefault.jpg`}
-                    alt={video.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                      <Play className="w-5 h-5 text-violet-600 ml-0.5" />
+                <h3 className="font-semibold text-sm text-slate-800 mb-3">{courseGroup.courseName} - Review Videos</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {courseGroup.videos.map((video: any) => (
+                    <div
+                      key={video.id}
+                      className="relative aspect-video bg-black rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={`https://img.youtube.com/vi/${video.youtube_id}/mqdefault.jpg`}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                          <Play className="w-3 h-3 text-violet-600 ml-0.5" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="p-3">
-                  <h4 className="font-semibold text-xs text-slate-800 line-clamp-2">{video.title}</h4>
-                  {video.description && (
-                    <p className="text-slate-400 text-[10px] mt-1 line-clamp-2">{video.description}</p>
-                  )}
+                  ))}
                 </div>
               </div>
             ))}
