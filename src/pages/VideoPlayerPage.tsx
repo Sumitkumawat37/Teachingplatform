@@ -4,7 +4,7 @@ import { useLecture, useCourses, useDoubts, useCreateDoubt, useLectureProgress, 
 import { usePurchase } from "@/lib/purchase-context";
 import { useAuth } from "@/lib/auth-context";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, CheckCircle, Send, MessageCircle, Lock, Eye, Play, Maximize, Minimize, X, ShieldCheck, AlertTriangle, FastForward, Settings, RotateCcw, ShieldAlert } from "lucide-react";
+import { ChevronLeft, CheckCircle, Send, MessageCircle, Lock, Eye, Play, Maximize, Minimize, X, ShieldCheck, AlertTriangle, FastForward, Settings, RotateCcw, ShieldAlert, Rewind } from "lucide-react";
 import { toast } from "sonner";
 import { useAntiPiracy } from "@/hooks/useAntiPiracy";
 import { useScreenProtection } from "@/hooks/useScreenProtection";
@@ -174,6 +174,45 @@ const VideoPlayerPage = () => {
         JSON.stringify({ event: "command", func: "setPlaybackRate", args: [speed] }),
         "*"
       );
+    }
+  };
+
+  // Handle forward 10s
+  const handleForward = () => {
+    if (hasYoutubeVideo && iframeRef.current?.contentWindow) {
+      const newTime = Math.min(ytProgress.currentTime + 10, ytProgress.duration);
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "seekTo", args: [newTime, true] }),
+        "*"
+      );
+    } else if (videoRef.current) {
+      videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 10, videoRef.current.duration);
+    }
+  };
+
+  // Handle backward 10s
+  const handleBackward = () => {
+    if (hasYoutubeVideo && iframeRef.current?.contentWindow) {
+      const newTime = Math.max(ytProgress.currentTime - 10, 0);
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "seekTo", args: [newTime, true] }),
+        "*"
+      );
+    } else if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(videoRef.current.currentTime - 10, 0);
+    }
+  };
+
+  // Handle seek via progress bar
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    if (hasYoutubeVideo && iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "seekTo", args: [time, true] }),
+        "*"
+      );
+    } else if (videoRef.current) {
+      videoRef.current.currentTime = time;
     }
   };
 
@@ -431,13 +470,16 @@ const VideoPlayerPage = () => {
                   <span className="text-[9px] sm:text-[10px] text-white/90 font-medium min-w-[60px] sm:min-w-[70px]">
                     {formatTime(ytProgress.currentTime)} / {formatTime(ytProgress.duration)}
                   </span>
-                  {/* Progress bar */}
-                  <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
-                      style={{ width: ytProgressPercent + "%" }}
-                    />
-                  </div>
+                  {/* Progress bar - clickable for seeking */}
+                  <input
+                    type="range"
+                    min="0"
+                    max={ytProgress.duration || 100}
+                    step="0.1"
+                    value={ytProgress.currentTime}
+                    onChange={handleSeek}
+                    className="flex-1 h-1.5 bg-white/20 rounded-full appearance-none cursor-pointer pointer-events-auto"
+                  />
                 </div>
               </div>
             </div>
@@ -455,6 +497,24 @@ const VideoPlayerPage = () => {
         {/* Custom Fullscreen Toggle & Playback Controls */}
         {(hasUploadedVideo || hasYoutubeVideo) && (
           <div className="absolute bottom-3 right-3 z-[10] flex items-center gap-2">
+            {/* Backward 10s */}
+            <button
+              onClick={handleBackward}
+              className="bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors"
+              title="Backward 10s"
+            >
+              <Rewind className="w-4 h-4" />
+            </button>
+
+            {/* Forward 10s */}
+            <button
+              onClick={handleForward}
+              className="bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors"
+              title="Forward 10s"
+            >
+              <FastForward className="w-4 h-4" />
+            </button>
+
             {/* Playback Speed Control */}
             <div className="relative">
               <button 

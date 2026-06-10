@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, FastForward, Rewind } from "lucide-react";
 
 interface CustomVideoPlayerProps {
   youtubeId: string;
@@ -11,7 +11,7 @@ interface CustomVideoPlayerProps {
 
 // Convert YouTube ID to privacy-enhanced embed URL with redirect lock
 function toYoutubeEmbed(youtubeId: string): string {
-  const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+  const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
   return `https://www.youtube-nocookie.com/embed/${youtubeId}?${ytParams}`;
 }
 
@@ -33,8 +33,64 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const embedUrl = toYoutubeEmbed(youtubeId);
+
+  // Send command to YouTube iframe via postMessage
+  const sendCommand = (func: string, args: any[] = []) => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func, args }),
+        "*"
+      );
+    }
+  };
+
+  // Listen for YouTube iframe messages
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.origin.includes("youtube")) return;
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data?.event === "infoDelivery" && data?.info?.currentTime != null && data?.info?.duration) {
+          setCurrentTime(data.info.currentTime);
+          setDuration(data.info.duration);
+          onProgress?.(data.info.currentTime, data.info.duration);
+        }
+        if (data?.event === "onStateChange") {
+          const state = data?.info;
+          // YouTube player states: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
+          if (state === 1) {
+            setIsPlaying(true);
+          } else if (state === 2 || state === 0) {
+            setIsPlaying(false);
+            if (state === 0) {
+              onEnded?.();
+            }
+          }
+        }
+      } catch { /* ignore non-JSON messages */ }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    // Kick off listening
+    const kickstart = setInterval(() => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage('{"event":"listening"}', "*");
+        iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: "command", func: "addEventListener", args: ["onStateChange"] }), "*");
+        iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: "command", func: "addEventListener", args: ["infoDelivery"] }), "*");
+      }
+    }, 1000);
+
+    progressIntervalRef.current = kickstart;
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, [onProgress, onEnded]);
 
   // Show/hide controls on hover
   const handleMouseEnter = () => {
@@ -65,16 +121,47 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   };
 
   const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    // Note: YouTube iframe controls are disabled, play/pause is handled by the iframe itself
+    if (isPlaying) {
+      sendCommand("pauseVideo");
+    } else {
+      sendCommand("playVideo");
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    sendCommand("seekTo", [time, true]);
+    setCurrentTime(time);
+  };
+
+  const handleForward = () => {
+    const newTime = Math.min(currentTime + 10, duration);
+    sendCommand("seekTo", [newTime, true]);
+    setCurrentTime(newTime);
+  };
+
+  const handleBackward = () => {
+    const newTime = Math.max(currentTime - 10, 0);
+    sendCommand("seekTo", [newTime, true]);
+    setCurrentTime(newTime);
   };
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (iframeRef.current) {
-      // Note: Muting iframe requires postMessage communication
-      // For simplicity, we'll just track the state
+    if (isMuted) {
+      sendCommand("unMute");
+      setVolume(100);
+      setIsMuted(false);
+    } else {
+      sendCommand("mute");
+      setIsMuted(true);
     }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const vol = parseInt(e.target.value);
+    setVolume(vol);
+    setIsMuted(vol === 0);
+    sendCommand("setVolume", [vol]);
   };
 
   const toggleFullscreen = () => {
@@ -177,6 +264,24 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
             {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />}
           </button>
 
+          {/* Backward 10s */}
+          <button
+            onClick={handleBackward}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            title="Backward 10s"
+          >
+            <Rewind className="w-4 h-4 text-white" />
+          </button>
+
+          {/* Forward 10s */}
+          <button
+            onClick={handleForward}
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            title="Forward 10s"
+          >
+            <FastForward className="w-4 h-4 text-white" />
+          </button>
+
           {/* Volume */}
           <div className="flex items-center gap-2 flex-shrink-0 hidden sm:flex">
             <button onClick={toggleMute} className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all">
@@ -187,20 +292,23 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               min="0"
               max="100"
               value={isMuted ? 0 : volume}
-              onChange={(e) => setVolume(parseInt(e.target.value))}
+              onChange={handleVolumeChange}
               className="w-16 sm:w-20 h-1 bg-white/30 rounded-full appearance-none cursor-pointer"
             />
           </div>
 
-          {/* Progress Bar (visual only - iframe controls are hidden) */}
+          {/* Progress Bar */}
           <div className="flex-1 flex items-center gap-2">
             <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(currentTime)}</span>
-            <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-violet-500 to-pink-500 transition-all"
-                style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
-              />
-            </div>
+            <input
+              type="range"
+              min="0"
+              max={duration || 100}
+              step="0.1"
+              value={currentTime}
+              onChange={handleSeek}
+              className="flex-1 h-1.5 bg-white/30 rounded-full appearance-none cursor-pointer"
+            />
             <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(duration)}</span>
           </div>
 
