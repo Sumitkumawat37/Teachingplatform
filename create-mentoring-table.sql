@@ -5,11 +5,12 @@ CREATE TABLE IF NOT EXISTS mentoring_requests (
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
-  subject TEXT NOT NULL,
-  preferred_teacher TEXT,
-  availability TEXT NOT NULL,
-  goals TEXT NOT NULL,
-  current_level TEXT NOT NULL,
+  attempt INTEGER,
+  preparation_stage TEXT,
+  optional_subject TEXT,
+  preferred_language TEXT,
+  mentoring_topic TEXT NOT NULL,
+  message TEXT NOT NULL,
   status TEXT DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

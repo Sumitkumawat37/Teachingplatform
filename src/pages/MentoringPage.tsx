@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Phone, BookOpen, MessageSquare, Send, CheckCircle, Clock, GraduationCap } from "lucide-react";
+import { User, Mail, Phone, Send, CheckCircle, GraduationCap, Target, BookOpen, MessageSquare, Clock, Award, Lightbulb, Users } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,16 +13,21 @@ const MentoringPage = () => {
     name: user?.user_metadata?.name || "",
     email: user?.email || "",
     phone: "",
-    subject: "",
-    preferredTeacher: "",
-    availability: "",
-    goals: "",
-    currentLevel: "",
+    attempt: "",
+    preparationStage: "",
+    optionalSubject: "",
+    preferredLanguage: "",
+    mentoringTopic: "",
+    message: "",
   });
 
-  const teachers = [
-    { id: "nadiya", name: "Nadiya Khan", subject: "Polity & GS-2 Expert", color: "violet" },
-    { id: "shivam", name: "Shivam Saxena", subject: "History & GS-1 Expert", color: "pink" },
+  const benefits = [
+    { icon: Target, title: "Personalized Study Plan", description: "Custom roadmap tailored to your strengths and weaknesses" },
+    { icon: Lightbulb, title: "Strategy Discussion", description: "Expert guidance on exam strategy and time management" },
+    { icon: BookOpen, title: "Answer Writing Guidance", description: "Learn the art of writing high-scoring answers" },
+    { icon: Award, title: "Interview Preparation", description: "Mock interviews and personality development tips" },
+    { icon: Users, title: "Motivation & Accountability", description: "Stay motivated with regular check-ins and support" },
+    { icon: MessageSquare, title: "Doubt Resolution", description: "Get your doubts cleared by expert faculty" },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,11 +42,12 @@ const MentoringPage = () => {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          subject: formData.subject,
-          preferred_teacher: formData.preferredTeacher,
-          availability: formData.availability,
-          goals: formData.goals,
-          current_level: formData.currentLevel,
+          attempt: formData.attempt ? parseInt(formData.attempt) : null,
+          preparation_stage: formData.preparationStage,
+          optional_subject: formData.optionalSubject,
+          preferred_language: formData.preferredLanguage,
+          mentoring_topic: formData.mentoringTopic,
+          message: formData.message,
           status: "pending",
           created_at: new Date().toISOString(),
         });
@@ -64,10 +70,10 @@ const MentoringPage = () => {
             <CheckCircle className="w-8 h-8 text-emerald-600" />
           </div>
           <h2 className="text-xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Request Submitted Successfully!
+            Your mentoring request has been submitted successfully. Our team will contact you shortly.
           </h2>
           <p className="text-slate-600 text-sm mb-6">
-            Your mentoring request has been received. Our team will contact you within 24-48 hours to schedule your session.
+            We will review your request and get back to you within 24-48 hours.
           </p>
           <button
             onClick={() => navigate("/dashboard")}
@@ -82,49 +88,45 @@ const MentoringPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl p-5 border border-violet-100/40" style={{ background: 'linear-gradient(135deg, #F3EEFF 0%, #FFEAF4 100%)' }}>
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/70 flex items-center justify-center shadow-sm">
-            <GraduationCap className="w-5 h-5 text-violet-600" />
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-2xl p-8 border border-violet-100/40" style={{ background: 'linear-gradient(135deg, #F3EEFF 0%, #FFEAF4 100%)' }}>
+        <div className="relative z-10 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/70 flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <GraduationCap className="w-8 h-8 text-violet-600" />
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              1:1 Mentoring Request
-            </h1>
-            <p className="text-slate-500 text-xs">Get personalized guidance from our expert faculty</p>
-          </div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            1:1 Mentoring with Expert Faculty
+          </h1>
+          <p className="text-slate-600 text-sm max-w-2xl mx-auto">
+            Guidance for UPSC preparation, strategy building, answer writing, optional subjects, interview preparation, and personalized study planning.
+          </p>
         </div>
       </div>
 
-      {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="rounded-2xl p-4 shadow-sm border border-violet-100/40" style={{ background: '#F3EEFF' }}>
-          <div className="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center mb-2">
-            <User className="w-5 h-5 text-violet-600" />
-          </div>
-          <h3 className="font-semibold text-sm text-slate-800">Personal Attention</h3>
-          <p className="text-[11px] text-slate-500 mt-1">Get 1:1 guidance tailored to your needs</p>
-        </div>
-        <div className="rounded-2xl p-4 shadow-sm border border-pink-100/40" style={{ background: '#FFEAF4' }}>
-          <div className="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center mb-2">
-            <Clock className="w-5 h-5 text-pink-600" />
-          </div>
-          <h3 className="font-semibold text-sm text-slate-800">Flexible Timing</h3>
-          <p className="text-[11px] text-slate-500 mt-1">Schedule sessions at your convenience</p>
-        </div>
-        <div className="rounded-2xl p-4 shadow-sm border border-emerald-100/40" style={{ background: '#ECFFF3' }}>
-          <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-2">
-            <BookOpen className="w-5 h-5 text-emerald-600" />
-          </div>
-          <h3 className="font-semibold text-sm text-slate-800">Expert Guidance</h3>
-          <p className="text-[11px] text-slate-500 mt-1">Learn from UPSC experts with proven track record</p>
-        </div>
-      </div>
-
-      {/* Mentoring Form */}
-      <div className="rounded-2xl p-6 shadow-sm border border-slate-100/60 bg-white">
+      {/* Benefits Section */}
+      <div>
         <h2 className="text-lg font-semibold text-slate-800 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          What You'll Get
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {benefits.map((benefit, index) => (
+            <div
+              key={index}
+              className="rounded-2xl p-5 shadow-sm border border-slate-100/60 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
+            >
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center mb-3 shadow-sm">
+                <benefit.icon className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-semibold text-sm text-slate-800 mb-1">{benefit.title}</h3>
+              <p className="text-[11px] text-slate-500">{benefit.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mentoring Request Form */}
+      <div className="rounded-2xl p-6 shadow-sm border border-slate-100/60 bg-white">
+        <h2 className="text-lg font-semibold text-slate-800 mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Request Your Mentoring Session
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -162,7 +164,7 @@ const MentoringPage = () => {
 
           {/* Phone */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Phone Number</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Mobile Number</label>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -171,46 +173,35 @@ const MentoringPage = () => {
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
-                placeholder="Enter your phone number"
+                placeholder="Enter your mobile number"
               />
             </div>
           </div>
 
-          {/* Preferred Teacher */}
+          {/* UPSC Attempt Number */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Preferred Teacher</label>
-            <div className="grid grid-cols-2 gap-3">
-              {teachers.map((teacher) => (
-                <button
-                  key={teacher.id}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, preferredTeacher: teacher.name })}
-                  className={`p-3 rounded-xl border-2 transition-all ${
-                    formData.preferredTeacher === teacher.name
-                      ? `border-${teacher.color}-500 bg-${teacher.color}-50`
-                      : "border-slate-200 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="text-center">
-                    <p className="font-semibold text-sm text-slate-800">{teacher.name}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">{teacher.subject}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">UPSC Attempt Number</label>
+            <input
+              type="number"
+              value={formData.attempt}
+              onChange={(e) => setFormData({ ...formData, attempt: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+              placeholder="e.g., 1, 2, 3"
+            />
           </div>
 
-          {/* Current Level */}
+          {/* Current Preparation Stage */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Current Preparation Level</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Current Preparation Stage</label>
             <select
               required
-              value={formData.currentLevel}
-              onChange={(e) => setFormData({ ...formData, currentLevel: e.target.value })}
+              value={formData.preparationStage}
+              onChange={(e) => setFormData({ ...formData, preparationStage: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
             >
-              <option value="">Select your level</option>
+              <option value="">Select your stage</option>
               <option value="beginner">Beginner - Just started</option>
+              <option value="foundation">Foundation - 3-6 months</option>
               <option value="intermediate">Intermediate - 6-12 months</option>
               <option value="advanced">Advanced - 1+ years</option>
               <option value="mains">Mains Qualified</option>
@@ -218,52 +209,62 @@ const MentoringPage = () => {
             </select>
           </div>
 
-          {/* Availability */}
+          {/* Optional Subject */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Preferred Availability</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Optional Subject</label>
+            <input
+              type="text"
+              value={formData.optionalSubject}
+              onChange={(e) => setFormData({ ...formData, optionalSubject: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+              placeholder="e.g., Geography, Political Science, Sociology"
+            />
+          </div>
+
+          {/* Preferred Language */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Preferred Language</label>
             <select
               required
-              value={formData.availability}
-              onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
+              value={formData.preferredLanguage}
+              onChange={(e) => setFormData({ ...formData, preferredLanguage: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
             >
-              <option value="">Select your preference</option>
-              <option value="morning">Morning (9 AM - 12 PM)</option>
-              <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
-              <option value="evening">Evening (5 PM - 9 PM)</option>
-              <option value="weekend">Weekend Only</option>
-              <option value="flexible">Flexible</option>
+              <option value="">Select language</option>
+              <option value="english">English</option>
+              <option value="hindi">Hindi</option>
+              <option value="both">Both English & Hindi</option>
             </select>
           </div>
 
-          {/* Subject/Topic */}
+          {/* Area Where Mentoring Is Needed */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Subject/Topic for Mentoring</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Area Where Mentoring Is Needed</label>
             <div className="relative">
               <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 required
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                value={formData.mentoringTopic}
+                onChange={(e) => setFormData({ ...formData, mentoringTopic: e.target.value })}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
-                placeholder="e.g., Polity, Essay Writing, Answer Writing"
+                placeholder="e.g., Strategy Building, Answer Writing, Interview Prep"
               />
             </div>
           </div>
 
-          {/* Goals */}
+          {/* Detailed Message */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Your Goals & Expectations</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Detailed Message</label>
             <div className="relative">
               <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
               <textarea
                 required
                 rows={4}
-                value={formData.goals}
-                onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none"
-                placeholder="Describe what you hope to achieve from this mentoring session..."
+                placeholder="Describe your specific requirements and expectations from the mentoring session..."
               />
             </div>
           </div>

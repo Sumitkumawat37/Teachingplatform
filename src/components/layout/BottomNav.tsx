@@ -1,11 +1,11 @@
-import { Home, BookOpen, User, LayoutDashboard, Users, Video, UserCog } from "lucide-react";
+import { Home, BookOpen, User, LayoutDashboard, Users, Video, UserCog, GraduationCap } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 
 const studentNav = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/courses", icon: BookOpen, label: "Courses" },
-  { to: "/live-classes", icon: Video, label: "Live" },
+  { to: "/mentoring", icon: GraduationCap, label: "Mentoring" },
   { to: "/profile", icon: User, label: "Profile" },
 ];
 

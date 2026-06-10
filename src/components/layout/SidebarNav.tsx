@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, BookOpen, FileText, User, LayoutDashboard, Users, Megaphone, Video, MessageCircle, Bell, BarChart3, GraduationCap, LogOut, Lock, UserCog, Crown, Mail } from "lucide-react";
+import { Home, BookOpen, FileText, User, LayoutDashboard, Users, Megaphone, Video, MessageCircle, Bell, BarChart3, GraduationCap, LogOut, Lock, UserCog, Crown, Mail, GraduationCap as MentoringIcon } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import { useProfiles } from "@/lib/supabase-data";
@@ -11,6 +11,7 @@ const studentNav = [
   { to: "/live-classes", icon: Video,         label: "Live Classes",  end: false },
   { to: "/notes",        icon: FileText,      label: "Notes",         end: false },
   { to: "/doubts",       icon: MessageCircle, label: "Doubts",        end: false },
+  { to: "/mentoring",    icon: MentoringIcon, label: "Mentoring",     end: false },
   { to: "/notifications",icon: Bell,          label: "Notifications", end: false },
   { to: "/profile",      icon: User,          label: "Profile",       end: false },
 ];
