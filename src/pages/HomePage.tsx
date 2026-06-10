@@ -46,6 +46,8 @@ const programs = [
 
   { icon: FileText, label: "Study Notes",   desc: "Curated notes, PYQs & PDF downloads",       grad: "from-pink-500 to-rose-500", path: "/notes",        badge: "500+ Notes", bg: "#FFEAF4" },
 
+  { icon: Users,    label: "1:1 Mentoring", desc: "Personal guidance from expert faculties",  grad: "from-emerald-500 to-teal-500",  path: "/mentoring", badge: "New", bg: "#ECFFF3" },
+
 ];
 
 
@@ -119,6 +121,24 @@ const HomePage = () => {
     };
     fetchTeacherProfiles();
   }, []);
+
+  // Hardcoded faculties to ensure both are always shown
+  const hardcodedFaculties = [
+    {
+      name: "Nadiya Ma'am",
+      subject: "Polity & GS Expert",
+      bio: "Expert in Indian Polity, Governance, and GS papers with 8+ years of teaching experience. Guided 45+ students to clear UPSC.",
+      email: "nadiya@upscwithnadiya.in"
+    },
+    {
+      name: "Shivam Saxena",
+      subject: "History & Current Affairs",
+      bio: "Specialist in Modern History, Art & Culture, and Current Affairs. Known for simplified teaching methods and strategic approach.",
+      email: "shivam@upscwithnadiya.in"
+    }
+  ];
+
+  const displayFaculties = teacherProfiles.length > 0 ? teacherProfiles : hardcodedFaculties;
 
   useEffect(() => {
     const fetchReviewVideos = async () => {
@@ -234,7 +254,7 @@ const HomePage = () => {
 
         {[
 
-          { icon: Users,      value: 50000, suffix: "+",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
+          { icon: Users,      value: 100, suffix: "+",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
 
           { icon: Clock,      value: 500,   suffix: "+",  label: "Hours Content",      grad: "from-pink-500 to-rose-500", bg: "#FFEAF4" },
 
@@ -277,11 +297,10 @@ const HomePage = () => {
 
 
       {/* ══ MEET YOUR MENTORS ══ */}
-      {teacherProfiles.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-slate-800 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Meet Your Mentors</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {teacherProfiles.map((teacher) => (
+      <div>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Meet Your Mentors</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {displayFaculties.map((teacher) => (
               <div
                 key={teacher.user_id}
                 className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
@@ -326,7 +345,6 @@ const HomePage = () => {
             ))}
           </div>
         </div>
-      )}
 
 
 
