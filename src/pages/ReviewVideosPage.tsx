@@ -41,9 +41,9 @@ const ReviewVideosPage = () => {
       <div className="relative overflow-hidden rounded-2xl p-5 border border-violet-100/40" style={{ background: 'linear-gradient(135deg, #F3EEFF 0%, #FFEAF4 100%)' }}>
         <div className="relative z-10">
           <h1 className="text-lg font-semibold text-slate-800 mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Student Reviews & Testimonials
+            Student Demos & Testimonials
           </h1>
-          <p className="text-slate-500 text-xs">Watch success stories from our UPSC aspirants</p>
+          <p className="text-slate-500 text-xs">Watch demo videos from our UPSC aspirants</p>
         </div>
       </div>
 

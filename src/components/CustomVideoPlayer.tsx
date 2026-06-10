@@ -37,6 +37,66 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
 
   const embedUrl = toYoutubeEmbed(youtubeId);
 
+  // Prevent screen recording and screenshot
+  useEffect(() => {
+    const preventDefault = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const preventContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const preventKeys = (e: KeyboardEvent) => {
+      // Prevent common screenshot keys
+      if (
+        (e.ctrlKey && (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')) ||
+        (e.metaKey && (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')) ||
+        (e.key === 'PrintScreen') ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'c' || e.key === 'C')) ||
+        (e.metaKey && e.shiftKey && (e.key === 'c' || e.key === 'C'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    const handleBlur = () => {
+      // Pause video when tab is blurred to prevent recording
+      if (isPlaying) {
+        setIsPlaying(false);
+        sendCommand('pauseVideo');
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && isPlaying) {
+        setIsPlaying(false);
+        sendCommand('pauseVideo');
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('contextmenu', preventContextMenu);
+    document.addEventListener('keydown', preventKeys);
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Prevent text selection
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+
+    return () => {
+      document.removeEventListener('contextmenu', preventContextMenu);
+      document.removeEventListener('keydown', preventKeys);
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.body.style.userSelect = '';
+      document.body.style.webkitUserSelect = '';
+    };
+  }, [isPlaying]);
+
   // Send command to YouTube iframe via postMessage
   const sendCommand = (func: string, args: any[] = []) => {
     if (iframeRef.current?.contentWindow) {

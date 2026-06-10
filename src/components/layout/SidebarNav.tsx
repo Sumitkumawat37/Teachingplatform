@@ -37,6 +37,7 @@ const adminNav = [
   { to: "/admin/profile",        icon: User,            label: "My Profile",    end: false },
   { to: "/admin/teachers",       icon: GraduationCap,   label: "Teachers",      end: false },
   { to: "/admin/content",        icon: BookOpen,        label: "Course",        end: false },
+  { to: "/admin/review-videos",  icon: Video,           label: "Review Videos", end: false },
   { to: "/notes",                icon: FileText,        label: "Notes",         end: false },
   { to: "/admin/students",       icon: Users,           label: "Students",      end: false },
   { to: "/admin/email-center",   icon: Mail,            label: "Email Center",  end: false },

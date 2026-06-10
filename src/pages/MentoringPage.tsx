@@ -341,6 +341,30 @@ const MentoringPage = () => {
               </>
             )}
           </button>
+
+          {/* Payment Section */}
+          <div className="mt-6 p-4 rounded-xl border border-amber-200 bg-amber-50">
+            <div className="flex items-center gap-2 mb-2">
+              <Award className="w-5 h-5 text-amber-600" />
+              <h3 className="font-semibold text-sm text-slate-800">Mentoring Session Fee</h3>
+            </div>
+            <p className="text-xs text-slate-600 mb-3">One-time payment of ₹100 for personalized mentoring session</p>
+            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+              <div>
+                <p className="text-sm font-semibold text-slate-800">₹100</p>
+                <p className="text-[10px] text-slate-500">Payment required before session</p>
+              </div>
+              <button
+                type="button"
+                className="px-4 py-2 bg-amber-500 text-white text-xs font-semibold rounded-lg hover:bg-amber-600 transition-colors"
+                onClick={() => {
+                  alert("Payment integration will be added soon. Please contact admin for payment details.");
+                }}
+              >
+                Pay Now
+              </button>
+            </div>
+          </div>
         </form>
       </div>
     </div>

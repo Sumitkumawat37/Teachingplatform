@@ -42,7 +42,7 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-full max-w-6xl p-0 overflow-hidden h-[85vh] sm:h-[90vh]">
-        <div className="relative h-full flex flex-col">
+        <div className="relative h-full flex flex-col items-center justify-center bg-black">
           {/* Close button */}
           <Button
             variant="ghost"
@@ -53,8 +53,8 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
             <X className="w-4 h-4" />
           </Button>
 
-          {/* Video player */}
-          <div className="flex-1 bg-black relative">
+          {/* Video player - centered and full screen on mobile */}
+          <div className="w-full h-full flex items-center justify-center">
             <CustomVideoPlayer
               youtubeId={currentVideo.youtube_id}
               title={currentVideo.title}
@@ -69,7 +69,7 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white z-10"
                 onClick={handlePrev}
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -77,7 +77,7 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white z-10"
                 onClick={handleNext}
               >
                 <ChevronRight className="w-5 h-5" />
@@ -86,7 +86,7 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
           )}
 
           {/* Video info */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 z-10">
             <p className="text-white font-semibold text-xs">{currentVideo.title}</p>
             <p className="text-white/70 text-[10px]">
               {currentIndex + 1} / {videos.length}
