@@ -4,6 +4,7 @@ import { User, Mail, Phone, Send, CheckCircle, GraduationCap, Target, BookOpen, 
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import teacherBanner from "../assets/teacher-banner.jpg";
+import shivamSaxena from "../assets/shivam-saxena.jpg";
 
 const MentoringPage = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const MentoringPage = () => {
       subject: "History & Current Affairs",
       bio: "Specialist in Modern History, Art & Culture, and Current Affairs. Known for simplified teaching methods and strategic approach.",
       email: "shivam@upscwithnadiya.in",
-      photo: teacherBanner
+      photo: shivamSaxena
     }
   ];
 
