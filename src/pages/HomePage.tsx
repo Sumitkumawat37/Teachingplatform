@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail, Youtube } from "lucide-react";
+import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail, Youtube, X } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +13,10 @@ import { useCourses, useAnnouncements, useLiveClasses } from "@/lib/supabase-dat
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+
+import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
+
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -78,6 +82,7 @@ const HomePage = () => {
 
   const [teacherProfiles, setTeacherProfiles] = useState<any[]>([]);
   const [reviewVideosByCourse, setReviewVideosByCourse] = useState<any[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
 
 
 
@@ -444,16 +449,16 @@ const HomePage = () => {
             {reviewVideosByCourse.slice(0, 3).map((courseGroup) => (
               <div
                 key={courseGroup.courseName}
-                className="rounded-2xl p-4 shadow-sm border border-slate-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 cursor-pointer"
+                className="rounded-2xl p-4 shadow-sm border border-slate-100/40"
                 style={{ background: '#F3EEFF' }}
-                onClick={() => navigate('/review-videos')}
               >
                 <h3 className="font-semibold text-sm text-slate-800 mb-3">{courseGroup.courseName} - Review Videos</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {courseGroup.videos.map((video: any) => (
                     <div
                       key={video.id}
-                      className="relative aspect-video bg-black rounded-lg overflow-hidden"
+                      className="relative aspect-video bg-black rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => setSelectedVideo(video)}
                     >
                       <img
                         src={`https://img.youtube.com/vi/${video.youtube_id}/mqdefault.jpg`}
@@ -665,7 +670,24 @@ const HomePage = () => {
 
       </div>
 
-
+      {/* Video Player Modal */}
+      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
+        <DialogContent className="max-w-6xl p-0 overflow-hidden h-[90vh]">
+          <button
+            onClick={() => setSelectedVideo(null)}
+            className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-lg p-2 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          {selectedVideo && (
+            <CustomVideoPlayer
+              youtubeId={selectedVideo.youtube_id}
+              title={selectedVideo.title}
+              autoplay={true}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
     </div>
 
