@@ -41,7 +41,7 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl p-0 overflow-hidden h-[90vh]">
+      <DialogContent className="w-full max-w-6xl p-0 overflow-hidden h-[85vh] sm:h-[90vh]">
         <div className="relative h-full flex flex-col">
           {/* Close button */}
           <Button

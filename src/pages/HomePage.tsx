@@ -672,7 +672,7 @@ const HomePage = () => {
 
       {/* Video Player Modal */}
       <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
-        <DialogContent className="max-w-6xl p-0 overflow-hidden h-[90vh]">
+        <DialogContent className="w-full max-w-6xl p-0 overflow-hidden h-[85vh] sm:h-[90vh]">
           <button
             onClick={() => setSelectedVideo(null)}
             className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-lg p-2 transition-colors"
