@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Phone, Send, CheckCircle, GraduationCap, Target, BookOpen, MessageSquare, Clock, Award, Lightbulb, Users } from "lucide-react";
+import { User, Mail, Phone, Send, CheckCircle, GraduationCap, Target, BookOpen, MessageSquare, Clock, Award, Lightbulb, Users, Mail as MailIcon } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import teacherBanner from "../assets/teacher-banner.jpg";
 
 const MentoringPage = () => {
   const navigate = useNavigate();
@@ -28,6 +29,23 @@ const MentoringPage = () => {
     { icon: Award, title: "Interview Preparation", description: "Mock interviews and personality development tips" },
     { icon: Users, title: "Motivation & Accountability", description: "Stay motivated with regular check-ins and support" },
     { icon: MessageSquare, title: "Doubt Resolution", description: "Get your doubts cleared by expert faculty" },
+  ];
+
+  const mentors = [
+    {
+      name: "Nadiya Khan",
+      subject: "Polity & GS Expert",
+      bio: "Expert in Indian Polity, Governance, and GS papers with 8+ years of teaching experience. Guided 45+ students to clear UPSC.",
+      email: "nadiya@upscwithnadiya.in",
+      photo: teacherBanner
+    },
+    {
+      name: "Shivam Saxena",
+      subject: "History & Current Affairs",
+      bio: "Specialist in Modern History, Art & Culture, and Current Affairs. Known for simplified teaching methods and strategic approach.",
+      email: "shivam@upscwithnadiya.in",
+      photo: teacherBanner
+    }
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -124,6 +142,41 @@ const MentoringPage = () => {
         </div>
       </div>
 
+      {/* Meet Your Mentors */}
+      <div>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Meet Your Mentors</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {mentors.map((mentor) => (
+            <div
+              key={mentor.name}
+              className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
+              style={{ background: '#F3EEFF' }}
+            >
+              <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-violet-200 shrink-0 shadow-sm bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center">
+                <img
+                  src={mentor.photo}
+                  alt={mentor.name}
+                  className="w-full h-full object-cover object-top"
+                  loading="lazy"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-semibold text-sm text-slate-800 truncate">{mentor.name}</h3>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-100 text-violet-600 shrink-0">Faculty</span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5 truncate">{mentor.subject}</p>
+                <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">{mentor.bio}</p>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <MailIcon className="w-3 h-3 text-violet-400" />
+                  <span className="text-[10px] text-slate-400 truncate">{mentor.email}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Mentoring Request Form */}
       <div className="rounded-2xl p-6 shadow-sm border border-slate-100/60 bg-white">
         <h2 className="text-lg font-semibold text-slate-800 mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -140,7 +193,7 @@ const MentoringPage = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
                 placeholder="Enter your full name"
               />
             </div>
@@ -156,7 +209,7 @@ const MentoringPage = () => {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
                 placeholder="Enter your email"
               />
             </div>
@@ -172,7 +225,7 @@ const MentoringPage = () => {
                 required
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
                 placeholder="Enter your mobile number"
               />
             </div>
@@ -185,7 +238,7 @@ const MentoringPage = () => {
               type="number"
               value={formData.attempt}
               onChange={(e) => setFormData({ ...formData, attempt: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
               placeholder="e.g., 1, 2, 3"
             />
           </div>
@@ -197,7 +250,7 @@ const MentoringPage = () => {
               required
               value={formData.preparationStage}
               onChange={(e) => setFormData({ ...formData, preparationStage: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
             >
               <option value="">Select your stage</option>
               <option value="beginner">Beginner - Just started</option>
@@ -216,7 +269,7 @@ const MentoringPage = () => {
               type="text"
               value={formData.optionalSubject}
               onChange={(e) => setFormData({ ...formData, optionalSubject: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
               placeholder="e.g., Geography, Political Science, Sociology"
             />
           </div>
@@ -228,7 +281,7 @@ const MentoringPage = () => {
               required
               value={formData.preferredLanguage}
               onChange={(e) => setFormData({ ...formData, preferredLanguage: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
             >
               <option value="">Select language</option>
               <option value="english">English</option>
@@ -247,7 +300,7 @@ const MentoringPage = () => {
                 required
                 value={formData.mentoringTopic}
                 onChange={(e) => setFormData({ ...formData, mentoringTopic: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm text-slate-800"
                 placeholder="e.g., Strategy Building, Answer Writing, Interview Prep"
               />
             </div>
@@ -263,7 +316,7 @@ const MentoringPage = () => {
                 rows={4}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none text-slate-800"
                 placeholder="Describe your specific requirements and expectations from the mentoring session..."
               />
             </div>
