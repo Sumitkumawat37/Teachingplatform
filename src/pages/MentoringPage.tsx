@@ -35,14 +35,12 @@ const MentoringPage = () => {
   const mentors = [
     {
       name: "Nadiya Khan",
-      subject: "Polity & Governance",
       bio: "Net qualified faculty / Criminal Lawyer .",
       email: "nadiyakhan0205@gmail.com",
       photo: teacherBanner
     },
     {
       name: "Shivam Saxena",
-      subject: "Mentoring & Polity",
       bio: "2 Times UPSC-CSE mains Qualified.",
       email: "shivam24892@gmail.com",
       photo: shivamSaxena
@@ -166,7 +164,6 @@ const MentoringPage = () => {
                   <h3 className="font-semibold text-sm text-slate-800 truncate">{mentor.name}</h3>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-100 text-violet-600 shrink-0">Faculty</span>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-0.5 truncate">{mentor.subject}</p>
                 <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">{mentor.bio}</p>
                 <div className="flex items-center gap-1 mt-1.5">
                   <MailIcon className="w-3 h-3 text-violet-400" />

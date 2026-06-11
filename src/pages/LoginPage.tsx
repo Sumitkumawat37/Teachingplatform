@@ -43,15 +43,15 @@ const LoginPage = () => {
   };
 
   const featureItems = [
-    { icon: Users,  text: "2,500+ active students" },
-    { icon: Star,   text: "4.9 rated platform" },
-    { icon: Shield, text: "45+ UPSC selections" },
+    { icon: Users,  text: "1000+ active students" },
+    { icon: Star,   text: "4.1 rated platform" },
+    { icon: Shield, text: "Expert guidance" },
   ];
 
   const proofItems = [
-    { icon: Users,  label: "2,500+ Students", color: "text-purple-400" },
-    { icon: Star,   label: "4.9 Rating",       color: "text-amber-400" },
-    { icon: Shield, label: "45+ Cleared",      color: "text-emerald-400" },
+    { icon: Users,  label: "1000+ Students", color: "text-purple-400" },
+    { icon: Star,   label: "4.1 Rating",       color: "text-amber-400" },
+    { icon: Shield, label: "Expert Guidance",  color: "text-emerald-400" },
   ];
 
   return (

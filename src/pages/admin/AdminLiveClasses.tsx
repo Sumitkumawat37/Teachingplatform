@@ -47,6 +47,34 @@ const AdminLiveClasses = () => {
     return () => { supabase.removeChannel(channel); };
   }, [qc]);
 
+  // Auto-complete live classes after their scheduled time + duration
+  useEffect(() => {
+    const updateCompletedClasses = async () => {
+      const now = new Date();
+      for (const cls of liveClasses) {
+        if (cls.status === "upcoming") {
+          const scheduledAt = new Date(cls.scheduled_at);
+          // Parse duration (e.g., "60 min" -> 60 minutes)
+          const durationMatch = cls.duration?.match(/(\d+)/);
+          const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+          const endTime = new Date(scheduledAt.getTime() + durationMinutes * 60 * 1000);
+          
+          if (now > endTime) {
+            await supabase
+              .from("live_classes")
+              .update({ status: "completed" })
+              .eq("id", cls.id);
+            qc.invalidateQueries({ queryKey: ["live_classes"] });
+          }
+        }
+      }
+    };
+    
+    updateCompletedClasses();
+    const interval = setInterval(updateCompletedClasses, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [liveClasses, qc]);
+
   const filteredChapters = chapters.filter((c) => c.course_id === selectedCourse);
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 

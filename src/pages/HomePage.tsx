@@ -257,11 +257,11 @@ const HomePage = () => {
 
         {[
 
-          { icon: Users,      value: 1000, suffix: "",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
+          { icon: Users,      value: 1000, suffix: "+",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
 
           { icon: Clock,      value: 500,   suffix: "+",  label: "Hours Content",      grad: "from-pink-500 to-rose-500", bg: "#FFEAF4" },
 
-          { icon: BookMarked, value: 10000, suffix: "+",  label: "PYQs Solved",           grad: "from-amber-500 to-orange-500", bg: "#FFF8E7" },
+          { icon: BookMarked, value: 5000, suffix: "+",  label: "PYQs Solved",           grad: "from-amber-500 to-orange-500", bg: "#FFF8E7" },
 
           { icon: Star,       value: 4.1,    suffix: "/5★", label: "Top Rated", grad: "from-emerald-500 to-teal-500", bg: "#ECFFF3" },
 
