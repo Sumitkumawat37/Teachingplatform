@@ -27,13 +27,13 @@ import shivamSaxena from "../assets/shivam-saxena.jpg";
 
 const reviews = [
 
-  { name: "Priya Sharma", rank: "AIR 287", year: "UPSC 2024", location: "Delhi", text: "Nadiya Ma'am's structured approach cleared every concept. From polity to GS-2, I aced it all. Highly recommend!", rating: 5 },
+  { name: "Priya Sharma", rank: "", year: "", location: "Delhi", text: "Nadiya Ma'am ki structured approach ne har concept clear kar diya. Polity se GS-2 tak sab acche se ho gaya. Highly recommend!", rating: 5 },
 
-  { name: "Rahul Verma", rank: "AIR 412", year: "UPSC 2023", location: "Mumbai", text: "Best mentor I've found online. Doubt replies are super fast and live classes are genuinely gold.", rating: 5 },
+  { name: "Rahul Verma", rank: "", year: "", location: "Mumbai", text: "Best mentor online maine paya hai. Doubt replies bahut fast hain aur live classes genuinely gold hain.", rating: 5 },
 
-  { name: "Ananya Singh", rank: "Mains Qualified", year: "UPSC 2024", location: "Bengaluru", text: "The notes + quiz combo is brilliant. Cracked prelims on first attempt. No coaching centre needed!", rating: 5 },
+  { name: "Ananya Singh", rank: "", year: "", location: "Bengaluru", text: "Notes + quiz combo brilliant hai. Pehli attempt mein prelims clear kar liya. Koi coaching centre ki zarurat nahi!", rating: 5 },
 
-  { name: "Mohammed Aslam", rank: "AIR 189", year: "UPSC 2024", location: "Hyderabad", text: "Affordable, structured, and the live tests kept me on track. Cleared with AIR 189. Life-changing!", rating: 5 },
+  { name: "Mohammed Aslam", rank: "", year: "", location: "Hyderabad", text: "Affordable, structured, aur live tests mujhe track par rakhte the. Life-changing experience!", rating: 5 },
 
 ];
 
@@ -128,7 +128,6 @@ const HomePage = () => {
     {
       user_id: "nadiya-khan",
       name: "Nadiya Khan",
-      subject: "Polity & Governance",
       bio: "Net qualified faculty / Criminal Lawyer .",
       email: "nadiyakhan0205@gmail.com",
       avatar_url: teacherBanner
@@ -136,7 +135,6 @@ const HomePage = () => {
     {
       user_id: "shivam-saxena",
       name: "Shivam Saxena",
-      subject: "Mentoring & Polity",
       bio: "2 Times UPSC-CSE mains Qualified.",
       email: "shivam24892@gmail.com",
       avatar_url: shivamSaxena
@@ -259,13 +257,13 @@ const HomePage = () => {
 
         {[
 
-          { icon: Users,      value: 1000, suffix: "+",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
+          { icon: Users,      value: 1000, suffix: "",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
 
           { icon: Clock,      value: 500,   suffix: "+",  label: "Hours Content",      grad: "from-pink-500 to-rose-500", bg: "#FFEAF4" },
 
           { icon: BookMarked, value: 10000, suffix: "+",  label: "PYQs Solved",           grad: "from-amber-500 to-orange-500", bg: "#FFF8E7" },
 
-          { icon: Star,       value: 49,    suffix: "/5★", label: "Top Rated", grad: "from-emerald-500 to-teal-500", bg: "#ECFFF3" },
+          { icon: Star,       value: 4.1,    suffix: "/5★", label: "Top Rated", grad: "from-emerald-500 to-teal-500", bg: "#ECFFF3" },
 
         ].map((s) => (
 
@@ -337,7 +335,6 @@ const HomePage = () => {
                     <h3 className="font-semibold text-sm text-slate-800 truncate">{teacher.name || "Teacher"}</h3>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-100 text-violet-600 shrink-0">Faculty</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5 truncate">{teacher.subject || "UPSC Expert & Course Instructor"}</p>
                   {teacher.bio && <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">{teacher.bio}</p>}
                   {teacher.email && (
                     <div className="flex items-center gap-1 mt-1.5">

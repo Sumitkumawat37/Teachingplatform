@@ -329,10 +329,10 @@ const MentoringPage = () => {
               <Award className="w-5 h-5 text-amber-600" />
               <h3 className="font-semibold text-sm text-slate-800">Mentoring Session Fee</h3>
             </div>
-            <p className="text-xs text-slate-600 mb-3">One-time payment of ₹100 for personalized mentoring session</p>
+            <p className="text-xs text-slate-600 mb-3">One-time payment of ₹99 for personalized mentoring session</p>
             <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
               <div>
-                <p className="text-sm font-semibold text-slate-800">₹100</p>
+                <p className="text-sm font-semibold text-slate-800">₹99</p>
                 <p className="text-[10px] text-slate-500">Payment required before session</p>
               </div>
               <button
