@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Play, ChevronLeft, Clock } from "lucide-react";
+import { Play, ChevronLeft, Clock, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useCourses, useLectures, useChapters } from "@/lib/supabase-data";
+import { Textarea } from "@/components/ui/textarea";
+import { useCourses, useLectures, useChapters, useCreateDoubt } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
 
@@ -17,11 +18,26 @@ const LecturePage = () => {
   const { data: courses = [] } = useCourses();
   const { data: lectures = [] } = useLectures(courseId);
   const { data: chapters = [] } = useChapters(courseId);
+  const createDoubt = useCreateDoubt();
+  const [newDoubt, setNewDoubt] = useState("");
 
   const course = courses.find((c) => c.id === courseId);
   const lecture = lectures.find((l) => l.id === lectureId);
   const purchased = hasPurchased(courseId || "");
   const canAccess = lecture?.free_preview || purchased;
+
+  const handleDoubtSubmit = () => {
+    if (!newDoubt.trim() || !user || !lectureId || !courseId) return;
+    createDoubt.mutate({
+      lecture_id: lectureId,
+      course_id: courseId,
+      user_id: user.id,
+      student_name: user.name || user.email,
+      question: newDoubt,
+    });
+    toast.success("Doubt submitted successfully!");
+    setNewDoubt("");
+  };
 
   useEffect(() => {
     if (!lecture) {
@@ -79,6 +95,23 @@ const LecturePage = () => {
             )}
             <span>Chapter: {chapters.find((c) => c.id === lecture.chapter_id)?.title}</span>
           </div>
+        </Card>
+
+        {/* Doubt Session Box */}
+        <Card className="p-4 space-y-3 border border-pink-100/40 shadow-sm rounded-2xl" style={{ background: '#FFEAF4' }}>
+          <h3 className="font-semibold text-sm flex items-center gap-2 text-slate-800">
+            <MessageCircle className="w-4 h-4 text-violet-600" /> Ask a Doubt About This Lecture
+          </h3>
+          <Textarea
+            placeholder="Type your doubt or question about this lecture here..."
+            value={newDoubt}
+            onChange={(e) => setNewDoubt(e.target.value)}
+            rows={3}
+            className="text-slate-800"
+          />
+          <Button className="w-full rounded-xl" onClick={handleDoubtSubmit} disabled={!newDoubt.trim()}>
+            <Send className="w-4 h-4 mr-2" /> Submit Doubt
+          </Button>
         </Card>
 
         {/* Navigation */}

@@ -259,7 +259,7 @@ const HomePage = () => {
 
         {[
 
-          { icon: Users,      value: 100, suffix: "+",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
+          { icon: Users,      value: 1000, suffix: "+",  label: "Aspirants",      grad: "from-violet-500 to-purple-600", bg: "#F3EEFF" },
 
           { icon: Clock,      value: 500,   suffix: "+",  label: "Hours Content",      grad: "from-pink-500 to-rose-500", bg: "#FFEAF4" },
 
