@@ -302,18 +302,6 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
           showControls ? "opacity-100" : "opacity-0"
         }`}
       >
-        {/* Play/Pause Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-          {!isPlaying && (
-            <button
-              onClick={togglePlay}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 pointer-events-auto"
-            >
-              <Play className="w-7 h-7 sm:w-8 sm:h-8 text-white fill-white ml-1" />
-            </button>
-          )}
-        </div>
-
         {/* Control Bar */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Play/Pause */}
@@ -372,7 +360,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
             <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(duration)}</span>
           </div>
 
-          {/* Fullscreen */}
+          {/* Fullscreen - always visible on mobile and desktop */}
           <button
             onClick={toggleFullscreen}
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"

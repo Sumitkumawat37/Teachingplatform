@@ -308,15 +308,15 @@ const HomePage = () => {
           {displayFaculties.map((teacher) => (
               <div
                 key={teacher.user_id}
-                className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
+                className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-slide-up"
                 style={{ background: '#F3EEFF' }}
               >
-                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 shrink-0 shadow-sm bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-violet-200 shrink-0 shadow-sm bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center animate-pulse-slow">
                   {teacher.avatar_url ? (
                     <img
                       src={teacher.avatar_url}
                       alt={teacher.name || "Teacher"}
-                      className="w-full h-full object-cover object-top"
+                      className="w-full h-full object-cover object-top hover:scale-110 transition-transform duration-300"
                       loading="lazy"
                       onError={(e) => {
                         (e.currentTarget.style.display = 'none');

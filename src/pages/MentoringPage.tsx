@@ -12,7 +12,7 @@ const MentoringPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.user_metadata?.name || "",
+    name: (user as any)?.user_metadata?.name || user?.name || "",
     email: user?.email || "",
     phone: "",
     attempt: "",
@@ -323,25 +323,6 @@ const MentoringPage = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-violet-600 to-pink-500 text-white font-semibold py-3 rounded-xl hover:from-violet-700 hover:to-pink-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4" />
-                Submit Request
-              </>
-            )}
-          </button>
-
           {/* Payment Section */}
           <div className="mt-6 p-4 rounded-xl border border-amber-200 bg-amber-50">
             <div className="flex items-center gap-2 mb-2">
@@ -365,6 +346,25 @@ const MentoringPage = () => {
               </button>
             </div>
           </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-4 bg-gradient-to-r from-violet-600 to-pink-500 text-white font-semibold py-3 rounded-xl hover:from-violet-700 hover:to-pink-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                Submit Request
+              </>
+            )}
+          </button>
         </form>
       </div>
     </div>
