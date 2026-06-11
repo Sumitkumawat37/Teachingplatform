@@ -298,39 +298,39 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
 
       {/* Custom Controls Overlay */}
       <div
-        className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 z-20 transition-opacity duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 p-2 sm:p-4 z-20 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
       >
         {/* Control Bar */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
           {/* Play/Pause */}
           <button
             onClick={togglePlay}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
           >
-            {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Play className="w-4 h-4 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />}
+            {isPlaying ? <Pause className="w-3 h-3 sm:w-5 sm:h-5 text-white" /> : <Play className="w-3 h-3 sm:w-5 sm:h-5 text-white fill-white ml-0.5" />}
           </button>
 
-          {/* Backward 10s */}
+          {/* Backward 10s - hidden on mobile */}
           <button
             onClick={handleBackward}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            className="hidden sm:flex w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
             title="Backward 10s"
           >
             <Rewind className="w-4 h-4 text-white" />
           </button>
 
-          {/* Forward 10s */}
+          {/* Forward 10s - hidden on mobile */}
           <button
             onClick={handleForward}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            className="hidden sm:flex w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
             title="Forward 10s"
           >
             <FastForward className="w-4 h-4 text-white" />
           </button>
 
-          {/* Volume */}
+          {/* Volume - hidden on mobile */}
           <div className="flex items-center gap-2 flex-shrink-0 hidden sm:flex">
             <button onClick={toggleMute} className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all">
               {isMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
@@ -346,8 +346,8 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
           </div>
 
           {/* Progress Bar */}
-          <div className="flex-1 flex items-center gap-2">
-            <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(currentTime)}</span>
+          <div className="flex-1 flex items-center gap-1 sm:gap-2">
+            <span className="text-white text-[9px] sm:text-xs font-medium min-w-[30px] sm:min-w-[40px] hidden sm:block">{formatTime(currentTime)}</span>
             <input
               type="range"
               min="0"
@@ -357,15 +357,15 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               onChange={handleSeek}
               className="flex-1 h-1.5 bg-white/30 rounded-full appearance-none cursor-pointer"
             />
-            <span className="text-white text-[10px] sm:text-xs font-medium min-w-[35px] sm:min-w-[40px]">{formatTime(duration)}</span>
+            <span className="text-white text-[9px] sm:text-xs font-medium min-w-[30px] sm:min-w-[40px] hidden sm:block">{formatTime(duration)}</span>
           </div>
 
-          {/* Fullscreen - always visible on mobile and desktop */}
+          {/* Fullscreen - visible on mobile and desktop */}
           <button
             onClick={toggleFullscreen}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0"
           >
-            {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            {isFullscreen ? <Minimize className="w-3 h-3 sm:w-5 sm:h-5 text-white" /> : <Maximize className="w-3 h-3 sm:w-5 sm:h-5 text-white" />}
           </button>
         </div>
       </div>
