@@ -14,16 +14,16 @@ DROP POLICY IF EXISTS "Users can view chat for class" ON public.live_chat;
 DROP POLICY IF EXISTS "Users can send chat messages" ON public.live_chat;
 DROP POLICY IF EXISTS "Admins can delete chat messages" ON public.live_chat;
 
--- Recreate policies for live_classes with correct syntax
+-- Recreate policies for live_classes with correct syntax (allow admins and teachers)
 CREATE POLICY "Anyone can view live classes" ON public.live_classes FOR SELECT TO authenticated USING (true);
-CREATE POLICY "Admins can manage live classes" ON public.live_classes FOR INSERT TO authenticated WITH CHECK (
-  EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and teachers can manage live classes" ON public.live_classes FOR INSERT TO authenticated WITH CHECK (
+  EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role IN ('admin', 'teacher'))
 );
-CREATE POLICY "Admins can update live classes" ON public.live_classes FOR UPDATE TO authenticated USING (
-  EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and teachers can update live classes" ON public.live_classes FOR UPDATE TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role IN ('admin', 'teacher'))
 );
-CREATE POLICY "Admins can delete live classes" ON public.live_classes FOR DELETE TO authenticated USING (
-  EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role = 'admin')
+CREATE POLICY "Admins and teachers can delete live classes" ON public.live_classes FOR DELETE TO authenticated USING (
+  EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = auth.uid() AND role IN ('admin', 'teacher'))
 );
 
 -- Recreate policies for attendance with correct syntax

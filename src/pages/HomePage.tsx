@@ -126,6 +126,7 @@ const HomePage = () => {
   // Hardcoded faculties to ensure both are always shown
   const hardcodedFaculties = [
     {
+      user_id: "nadiya-khan",
       name: "Nadiya Khan",
       subject: "Polity & Governance",
       bio: "Net qualified faculty / Criminal Lawyer .",
@@ -133,6 +134,7 @@ const HomePage = () => {
       avatar_url: teacherBanner
     },
     {
+      user_id: "shivam-saxena",
       name: "Shivam Saxena",
       subject: "Mentoring & Polity",
       bio: "2 Times UPSC-CSE mains Qualified.",
