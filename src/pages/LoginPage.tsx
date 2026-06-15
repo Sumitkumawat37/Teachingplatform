@@ -10,16 +10,9 @@ const LoginPage = () => {
   const { login, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"student" | "teacher" | "admin">("student");
-  const [email, setEmail] = useState("student@demo.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleRoleSwitch = (r: "student" | "teacher" | "admin") => {
-    setRole(r);
-    setEmail(r === "teacher" ? "teacher@demo.com" : r === "admin" ? "superadmin@demo.com" : "student@demo.com");
-    setPassword("123456");
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,23 +81,7 @@ const LoginPage = () => {
       <div className="flex-1 flex items-start md:items-center justify-center px-4 pt-0 pb-8 md:py-0 -mt-8 md:mt-0 relative z-10">
         <div className="w-full max-w-sm">
           <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-5">
-            <div className="flex gap-1.5 bg-slate-50 border border-slate-100 p-1.5 rounded-xl mb-5">
-              {(['student', 'teacher', 'admin'] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => handleRoleSwitch(r)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    role === r
-                      ? r === 'admin'
-                        ? 'bg-amber-500 text-white shadow-sm'
-                        : 'bg-violet-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-600'
-                  }`}
-                >
-                  {r === 'student' ? 'Student' : r === 'teacher' ? 'Teacher' : 'Admin'}
-                </button>
-              ))}
-            </div>
+            <h2 className="text-xl font-bold text-slate-800 mb-5 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>Sign In</h2>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-1.5">
@@ -136,13 +113,6 @@ const LoginPage = () => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-              </div>
-
-              <div className="bg-violet-50 rounded-xl p-3 border border-violet-100">
-                <p className="text-[10px] font-bold text-violet-600 mb-1 uppercase tracking-wide">Demo Credentials</p>
-                <p className="text-[10px] text-slate-500">Student: student@demo.com / 123456</p>
-                <p className="text-[10px] text-slate-500">Teacher: teacher@demo.com / 123456</p>
-                <p className="text-[10px] text-amber-600 font-semibold mt-0.5">Admin: superadmin@demo.com / 123456</p>
               </div>
 
               <button
