@@ -24,7 +24,6 @@ const LecturePage = () => {
   const course = courses.find((c) => c.id === courseId);
   const lecture = lectures.find((l) => l.id === lectureId);
   const purchased = hasPurchased(courseId || "");
-  const canAccess = lecture?.free_preview || purchased;
 
   const handleDoubtSubmit = () => {
     if (!newDoubt.trim() || !user || !lectureId || !courseId) return;
@@ -45,12 +44,16 @@ const LecturePage = () => {
       navigate(`/courses/${courseId}`);
       return;
     }
+    // Get lecture index in the course (sorted by chapter order and lecture order)
+    const lectureIndex = lectures.findIndex(l => l.id === lectureId);
+    const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
+    const canAccess = lecture?.free_preview || purchased || isFirstFive;
     if (!canAccess) {
       toast.error("Purchase this course to access this lecture");
       navigate(`/courses/${courseId}`);
       return;
     }
-  }, [lecture, canAccess, courseId, navigate]);
+  }, [lecture, purchased, courseId, navigate, lectures]);
 
   if (!lecture || !course) return null;
 
@@ -149,7 +152,10 @@ const LecturePage = () => {
                   {lectures
                     .filter((l) => l.chapter_id === chapter.id)
                     .map((l) => {
-                      const lCanAccess = l.free_preview || purchased;
+                      // Get lecture index in the course (sorted by chapter order and lecture order)
+                      const lIndex = lectures.findIndex(lec => lec.id === l.id);
+                      const lIsFirstFive = lIndex >= 0 && lIndex < 5;
+                      const lCanAccess = l.free_preview || purchased || lIsFirstFive;
                       return (
                         <div
                           key={l.id}

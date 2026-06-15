@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { useLecture, useCourses, useDoubts, useCreateDoubt, useLectureProgress, useUpsertLectureProgress } from "@/lib/supabase-data";
+import { useLecture, useCourses, useLectures, useDoubts, useCreateDoubt, useLectureProgress, useUpsertLectureProgress } from "@/lib/supabase-data";
 import { usePurchase } from "@/lib/purchase-context";
 import { useAuth } from "@/lib/auth-context";
 import { useParams, useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ const VideoPlayerPage = () => {
   const { user } = useAuth();
   const { data: lecture } = useLecture(lectureId);
   const { data: courses = [] } = useCourses();
+  const { data: lectures = [] } = useLectures(courseId);
   const { data: lectureDoubts = [] } = useDoubts(lectureId);
   const { data: progressData = [] } = useLectureProgress();
   const createDoubt = useCreateDoubt();
@@ -70,7 +71,10 @@ const VideoPlayerPage = () => {
   const course = courses.find((c) => c.id === courseId);
   const myProgress = progressData.find((p) => p.lecture_id === lectureId);
   const completed = myProgress?.completed ?? false;
-  const canAccess = lecture ? (lecture.free_preview || hasPurchased(courseId || "")) : false;
+  // Get lecture index in the course (sorted by chapter order and lecture order)
+  const lectureIndex = lectures.findIndex(l => l.id === lectureId);
+  const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
+  const canAccess = lecture ? (lecture.free_preview || hasPurchased(courseId || "") || isFirstFive) : false;
 
   // Extract YouTube video ID from various URL formats or direct ID
   const extractYoutubeId = (input: string | undefined): string | null => {
@@ -591,7 +595,7 @@ const VideoPlayerPage = () => {
         )}
 
         {/* Free Preview Badge */}
-        {lecture.free_preview && !isFullscreen && (
+        {(lecture.free_preview || isFirstFive) && !isFullscreen && (
           <div className="absolute top-3 left-3 pointer-events-none z-10">
             <div className="flex items-center gap-1 bg-emerald-500/90 text-white text-[9px] font-bold px-2.5 py-1 rounded-full">
               <Eye className="w-3 h-3" /> Free Preview

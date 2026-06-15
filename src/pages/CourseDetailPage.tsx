@@ -63,7 +63,10 @@ const CourseDetailPage = memo(() => {
   };
 
   const handleLectureClick = (lecture: typeof lectures[0]) => {
-    const canAccess = lecture.free_preview || purchased;
+    // Get lecture index in the course (sorted by chapter order and lecture order)
+    const lectureIndex = lectures.findIndex(l => l.id === lecture.id);
+    const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
+    const canAccess = lecture.free_preview || purchased || isFirstFive;
     if (!canAccess) {
       toast.error("Purchase this course to unlock all lectures.");
       return;
@@ -221,7 +224,10 @@ const CourseDetailPage = memo(() => {
               {lectures
                 .filter((l) => l.chapter_id === chapter.id)
                 .map((lecture) => {
-                  const canAccess = lecture.free_preview || purchased;
+                  // Get lecture index in the course (sorted by chapter order and lecture order)
+                  const lectureIndex = lectures.findIndex(l => l.id === lecture.id);
+                  const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
+                  const canAccess = lecture.free_preview || purchased || isFirstFive;
                   return (
                     <div
                       key={lecture.id}
@@ -251,7 +257,7 @@ const CourseDetailPage = memo(() => {
                               <Clock className="w-2.5 h-2.5" /> {lecture.duration}
                             </span>
                           )}
-                          {lecture.free_preview && !purchased && (
+                          {(lecture.free_preview || isFirstFive) && !purchased && (
                             <span className="flex items-center gap-0.5 text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100">
                               <Eye className="w-2.5 h-2.5" /> Free
                             </span>
