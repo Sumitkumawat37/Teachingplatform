@@ -24,6 +24,7 @@ const superAdminOwnNav = [
 const superAdminMgmtNav = [
   { to: "/admin/content",       icon: BookOpen,      label: "Course",        end: false },
   { to: "/admin/students",      icon: Users,         label: "Students",      end: false },
+  { to: "/admin/mentoring",     icon: MentoringIcon, label: "Mentoring",     end: false },
   { to: "/notes",               icon: FileText,      label: "Notes",         end: false },
   { to: "/admin/email-center",  icon: Mail,          label: "Email Center",  end: false },
   { to: "/admin/live",          icon: Video,         label: "Live Classes",  end: false },
@@ -38,6 +39,7 @@ const adminNav = [
   { to: "/admin/teachers",       icon: GraduationCap,   label: "Teachers",      end: false },
   { to: "/admin/content",        icon: BookOpen,        label: "Course",        end: false },
   { to: "/admin/review-videos",  icon: Video,           label: "Review Videos", end: false },
+  { to: "/admin/mentoring",     icon: MentoringIcon,   label: "Mentoring",     end: false },
   { to: "/notes",                icon: FileText,        label: "Notes",         end: false },
   { to: "/admin/students",       icon: Users,           label: "Students",      end: false },
   { to: "/admin/email-center",   icon: Mail,            label: "Email Center",  end: false },

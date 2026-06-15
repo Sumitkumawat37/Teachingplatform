@@ -34,6 +34,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminProfile = lazy(() => import("./pages/admin/AdminProfile"));
 const AdminTeachers = lazy(() => import("./pages/admin/AdminTeachers"));
 const AdminReviewVideos = lazy(() => import("./pages/admin/AdminReviewVideos"));
+const AdminMentoring = lazy(() => import("./pages/admin/AdminMentoring"));
 const AdminContent = lazy(() => import("./pages/admin/AdminContent"));
 const AdminStudents = lazy(() => import("./pages/admin/AdminStudents"));
 const AdminAnnouncements = lazy(() => import("./pages/admin/AdminAnnouncements"));
@@ -139,6 +140,7 @@ function AppRoutes() {
         <Route path="/admin/profile" element={<Suspense fallback={<PageLoader />}><AdminProfile /></Suspense>} />
         <Route path="/admin/teachers" element={<Suspense fallback={<PageLoader />}><AdminTeachers /></Suspense>} />
         <Route path="/admin/review-videos" element={<Suspense fallback={<PageLoader />}><AdminReviewVideos /></Suspense>} />
+        <Route path="/admin/mentoring" element={<Suspense fallback={<PageLoader />}><AdminMentoring /></Suspense>} />
         <Route path="/admin/content" element={<Suspense fallback={<PageLoader />}><AdminContent /></Suspense>} />
         <Route path="/admin/students" element={<Suspense fallback={<PageLoader />}><AdminStudents /></Suspense>} />
         <Route path="/admin/announcements" element={<Suspense fallback={<PageLoader />}><AdminAnnouncements /></Suspense>} />

@@ -283,11 +283,11 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               allowFullScreen
             />
             {/* Redirect lock overlays for shorts */}
-            <div className="absolute top-0 left-0 right-0 h-12 bg-black pointer-events-none z-[50]" />
-            <div className="absolute top-0 left-0 w-12 h-12 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute top-0 right-0 w-16 h-12 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute bottom-0 right-0 w-44 h-14 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-[50]" />
+            <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-[50]" />
+            <div className="absolute top-0 left-0 w-20 h-16 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute top-0 right-0 w-24 h-16 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute bottom-0 right-0 w-48 h-20 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/90 to-transparent pointer-events-none z-[50]" />
             <div className="absolute top-2 left-2 z-[70] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
               UPSC Nadiya
             </div>
