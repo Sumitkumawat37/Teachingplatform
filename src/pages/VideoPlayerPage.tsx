@@ -337,7 +337,7 @@ const VideoPlayerPage = () => {
   // Build YouTube embed URL with privacy-enhanced mode and redirect lock
   const getYoutubeEmbedUrl = () => {
     if (!hasYoutubeVideo) return "";
-    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href) + "&fs=0";
     return "https://www.youtube-nocookie.com/embed/" + youtubeId + "?" + ytParams;
   };
 
@@ -425,22 +425,22 @@ const VideoPlayerPage = () => {
               
               {/* Redirect lock overlays */}
               {/* Top overlay - covers title bar and channel avatar */}
-              <div className="absolute top-0 left-0 right-0 h-12 bg-black pointer-events-none z-[5]" />
+              <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-[50]" />
               
               {/* Top-left overlay - blocks channel avatar */}
-              <div className="absolute top-0 left-0 w-12 h-12 bg-black z-[6] pointer-events-auto" />
+              <div className="absolute top-0 left-0 w-20 h-16 bg-black z-[60] pointer-events-auto" />
               
               {/* Top-right overlay - blocks "..." menu */}
-              <div className="absolute top-0 right-0 w-16 h-12 bg-black z-[6] pointer-events-auto" />
+              <div className="absolute top-0 right-0 w-24 h-16 bg-black z-[60] pointer-events-auto" />
               
               {/* Bottom-right overlay - blocks share/watch later buttons */}
-              <div className="absolute bottom-0 right-0 w-44 h-14 bg-black z-[6] pointer-events-auto" />
+              <div className="absolute bottom-0 right-0 w-48 h-20 bg-black z-[60] pointer-events-auto" />
               
               {/* Bottom gradient - allows controls to work through */}
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-[5]" />
+              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/95 to-transparent pointer-events-none z-[50]" />
               
               {/* Brand stamp */}
-              <div className="absolute top-2 left-2 z-[7] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
+              <div className="absolute top-2 left-2 z-[70] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
                 UPSC Nadiya
               </div>
               
