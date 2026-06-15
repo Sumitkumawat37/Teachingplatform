@@ -11,9 +11,10 @@ interface CustomVideoPlayerProps {
 }
 
 // Convert YouTube ID to privacy-enhanced embed URL with redirect lock
-function toYoutubeEmbed(youtubeId: string): string {
-  const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
-  return `https://www.youtube-nocookie.com/embed/${youtubeId}?${ytParams}`;
+function toYoutubeEmbed(youtubeId: string, isShorts: boolean = false): string {
+  const baseParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+  const shortsParam = isShorts ? "&shorts=1" : "";
+  return `https://www.youtube-nocookie.com/embed/${youtubeId}?${baseParams}${shortsParam}`;
 }
 
 export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
@@ -37,7 +38,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const embedUrl = toYoutubeEmbed(youtubeId);
+  const embedUrl = toYoutubeEmbed(youtubeId, aspectRatio === 'aspect-[9/16]');
 
   // Prevent screen recording and screenshot
   useEffect(() => {
@@ -274,17 +275,22 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               title={title}
               className="absolute"
               style={{ 
-                width: '177.78vh', 
-                height: '100vh', 
-                maxWidth: '56.25vw',
-                maxHeight: '100vw',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)'
+                width: '100%', 
+                height: '100%',
+                objectFit: 'cover'
               }}
               allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
             />
+            {/* Redirect lock overlays for shorts */}
+            <div className="absolute top-0 left-0 right-0 h-12 bg-black pointer-events-none z-[5]" />
+            <div className="absolute top-0 left-0 w-12 h-12 bg-black z-[6] pointer-events-auto" />
+            <div className="absolute top-0 right-0 w-16 h-12 bg-black z-[6] pointer-events-auto" />
+            <div className="absolute bottom-0 right-0 w-44 h-14 bg-black z-[6] pointer-events-auto" />
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-[5]" />
+            <div className="absolute top-2 left-2 z-[7] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
+              UPSC Nadiya
+            </div>
           </div>
         ) : (
           <>
