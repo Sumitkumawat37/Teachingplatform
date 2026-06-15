@@ -27,7 +27,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         
         {/* Footer */}
         <footer className="bg-white/80 backdrop-blur-sm border-t border-slate-200/50 py-3 px-4 text-center">
-          <p className="text-xs text-slate-500">Developed by JK Technologies & Services</p>
+          <p className="text-xs text-slate-500">Developed by ❤️ JK Technologies & Services</p>
         </footer>
       </div>
 
