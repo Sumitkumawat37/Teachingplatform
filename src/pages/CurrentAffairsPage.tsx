@@ -37,14 +37,14 @@ const CurrentAffairsPage = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      let query = supabase.from("current_affairs").select("*");
+      let query = supabase.from("current_affairs" as any).select("*");
       if (category !== "All") query = query.eq("category", category);
       if (search.trim()) query = query.ilike("title", `%${search}%`);
 
       const { data, error } = await query.order("published_at", { ascending: false });
       if (error) throw error;
 
-      setArticles((data || []).map(item => ({
+      setArticles((data || []).map((item: any) => ({
         ...item,
         mcqs: Array.isArray(item.mcqs) ? item.mcqs : JSON.parse(item.mcqs || "[]")
       })));
