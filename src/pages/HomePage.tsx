@@ -487,7 +487,7 @@ const HomePage = () => {
                   {courseGroup.videos.map((video: any) => (
                     <div
                       key={video.id}
-                      className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
+                      className="relative aspect-[9/16] bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
                       onClick={() => setSelectedVideo(video)}
                     >
                       <img
