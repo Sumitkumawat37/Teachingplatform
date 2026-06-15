@@ -12,7 +12,7 @@ interface CustomVideoPlayerProps {
 
 // Convert YouTube ID to privacy-enhanced embed URL with redirect lock
 function toYoutubeEmbed(youtubeId: string, isShorts: boolean = false): string {
-  const baseParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href);
+  const baseParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href) + "&fs=0";
   const shortsParam = isShorts ? "&shorts=1" : "";
   return `https://www.youtube-nocookie.com/embed/${youtubeId}?${baseParams}${shortsParam}`;
 }
@@ -283,11 +283,11 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               allowFullScreen
             />
             {/* Redirect lock overlays for shorts */}
-            <div className="absolute top-0 left-0 right-0 h-16 bg-black pointer-events-none z-[50]" />
-            <div className="absolute top-0 left-0 w-20 h-16 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute top-0 right-0 w-24 h-16 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute bottom-0 right-0 w-48 h-20 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/90 to-transparent pointer-events-none z-[50]" />
+            <div className="absolute top-0 left-0 right-0 h-32 bg-black pointer-events-none z-[50]" />
+            <div className="absolute top-0 left-0 w-40 h-32 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute top-0 right-0 w-40 h-32 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute bottom-0 right-0 w-64 h-32 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/95 to-transparent pointer-events-none z-[50]" />
             <div className="absolute top-2 left-2 z-[70] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
               UPSC Nadiya
             </div>
