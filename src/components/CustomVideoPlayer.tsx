@@ -286,8 +286,8 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
             <div className="absolute top-0 left-0 right-0 h-32 bg-black pointer-events-none z-[50]" />
             <div className="absolute top-0 left-0 w-40 h-32 bg-black z-[60] pointer-events-auto" />
             <div className="absolute top-0 right-0 w-40 h-32 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute bottom-0 right-0 w-64 h-32 bg-black z-[60] pointer-events-auto" />
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/95 to-transparent pointer-events-none z-[50]" />
+            <div className="absolute bottom-0 right-0 w-48 h-20 bg-black z-[60] pointer-events-auto" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/95 to-transparent pointer-events-none z-[50]" />
             <div className="absolute top-2 left-2 z-[70] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
               UPSC Nadiya
             </div>
