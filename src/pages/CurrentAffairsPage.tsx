@@ -50,8 +50,8 @@ const CurrentAffairsPage = () => {
       })));
 
       if (user) {
-        const { data: bData } = await supabase.from("current_affair_bookmarks").select("article_id").eq("user_id", user.id);
-        setBookmarks(bData?.map(b => b.article_id) || []);
+        const { data: bData } = await supabase.from("current_affair_bookmarks" as any).select("article_id").eq("user_id", user.id);
+        setBookmarks(bData?.map((b: any) => b.article_id) || []);
       }
     } catch {
       toast.error("Failed to load current affairs");
@@ -69,11 +69,11 @@ const CurrentAffairsPage = () => {
     const isBookmarked = bookmarks.includes(id);
     try {
       if (isBookmarked) {
-        await supabase.from("current_affair_bookmarks").delete().eq("user_id", user.id).eq("article_id", id);
+        await supabase.from("current_affair_bookmarks" as any).delete().eq("user_id", user.id).eq("article_id", id);
         setBookmarks(prev => prev.filter(x => x !== id));
         toast.success("Bookmark removed");
       } else {
-        await supabase.from("current_affair_bookmarks").insert({ user_id: user.id, article_id: id });
+        await supabase.from("current_affair_bookmarks" as any).insert({ user_id: user.id, article_id: id });
         setBookmarks(prev => [...prev, id]);
         toast.success("Article bookmarked");
       }
