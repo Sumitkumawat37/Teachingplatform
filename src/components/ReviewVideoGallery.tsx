@@ -41,8 +41,8 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-6xl p-0 overflow-hidden h-[85vh] sm:h-[90vh]">
-        <div className="relative h-full flex flex-col items-center justify-center bg-black">
+      <DialogContent className="w-full max-w-md p-0 overflow-hidden">
+        <div className="relative aspect-[9/16] w-full flex flex-col items-center justify-center bg-black">
           {/* Close button */}
           <Button
             variant="ghost"
@@ -53,13 +53,14 @@ export function ReviewVideoGallery({ videos, open, onOpenChange, startIndex = 0 
             <X className="w-4 h-4" />
           </Button>
 
-          {/* Video player - centered and full screen on mobile */}
+          {/* Video player - shorts format */}
           <div className="w-full h-full flex items-center justify-center">
             <CustomVideoPlayer
               youtubeId={currentVideo.youtube_id}
               title={currentVideo.title}
               autoplay={true}
               onEnded={handleVideoEnded}
+              aspectRatio="aspect-[9/16]"
             />
           </div>
 

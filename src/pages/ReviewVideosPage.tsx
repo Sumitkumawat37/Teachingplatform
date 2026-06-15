@@ -93,13 +93,13 @@ const ReviewVideosPage = () => {
               className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 cursor-pointer"
               onClick={() => handleWatchVideo(index)}
             >
-              <div className="relative aspect-video bg-slate-900">
+              <div className="relative aspect-[9/16] bg-slate-900">
                 <img
-                  src={`https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`}
+                  src={`https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
                   alt={video.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = `https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`;
+                    e.currentTarget.src = `https://img.youtube.com/vi/${video.youtube_id}/mqdefault.jpg`;
                   }}
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
