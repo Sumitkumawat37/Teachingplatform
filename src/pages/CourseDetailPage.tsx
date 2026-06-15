@@ -32,8 +32,6 @@ const CourseDetailPage = memo(() => {
   const [showReviewGallery, setShowReviewGallery] = useState(false);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
   const [hasSeenReviewGallery, setHasSeenReviewGallery] = useState(false);
-  const [currentEmbeddedIndex, setCurrentEmbeddedIndex] = useState(0);
-  const [showReviewVideoList, setShowReviewVideoList] = useState(false);
 
   // Disabled auto-popup - user must manually click to play videos
 
@@ -366,27 +364,41 @@ const CourseDetailPage = memo(() => {
         )}
       </div>
 
-      {/* Review Videos Section - Gallery Box */}
+      {/* Review Videos Section - Grid like homepage */}
       {reviewVideos.length > 0 && (
         <div className="mt-6">
           <h3 className="font-semibold text-base text-slate-800 mb-3">Course Review Videos</h3>
-          <div className="relative">
-            <CustomVideoPlayer
-              youtubeId={reviewVideos[currentEmbeddedIndex]?.youtube_id}
-              title={reviewVideos[currentEmbeddedIndex]?.title}
-              autoplay={false}
-            />
-            <div className="mt-2 flex items-center justify-between">
-              <p className="text-sm text-slate-600">{reviewVideos[currentEmbeddedIndex]?.title}</p>
-              <p className="text-xs text-slate-400">{currentEmbeddedIndex + 1} / {reviewVideos.length}</p>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {reviewVideos.map((rv: any, index: number) => (
+              <div
+                key={rv.id}
+                className="relative aspect-[9/16] bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
+                onClick={() => {
+                  setSelectedVideoIndex(index);
+                  setShowReviewGallery(true);
+                }}
+              >
+                <img
+                  src={`https://img.youtube.com/vi/${rv.youtube_id}/hqdefault.jpg`}
+                  alt={rv.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.currentTarget.style.display = 'none');
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-pink-500 text-white text-xs font-semibold p-2 text-center">${rv.title || 'Video'}</div>`;
+                    }
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                    <Play className="w-4 h-4 text-violet-600 ml-0.5" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <Button
-            className="w-full mt-3"
-            onClick={() => setShowReviewVideoList(true)}
-          >
-            <Play className="w-4 h-4 mr-2" /> View All Review Videos
-          </Button>
         </div>
       )}
 
@@ -397,44 +409,6 @@ const CourseDetailPage = memo(() => {
         onOpenChange={setShowReviewGallery}
         startIndex={selectedVideoIndex}
       />
-
-      {/* Review Video List Dialog */}
-      <Dialog open={showReviewVideoList} onOpenChange={setShowReviewVideoList}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Course Review Videos</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
-            {reviewVideos.map((rv: any, index: number) => (
-              <Card
-                key={rv.id}
-                className="cursor-pointer overflow-hidden hover:shadow-md transition-shadow"
-                onClick={() => {
-                  setSelectedVideoIndex(index);
-                  setShowReviewVideoList(false);
-                  setShowReviewGallery(true);
-                }}
-              >
-                <div className="aspect-[9/16] bg-slate-900 relative">
-                  <img
-                    src={`https://img.youtube.com/vi/${rv.youtube_id}/hqdefault.jpg`}
-                    alt={rv.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/20 transition-colors">
-                    <Play className="w-8 h-8 text-white fill-white" />
-                  </div>
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-medium text-slate-700 truncate">{rv.title}</p>
-                  <p className="text-xs text-slate-500 mt-1">Video {index + 1}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Feedback Section - Read Only */}
       <div className="mt-6 space-y-4">
