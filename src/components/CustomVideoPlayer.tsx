@@ -7,6 +7,7 @@ interface CustomVideoPlayerProps {
   autoplay?: boolean;
   onProgress?: (currentTime: number, duration: number) => void;
   onEnded?: () => void;
+  aspectRatio?: string;
 }
 
 // Convert YouTube ID to privacy-enhanced embed URL with redirect lock
@@ -21,6 +22,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   autoplay = false,
   onProgress,
   onEnded,
+  aspectRatio = "aspect-video",
 }) => {
   const [isPlaying, setIsPlaying] = useState(autoplay);
   const [currentTime, setCurrentTime] = useState(0);
@@ -257,22 +259,44 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full aspect-video bg-black rounded-xl overflow-hidden group max-w-full"
+      className={`relative w-full ${aspectRatio} bg-black rounded-xl overflow-hidden group max-w-full`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
     >
       {/* YouTube iframe with redirect lock */}
       <div className="relative w-full h-full overflow-hidden">
-        <iframe
-          ref={iframeRef}
-          src={embedUrl}
-          title={title}
-          className="absolute border-0"
-          style={{ top: '-60px', left: 0, width: '100%', height: 'calc(100% + 120px)' }}
-          allow="autoplay; encrypted-media; picture-in-picture"
-          allowFullScreen
-        />
+        {aspectRatio === 'aspect-[9/16]' ? (
+          <div className="relative w-full h-full flex items-center justify-center bg-black">
+            <iframe
+              ref={iframeRef}
+              src={embedUrl}
+              title={title}
+              className="absolute"
+              style={{ 
+                width: '177.78vh', 
+                height: '100vh', 
+                maxWidth: '56.25vw',
+                maxHeight: '100vw',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <>
+            <iframe
+              ref={iframeRef}
+              src={embedUrl}
+              title={title}
+              className="absolute border-0"
+              style={{ top: '-60px', left: 0, width: '100%', height: 'calc(100% + 120px)' }}
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
         
         {/* Redirect lock overlays */}
         {/* Top overlay - covers title bar and channel avatar */}
@@ -294,6 +318,8 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         <div className="absolute top-2 left-2 z-[7] px-2 py-0.5 rounded bg-gradient-to-r from-violet-600 to-pink-500 text-white text-[10px] font-semibold pointer-events-none">
           UPSC Nadiya
         </div>
+          </>
+        )}
       </div>
 
       {/* Custom Controls Overlay */}

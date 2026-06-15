@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail, Youtube, X } from "lucide-react";
+import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail, Youtube, X, ChevronLeft } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -96,6 +96,8 @@ const HomePage = () => {
   const [teacherProfiles, setTeacherProfiles] = useState<any[]>([]);
   const [reviewVideosByCourse, setReviewVideosByCourse] = useState<any[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [selectedVideoIndex, setSelectedVideoIndex] = useState<number>(0);
+  const [selectedCourseIndex, setSelectedCourseIndex] = useState<number>(0);
 
 
 
@@ -488,7 +490,11 @@ const HomePage = () => {
                     <div
                       key={video.id}
                       className="relative aspect-[9/16] bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
-                      onClick={() => setSelectedVideo(video)}
+                      onClick={() => {
+                        setSelectedVideo(video);
+                        setSelectedVideoIndex(courseGroup.videos.indexOf(video));
+                        setSelectedCourseIndex(reviewVideosByCourse.indexOf(courseGroup));
+                      }}
                     >
                       <img
                         src={`https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
@@ -717,12 +723,49 @@ const HomePage = () => {
             <X className="w-4 h-4" />
           </button>
           {selectedVideo && (
-            <div className="aspect-[9/16] w-full bg-black">
+            <div className="relative aspect-[9/16] w-full bg-black">
               <CustomVideoPlayer
                 youtubeId={selectedVideo.youtube_id}
                 title={selectedVideo.title}
                 autoplay={true}
+                aspectRatio="aspect-[9/16]"
               />
+              {/* Previous Button */}
+              <button
+                onClick={() => {
+                  const currentCourse = reviewVideosByCourse[selectedCourseIndex];
+                  if (selectedVideoIndex > 0) {
+                    setSelectedVideoIndex(selectedVideoIndex - 1);
+                    setSelectedVideo(currentCourse.videos[selectedVideoIndex - 1]);
+                  } else if (selectedCourseIndex > 0) {
+                    const prevCourse = reviewVideosByCourse[selectedCourseIndex - 1];
+                    setSelectedCourseIndex(selectedCourseIndex - 1);
+                    setSelectedVideoIndex(prevCourse.videos.length - 1);
+                    setSelectedVideo(prevCourse.videos[prevCourse.videos.length - 1]);
+                  }
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              {/* Next Button */}
+              <button
+                onClick={() => {
+                  const currentCourse = reviewVideosByCourse[selectedCourseIndex];
+                  if (selectedVideoIndex < currentCourse.videos.length - 1) {
+                    setSelectedVideoIndex(selectedVideoIndex + 1);
+                    setSelectedVideo(currentCourse.videos[selectedVideoIndex + 1]);
+                  } else if (selectedCourseIndex < reviewVideosByCourse.length - 1) {
+                    const nextCourse = reviewVideosByCourse[selectedCourseIndex + 1];
+                    setSelectedCourseIndex(selectedCourseIndex + 1);
+                    setSelectedVideoIndex(0);
+                    setSelectedVideo(nextCourse.videos[0]);
+                  }
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
             </div>
           )}
         </DialogContent>
