@@ -415,9 +415,9 @@ const CourseDetailPage = memo(() => {
                   setShowReviewGallery(true);
                 }}
               >
-                <div className="aspect-video bg-slate-900 relative">
+                <div className="aspect-[9/16] bg-slate-900 relative">
                   <img
-                    src={`https://img.youtube.com/vi/${rv.youtube_id}/mqdefault.jpg`}
+                    src={`https://img.youtube.com/vi/${rv.youtube_id}/hqdefault.jpg`}
                     alt={rv.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
