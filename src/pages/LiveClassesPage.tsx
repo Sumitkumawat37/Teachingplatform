@@ -30,8 +30,24 @@ const LiveClassesPage = () => {
     return raw.startsWith("http") ? raw : `https://${raw}`;
   };
 
-  const upcoming = liveClasses.filter((c) => c.status === "upcoming");
-  const completed = liveClasses.filter((c) => c.status === "completed");
+  const now = new Date();
+  const upcoming = liveClasses.filter((c) => {
+    if (c.status !== "upcoming") return false;
+    const scheduledAt = new Date(c.scheduled_at);
+    const durationMatch = c.duration?.match(/(\d+)/);
+    const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+    const endTime = new Date(scheduledAt.getTime() + durationMinutes * 60 * 1000);
+    return now <= endTime;
+  });
+  const completed = liveClasses.filter((c) => {
+    if (c.status === "completed") return true;
+    if (c.status !== "upcoming") return false;
+    const scheduledAt = new Date(c.scheduled_at);
+    const durationMatch = c.duration?.match(/(\d+)/);
+    const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+    const endTime = new Date(scheduledAt.getTime() + durationMinutes * 60 * 1000);
+    return now > endTime;
+  });
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);

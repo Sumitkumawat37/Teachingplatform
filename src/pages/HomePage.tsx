@@ -35,6 +35,10 @@ const reviews = [
 
   { name: "Mohammed Aslam", rank: "", year: "", location: "Hyderabad", text: "Affordable, structured, aur live tests mujhe track par rakhte the. Life-changing experience!", rating: 5 },
 
+  { name: "Sneha Gupta", rank: "", year: "", location: "Pune", text: "Mains preparation mein Nadiya Ma'am ka guidance bohot helpful tha. Answer writing tips ne meri score improve kiye. Thank you so much!", rating: 5 },
+
+  { name: "Vikram Singh", rank: "", year: "", location: "Lucknow", text: "Live classes aur notes combination best hai. Time management bhi sikhaya gaya. Highly recommended for serious aspirants.", rating: 5 },
+
 ];
 
 
@@ -61,9 +65,15 @@ const faqs = [
 
   { q: "Can I access the content after the batch ends?", a: "Yes! All recorded lectures and notes remain accessible for 2 years after your batch ends. You can revisit any topic anytime." },
 
-  { q: "Is there any free trial available?", a: "Absolutely! You get 2 free lecture previews in every course. Simply sign up, browse the Course Marketplace, and tap any course to access the free preview lectures." },
+  { q: "Is there any free trial available?", a: "Absolutely! You get 4 free lecture previews in every course. Simply sign up, browse the Course Marketplace, and tap any course to access the free preview lectures." },
 
-  { q: "How is Nadiya Ma'am different from other UPSC mentors?", a: "Nadiya Ma'am combines simplified teaching with personal feedback. With a 92% student satisfaction rate and 45+ students clearing UPSC, her track record speaks for itself. She personally reviews doubts within 24 hours." },
+  { q: "How is Nadiya Ma'am different from other UPSC mentors?", a: "Nadiya Ma'am combines simplified teaching with personal feedback. With a 92% student satisfaction rate, her track record speaks for itself. She personally reviews doubts within 24 hours." },
+
+  { q: "What if I miss a live class?", a: "No worries! All live classes are recorded and available within 24 hours. You can watch them anytime at your convenience. The recording includes the complete session with all Q&A." },
+
+  { q: "Do you provide study material?", a: "Yes, comprehensive study material is provided including notes PDFs, current affairs compilations, PYQ analysis, and answer writing templates. All material is regularly updated." },
+
+  { q: "How can I ask doubts during the course?", a: "You can ask doubts directly during live classes, through our dedicated doubt section, or via email. Our faculty responds within 24 hours. You can also schedule one-on doubt clearing sessions." },
 
 ];
 
@@ -473,22 +483,29 @@ const HomePage = () => {
                 style={{ background: '#F3EEFF' }}
               >
                 <h3 className="font-semibold text-sm text-slate-800 mb-3">{courseGroup.courseName} - Review Videos</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {courseGroup.videos.map((video: any) => (
                     <div
                       key={video.id}
-                      className="relative aspect-video bg-black rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                      className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
                       onClick={() => setSelectedVideo(video)}
                     >
                       <img
-                        src={`https://img.youtube.com/vi/${video.youtube_id}/mqdefault.jpg`}
+                        src={`https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
                         alt={video.title}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        onError={(e) => {
+                          (e.currentTarget.style.display = 'none');
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-pink-500 text-white text-xs font-semibold p-2 text-center">${video.title || 'Video'}</div>`;
+                          }
+                        }}
                       />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play className="w-3 h-3 text-violet-600 ml-0.5" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                          <Play className="w-4 h-4 text-violet-600 ml-0.5" />
                         </div>
                       </div>
                     </div>
