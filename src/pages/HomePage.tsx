@@ -709,7 +709,7 @@ const HomePage = () => {
 
       {/* Video Player Modal */}
       <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
-        <DialogContent className="w-full max-w-6xl p-0 overflow-hidden h-[85vh] sm:h-[90vh]">
+        <DialogContent className="w-full max-w-md p-0 overflow-hidden">
           <button
             onClick={() => setSelectedVideo(null)}
             className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-lg p-2 transition-colors"
@@ -717,11 +717,13 @@ const HomePage = () => {
             <X className="w-4 h-4" />
           </button>
           {selectedVideo && (
-            <CustomVideoPlayer
-              youtubeId={selectedVideo.youtube_id}
-              title={selectedVideo.title}
-              autoplay={true}
-            />
+            <div className="aspect-[9/16] w-full bg-black">
+              <CustomVideoPlayer
+                youtubeId={selectedVideo.youtube_id}
+                title={selectedVideo.title}
+                autoplay={true}
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>
