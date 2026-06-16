@@ -33,11 +33,19 @@ export function useLectures(courseId?: string) {
   return useQuery({
     queryKey: ["lectures", courseId],
     queryFn: async () => {
-      let q = supabase.from("lectures").select("*, chapters(title)").order("sort_order");
+      let q = supabase
+        .from("lectures")
+        .select("*, chapters(title, sort_order)")
+        .order("sort_order", { ascending: true });
       if (courseId) q = q.eq("course_id", courseId);
       const { data, error } = await q;
       if (error) throw error;
-      return data;
+      // Sort by chapter sort_order first, then lecture sort_order
+      return data?.sort((a: any, b: any) => {
+        const chapterOrderDiff = (a.chapters?.sort_order || 0) - (b.chapters?.sort_order || 0);
+        if (chapterOrderDiff !== 0) return chapterOrderDiff;
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      });
     },
   });
 }

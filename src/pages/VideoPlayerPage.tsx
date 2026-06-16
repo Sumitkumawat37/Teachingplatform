@@ -287,7 +287,7 @@ const VideoPlayerPage = () => {
       <div className="w-12 h-12 rounded-2xl gradient-hero flex items-center justify-center mx-auto mb-3">
         <Play className="w-6 h-6 text-white" />
       </div>
-      <p className="text-gray-400 text-sm">Lecture not found</p>
+      <p className="text-slate-400 text-sm">Lecture not found</p>
     </div>
   );
 
@@ -530,7 +530,7 @@ const VideoPlayerPage = () => {
               </button>
               {showSpeedMenu && (
                 <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-sm rounded-xl p-2 border border-white/10 min-w-[120px]">
-                  <p className="text-[10px] text-gray-400 font-semibold mb-2 px-1">Playback Speed</p>
+                  <p className="text-[10px] text-slate-400 font-semibold mb-2 px-1">Playback Speed</p>
                   <div className="space-y-1">
                     {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
                       <button
@@ -540,7 +540,7 @@ const VideoPlayerPage = () => {
                           handlePlaybackSpeedChange(speed);
                           setShowSpeedMenu(false);
                         }}
-                        className={"w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors " + (speed === playbackSpeed ? "bg-primary text-white" : "text-gray-300 hover:bg-white/10")}
+                        className={"w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors " + (speed === playbackSpeed ? "bg-primary text-white" : "text-slate-300 hover:bg-white/10")}
                       >
                         {speed}x
                       </button>
@@ -553,7 +553,7 @@ const VideoPlayerPage = () => {
             {/* Auto-Next Toggle */}
             <button
               onClick={() => setAutoNextEnabled(!autoNextEnabled)}
-              className={"bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors " + (autoNextEnabled ? "text-primary" : "text-gray-400")}
+              className={"bg-black/70 hover:bg-black/90 text-white rounded-lg p-2 transition-colors " + (autoNextEnabled ? "text-primary" : "text-slate-400")}
               title="Auto-play next lecture"
             >
               <FastForward className="w-4 h-4" />
@@ -611,7 +611,7 @@ const VideoPlayerPage = () => {
             <h2 className="text-base font-semibold text-slate-800 leading-snug">{lecture.title}</h2>
             <p className="text-slate-400 text-xs mt-0.5">{course.title}</p>
             {lecture.duration && (
-              <p className="text-gray-500 text-[10px] mt-1">Duration: {lecture.duration}</p>
+              <p className="text-slate-500 text-[10px] mt-1">Duration: {lecture.duration}</p>
             )}
           </div>
           {completed ? (

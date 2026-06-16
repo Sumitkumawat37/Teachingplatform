@@ -52,15 +52,15 @@ const StudyPlannerPage = () => {
     if (!user) return;
     try {
       const { data: plan } = await supabase
-        .from("study_plans")
+        .from("study_plans" as any)
         .select("*, study_tasks(task_name, is_completed)")
         .eq("user_id", user.id)
         .eq("target_date", date)
         .maybeSingle();
 
       if (plan) {
-        setFocusArea(plan.focus_area || "");
-        setTasks((plan.study_tasks || []).map((t: any) => ({
+        setFocusArea((plan as any).focus_area || "");
+        setTasks(((plan as any).study_tasks || []).map((t: any) => ({
           taskName: t.task_name,
           isCompleted: t.is_completed
         })));
@@ -159,7 +159,7 @@ const StudyPlannerPage = () => {
                 value={focusArea}
                 onChange={(e) => setFocusArea(e.target.value)}
                 placeholder="e.g. Laxmikanth Fundamental Rights Chapter 7 review + 1 Mains Answer"
-                className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30"
+                className="w-full bg-white/5 border border-purple-500/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/30"
               />
             </div>
 
@@ -173,7 +173,7 @@ const StudyPlannerPage = () => {
                   onChange={(e) => setNewTaskName(e.target.value)}
                   placeholder="Add specific task item…"
                   onKeyDown={(e) => e.key === "Enter" && addTask()}
-                  className="flex-1 bg-white/5 border border-purple-500/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-purple-500/30"
+                  className="flex-1 bg-white/5 border border-purple-500/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/30"
                 />
                 <Button onClick={addTask} size="icon" className="bg-indigo-600 hover:bg-indigo-500 shrink-0">
                   <Plus className="w-4 h-4" />
@@ -181,7 +181,7 @@ const StudyPlannerPage = () => {
               </div>
 
               <div className="space-y-1.5 pt-1">
-                {tasks.length === 0 && <p className="text-xs text-gray-500 italic text-center py-4">No specific subtasks added. Create some above.</p>}
+                {tasks.length === 0 && <p className="text-xs text-slate-500 italic text-center py-4">No specific subtasks added. Create some above.</p>}
                 {tasks.map((task, index) => (
                   <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-white/3 border border-white/5 hover:bg-white/5 transition-all">
                     <button onClick={() => toggleTask(index)} className="shrink-0">

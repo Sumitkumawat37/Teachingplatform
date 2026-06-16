@@ -44,7 +44,7 @@ const VerifyEmailPage = () => {
                 <Loader2 className="w-16 h-16 text-purple-400 animate-spin" />
               </div>
               <h1 className="text-xl font-bold text-white mb-2">Verifying your email…</h1>
-              <p className="text-gray-500 text-sm">Please wait a moment.</p>
+              <p className="text-slate-500 text-sm">Please wait a moment.</p>
             </>
           )}
           {status === "success" && (
@@ -53,8 +53,8 @@ const VerifyEmailPage = () => {
                 <CheckCircle className="w-16 h-16 text-green-400" />
               </div>
               <h1 className="text-xl font-bold text-white mb-3">Email Verified!</h1>
-              <p className="text-gray-400 text-sm mb-6">{message}</p>
-              <p className="text-gray-600 text-xs mb-6">Redirecting to login in 3 seconds…</p>
+              <p className="text-slate-400 text-sm mb-6">{message}</p>
+              <p className="text-slate-600 text-xs mb-6">Redirecting to login in 3 seconds…</p>
               <button
                 onClick={() => navigate("/login")}
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-sm hover:opacity-90 transition"
@@ -69,7 +69,7 @@ const VerifyEmailPage = () => {
                 <XCircle className="w-16 h-16 text-red-400" />
               </div>
               <h1 className="text-xl font-bold text-white mb-3">Verification Failed</h1>
-              <p className="text-gray-400 text-sm mb-8">{message}</p>
+              <p className="text-slate-400 text-sm mb-8">{message}</p>
               <button
                 onClick={() => navigate("/signup")}
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold text-sm hover:opacity-90 transition"

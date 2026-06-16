@@ -189,7 +189,7 @@ const SuperAdminUsers = () => {
                       <button
                         key={r}
                         onClick={() => setNewRole(r)}
-                        className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all border ${newRole === r ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-transparent shadow-lg shadow-purple-500/25" : "text-gray-400 border-purple-500/15 hover:border-purple-500/30"}`}
+                        className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all border ${newRole === r ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-transparent shadow-lg shadow-purple-500/25" : "text-slate-400 border-purple-500/15 hover:border-purple-500/30"}`}
                       >
                         {r === "admin" ? "Teacher" : "Student"}
                       </button>
@@ -266,7 +266,7 @@ const SuperAdminUsers = () => {
           return (
             <div key={s.label} className="glass-card rounded-2xl p-3 text-center neon-border">
               <p className={`text-xl font-extrabold bg-gradient-to-br ${s.color} bg-clip-text text-transparent`}>{s.value}</p>
-              <p className="text-[9px] text-gray-500 font-semibold mt-0.5">{s.label}</p>
+              <p className="text-[9px] text-slate-500 font-semibold mt-0.5">{s.label}</p>
             </div>
           );
         })}
@@ -274,7 +274,7 @@ const SuperAdminUsers = () => {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
         <Input
           placeholder="Search by name or email..."
           value={search}
@@ -292,8 +292,8 @@ const SuperAdminUsers = () => {
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass-card rounded-3xl p-8 text-center neon-border">
-          <Users className="w-10 h-10 text-gray-600 mx-auto mb-2" />
-          <p className="text-gray-400 text-sm">No users found</p>
+          <Users className="w-10 h-10 text-slate-600 mx-auto mb-2" />
+          <p className="text-slate-400 text-sm">No users found</p>
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -324,7 +324,7 @@ const SuperAdminUsers = () => {
                     <p className="text-sm font-bold text-white truncate">{p.name}</p>
                     {roleBadge(role)}
                   </div>
-                  <p className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                  <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
                     <Mail className="w-2.5 h-2.5 shrink-0" />
                     <span className="truncate">{p.email}</span>
                   </p>

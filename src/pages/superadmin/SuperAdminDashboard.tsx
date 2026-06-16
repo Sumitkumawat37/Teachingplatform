@@ -122,7 +122,7 @@ const SuperAdminDashboard = () => {
                 <Icon className="w-4 h-4 text-white" />
               </div>
               <p className={`text-lg font-extrabold bg-gradient-to-br ${s.from} ${s.to} bg-clip-text text-transparent`}>{s.value}</p>
-              <p className="text-[9px] text-gray-500 font-semibold">{s.label}</p>
+              <p className="text-[9px] text-slate-500 font-semibold">{s.label}</p>
             </button>
           );
         })}
@@ -130,7 +130,7 @@ const SuperAdminDashboard = () => {
 
       {/* Quick Actions */}
       <div>
-        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-0.5">Quick Actions</p>
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 px-0.5">Quick Actions</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {quickActions.map((a, index) => {
             const Icon = a.icon;
@@ -154,7 +154,7 @@ const SuperAdminDashboard = () => {
       {/* Recent Users */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Recent Users</p>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Recent Users</p>
           <button
             onClick={() => navigate("/superadmin/users")}
             className="text-[10px] font-bold text-purple-400 hover:underline"
@@ -177,7 +177,7 @@ const SuperAdminDashboard = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white truncate">{p.name}</p>
-                  <p className="text-[9px] text-gray-500 truncate">{p.email}</p>
+                  <p className="text-[9px] text-slate-500 truncate">{p.email}</p>
                 </div>
                 <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${roleInfo.cls}`}>
                   {roleInfo.label}
