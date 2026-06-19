@@ -38,7 +38,7 @@ const NotesPage = () => {
     if (!fileUrl) return '';
     // Convert Google Drive link to embed format
     if (fileUrl.includes('drive.google.com')) {
-      const match = fileUrl.match(/\/file\/d\/([^\/]+)/);
+      const match = fileUrl.match(/\/file\/d\/([^/]+)/);
       if (match) {
         return `https://drive.google.com/file/d/${match[1]}/preview?rm=minimal`;
       }

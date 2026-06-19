@@ -1,15 +1,39 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth-context";
+import { getSupabasePaginationRange, calculatePagination } from "./pagination";
+import { cacheGet, cacheSet, cacheDelete, cacheDeletePattern } from "./redis";
 
 // Courses
-export function useCourses() {
+export function useCourses(page: number = 1, limit: number = 20) {
   return useQuery({
-    queryKey: ["courses"],
+    queryKey: ["courses", page, limit],
     queryFn: async () => {
-      const { data, error } = await supabase.from("courses").select("*").order("created_at");
+      const cacheKey = `courses:page:${page}:limit:${limit}`;
+      
+      // Try cache first
+      const cached = await cacheGet(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      
+      const { from, to } = getSupabasePaginationRange(page, limit);
+      const { data, error, count } = await supabase
+        .from("courses")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(from, to);
       if (error) throw error;
-      return data;
+      
+      const result = {
+        data: data || [],
+        pagination: calculatePagination(page, limit, count || 0),
+      };
+      
+      // Cache for 5 minutes
+      await cacheSet(cacheKey, result, 300);
+      
+      return result;
     },
   });
 }
@@ -19,10 +43,22 @@ export function useChapters(courseId?: string) {
   return useQuery({
     queryKey: ["chapters", courseId],
     queryFn: async () => {
+      const cacheKey = courseId ? `chapters:course:${courseId}` : "chapters:all";
+      
+      // Try cache first
+      const cached = await cacheGet(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      
       let q = supabase.from("chapters").select("*").order("sort_order");
       if (courseId) q = q.eq("course_id", courseId);
       const { data, error } = await q;
       if (error) throw error;
+      
+      // Cache for 10 minutes
+      await cacheSet(cacheKey, data, 600);
+      
       return data;
     },
   });
@@ -33,6 +69,14 @@ export function useLectures(courseId?: string) {
   return useQuery({
     queryKey: ["lectures", courseId],
     queryFn: async () => {
+      const cacheKey = courseId ? `lectures:course:${courseId}` : "lectures:all";
+      
+      // Try cache first
+      const cached = await cacheGet(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      
       let q = supabase
         .from("lectures")
         .select("*, chapters(title, sort_order)")
@@ -40,12 +84,18 @@ export function useLectures(courseId?: string) {
       if (courseId) q = q.eq("course_id", courseId);
       const { data, error } = await q;
       if (error) throw error;
+      
       // Sort by chapter sort_order first, then lecture sort_order
-      return data?.sort((a: any, b: any) => {
+      const sortedData = data?.sort((a: any, b: any) => {
         const chapterOrderDiff = (a.chapters?.sort_order || 0) - (b.chapters?.sort_order || 0);
         if (chapterOrderDiff !== 0) return chapterOrderDiff;
         return (a.sort_order || 0) - (b.sort_order || 0);
       });
+      
+      // Cache for 10 minutes
+      await cacheSet(cacheKey, sortedData, 600);
+      
+      return sortedData;
     },
   });
 }
@@ -95,13 +145,29 @@ export function usePurchases() {
 
 // Lecture progress
 export function useLectureProgress() {
+  const { user } = useAuth();
   return useQuery({
     queryKey: ["lecture_progress"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("lecture_progress").select("*");
+      if (!user) return [];
+      
+      const cacheKey = `lecture_progress:user:${user.id}`;
+      
+      // Try cache first
+      const cached = await cacheGet(cacheKey);
+      if (cached) {
+        return cached;
+      }
+      
+      const { data, error } = await supabase.from("lecture_progress").select("*").eq("user_id", user.id);
       if (error) throw error;
+      
+      // Cache for 5 minutes
+      await cacheSet(cacheKey, data, 300);
+      
       return data;
     },
+    enabled: !!user,
   });
 }
 
@@ -111,6 +177,9 @@ export function useUpsertLectureProgress() {
     mutationFn: async (progress: { user_id: string; lecture_id: string; watched_percent: number; completed: boolean }) => {
       const { error } = await supabase.from("lecture_progress").upsert(progress, { onConflict: "user_id,lecture_id" });
       if (error) throw error;
+      
+      // Invalidate cache for this user's progress
+      await cacheDeletePattern(`lecture_progress:user:${progress.user_id}:*`);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["lecture_progress"] }),
   });
@@ -240,7 +309,7 @@ export function useCourseFeedback(courseId?: string) {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("course_feedback")
-        .select("*, profiles(name, avatar_url)")
+        .select("*")
         .eq("course_id", courseId!)
         .order("created_at", { ascending: false });
       if (error) throw error;

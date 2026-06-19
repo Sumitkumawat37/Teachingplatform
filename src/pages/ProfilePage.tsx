@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { usePurchase } from "@/lib/purchase-context";
 import { useCourses, useLectureProgress } from "@/lib/supabase-data";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, BookOpen, Video, CheckCircle, ChevronRight, LogOut } from "lucide-react";
+import { User, Mail, BookOpen, Video, CheckCircle, ChevronRight, LogOut, Trash2, Shield, FileText } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const ProfilePage = () => {
@@ -52,7 +52,6 @@ const ProfilePage = () => {
 
       <div className="space-y-1">
         {[
-          { label: "My Dashboard", to: "/dashboard" },
           { label: "Live Classes", to: "/live-classes" },
           { label: "My Doubts", to: "/doubts" },
           { label: "Notifications", to: "/notifications" },
@@ -62,6 +61,30 @@ const ProfilePage = () => {
             <ChevronRight className="w-4 h-4 text-slate-400" />
           </Card>
         ))}
+      </div>
+
+      <div className="space-y-1">
+        <Card className="p-3 flex items-center justify-between cursor-pointer bg-white border border-slate-100/60 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" onClick={() => navigate("/privacy-policy")}>
+          <div className="flex items-center gap-3">
+            <Shield className="w-4 h-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-700">Privacy Policy</span>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-400" />
+        </Card>
+        <Card className="p-3 flex items-center justify-between cursor-pointer bg-white border border-slate-100/60 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" onClick={() => navigate("/terms-of-service")}>
+          <div className="flex items-center gap-3">
+            <FileText className="w-4 h-4 text-slate-500" />
+            <span className="text-sm font-medium text-slate-700">Terms of Service</span>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-400" />
+        </Card>
+        <Card className="p-3 flex items-center justify-between cursor-pointer bg-white border border-red-100/60 shadow-sm rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" onClick={() => navigate("/delete-account")}>
+          <div className="flex items-center gap-3">
+            <Trash2 className="w-4 h-4 text-red-500" />
+            <span className="text-sm font-medium text-red-600">Delete Account</span>
+          </div>
+          <ChevronRight className="w-4 h-4 text-slate-400" />
+        </Card>
       </div>
 
       <Button variant="destructive" className="w-full rounded-xl" onClick={handleLogout}>

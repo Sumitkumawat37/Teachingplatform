@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { trackSignupClick } from "@/lib/analytics";
 
 const SignupPage = () => {
   const { signup, signInWithGoogle } = useAuth();
@@ -16,6 +17,7 @@ const SignupPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    trackSignupClick();
     if (!name.trim() || !email.trim() || !password) return toast.error("Please fill all fields");
     if (password.length < 6) return toast.error("Password must be at least 6 characters");
     setLoading(true);

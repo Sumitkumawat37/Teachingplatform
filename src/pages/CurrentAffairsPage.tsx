@@ -44,14 +44,14 @@ const CurrentAffairsPage = () => {
       const { data, error } = await query.order("published_at", { ascending: false });
       if (error) throw error;
 
-      setArticles((data || []).map((item: any) => ({
+      setArticles(Array.isArray(data) ? data.map((item: any) => ({
         ...item,
         mcqs: Array.isArray(item.mcqs) ? item.mcqs : JSON.parse(item.mcqs || "[]")
-      })));
+      })) : []);
 
       if (user) {
         const { data: bData } = await supabase.from("current_affair_bookmarks" as any).select("article_id").eq("user_id", user.id);
-        setBookmarks(bData?.map((b: any) => b.article_id) || []);
+        setBookmarks(Array.isArray(bData) ? bData.map((b: any) => b.article_id) : []);
       }
     } catch {
       toast.error("Failed to load current affairs");
@@ -110,11 +110,11 @@ const CurrentAffairsPage = () => {
             <h3 className="font-semibold text-slate-800 flex items-center gap-2"><HelpCircle className="w-5 h-5 text-violet-600" /> Daily Article MCQs</h3>
             <Button variant="ghost" size="sm" onClick={() => setActiveMcqArticle(null)} className="text-violet-600 hover:text-violet-700">Exit MCQs</Button>
           </div>
-          {activeMcqArticle.mcqs.map((m, mIdx) => (
+          {Array.isArray(activeMcqArticle.mcqs) && activeMcqArticle.mcqs.map((m, mIdx) => (
             <div key={mIdx} className="space-y-3">
               <p className="text-sm font-semibold text-slate-800">Q{mIdx+1}. {m.question}</p>
               <div className="space-y-2">
-                {m.options.map((opt, oIdx) => {
+                {Array.isArray(m.options) && m.options.map((opt, oIdx) => {
                   const isSelected = selectedAnswers[mIdx] === oIdx;
                   const isCorrect = oIdx === m.correct_index;
 
@@ -166,7 +166,7 @@ const CurrentAffairsPage = () => {
             </div>
             {/* Category Pill select */}
             <div className="flex gap-1.5 overflow-x-auto">
-              {CATEGORIES.map(cat => (
+              {Array.isArray(CATEGORIES) && CATEGORIES.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
@@ -189,7 +189,7 @@ const CurrentAffairsPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {articles.map(article => (
+              {Array.isArray(articles) && articles.map(article => (
                 <Card key={article.id} className="p-5 bg-white border border-slate-100/60 flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-250 space-y-4 rounded-2xl shadow-sm">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">

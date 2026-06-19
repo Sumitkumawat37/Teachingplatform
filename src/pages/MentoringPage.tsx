@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { User, Mail, Phone, Send, CheckCircle, GraduationCap, Target, BookOpen, MessageSquare, Clock, Award, Lightbulb, Users, Mail as MailIcon } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { RazorpayCheckout } from "@/components/RazorpayCheckout";
 import teacherBanner from "../assets/teacher-banner.jpg";
 import shivamSaxena from "../assets/shivam-saxena.jpg";
 
@@ -11,6 +12,7 @@ const MentoringPage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [formData, setFormData] = useState({
     name: (user as any)?.user_metadata?.name || user?.name || "",
     email: user?.email || "",
@@ -21,15 +23,18 @@ const MentoringPage = () => {
     preferredLanguage: "",
     mentoringTopic: "",
     message: "",
+    question1Answer: "",
+    question2Answer: "",
+    question3Answer: "",
   });
 
   const benefits = [
     { icon: Target, title: "Personalized Study Plan", description: "Custom roadmap tailored to your strengths and weaknesses" },
-    { icon: Lightbulb, title: "Strategy Discussion", description: "Expert guidance on exam strategy and time management" },
+      { icon: MessageSquare, title: "Doubt Resolution", description: "Get your doubts cleared by expert faculty" },
     { icon: BookOpen, title: "Answer Writing Guidance", description: "Learn the art of writing high-scoring answers" },
     { icon: Award, title: "Interview Preparation", description: "Mock interviews and personality development tips" },
     { icon: Users, title: "Motivation & Accountability", description: "Stay motivated with regular check-ins and support" },
-    { icon: MessageSquare, title: "Doubt Resolution", description: "Get your doubts cleared by expert faculty" },
+   { icon: Lightbulb, title: "Strategy Discussion", description: "Expert guidance on exam strategy and time management" },
   ];
 
   const mentors = [
@@ -65,7 +70,12 @@ const MentoringPage = () => {
           preferred_language: formData.preferredLanguage,
           mentoring_topic: formData.mentoringTopic,
           message: formData.message,
+          question1_answer: formData.question1Answer,
+          question2_answer: formData.question2Answer,
+          question3_answer: formData.question3Answer,
           status: "pending",
+          payment_status: paymentCompleted ? "paid" : "pending",
+          payment_id: paymentCompleted ? "manual" : null,
           created_at: new Date().toISOString(),
         });
 
@@ -77,6 +87,11 @@ const MentoringPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePaymentSuccess = (paymentId: string, orderId: string) => {
+    setPaymentCompleted(true);
+    alert("Payment successful! You can now submit your mentoring request.");
   };
 
   if (submitted) {
@@ -126,7 +141,7 @@ const MentoringPage = () => {
           What You'll Get
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {benefits.map((benefit, index) => (
+          {Array.isArray(benefits) && benefits.map((benefit, index) => (
             <div
               key={index}
               className="rounded-2xl p-5 shadow-sm border border-slate-100/60 bg-white hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
@@ -145,7 +160,7 @@ const MentoringPage = () => {
       <div>
         <h2 className="text-lg font-semibold text-slate-800 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Meet Your Mentors</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {mentors.map((mentor) => (
+          {Array.isArray(mentors) && mentors.map((mentor) => (
             <div
               key={mentor.name}
               className="flex items-center gap-4 rounded-2xl p-4 shadow-sm border border-violet-100/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-250"
@@ -304,6 +319,60 @@ const MentoringPage = () => {
             </div>
           </div>
 
+          {/* Question 1 */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Q1: Inter-linking of rivers (150 words)
+            </label>
+            <p className="text-[11px] text-slate-500 mb-2">
+              Inter-linking of rivers (e.g., the Ken-Betwa project) is often presented as a panacea for India's water regional imbalances. Examine the complex trade-offs between achieving water security for agriculture and the resulting fragmentation of wildlife habitats.
+            </p>
+            <textarea
+              required
+              rows={4}
+              value={formData.question1Answer}
+              onChange={(e) => setFormData({ ...formData, question1Answer: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none text-slate-800"
+              placeholder="Write your answer here..."
+            />
+          </div>
+
+          {/* Question 2 */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Q2: Left-Wing Extremism (LWE) (150 words)
+            </label>
+            <p className="text-[11px] text-slate-500 mb-2">
+              The Government of India has set an ambitious goal to completely eliminate Left-Wing Extremism (LWE). Discuss how the dual-track strategy of aggressive security operations and targeted infrastructure development has shrunk the 'Red Corridor' footprint.
+            </p>
+            <textarea
+              required
+              rows={4}
+              value={formData.question2Answer}
+              onChange={(e) => setFormData({ ...formData, question2Answer: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none text-slate-800"
+              placeholder="Write your answer here..."
+            />
+          </div>
+
+          {/* Question 3 */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Q3: Iran-US Conflict (250 Words)
+            </label>
+            <p className="text-[11px] text-slate-500 mb-2">
+              Evaluate the systemic triggers behind the ongoing conflict between Iran and the United States. What diplomatic and strategic measures must the international community adopt to ensure long-term regional stability?
+            </p>
+            <textarea
+              required
+              rows={4}
+              value={formData.question3Answer}
+              onChange={(e) => setFormData({ ...formData, question3Answer: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none text-slate-800"
+              placeholder="Write your answer here..."
+            />
+          </div>
+
           {/* Detailed Message */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Detailed Message</label>
@@ -330,17 +399,20 @@ const MentoringPage = () => {
             <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
               <div>
                 <p className="text-sm font-semibold text-slate-800">₹99</p>
-                <p className="text-[10px] text-slate-500">Payment required before session</p>
+                <p className="text-[10px] text-slate-500">
+                  {paymentCompleted ? "Payment completed ✓" : "Payment required before session"}
+                </p>
               </div>
-              <button
-                type="button"
+              <RazorpayCheckout
+                amount={99}
+                currency="INR"
+                courseTitle="Mentoring Session"
+                buttonText={paymentCompleted ? "Paid" : "Pay Now"}
                 className="px-4 py-2 bg-amber-500 text-white text-xs font-semibold rounded-lg hover:bg-amber-600 transition-colors"
-                onClick={() => {
-                  alert("Payment integration will be added soon. Please contact admin for payment details.");
-                }}
-              >
-                Pay Now
-              </button>
+                disabled={paymentCompleted}
+                onSuccess={handlePaymentSuccess}
+                onFailure={(error) => alert(`Payment failed: ${error}`)}
+              />
             </div>
           </div>
 

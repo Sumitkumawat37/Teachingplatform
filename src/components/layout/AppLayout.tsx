@@ -1,9 +1,23 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { AppHeader } from "./AppHeader";
 import { BottomNav } from "./BottomNav";
 import { SidebarNav } from "./SidebarNav";
+import { MetaTags } from "@/components/MetaTags";
 
 export function AppLayout({ children }: { children: ReactNode }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    // Load collapsed state from localStorage
+    const saved = localStorage.getItem('sidebar-collapsed');
+    if (saved) setSidebarCollapsed(JSON.parse(saved));
+  }, []);
+
+  const handleToggleSidebar = (collapsed: boolean) => {
+    setSidebarCollapsed(collapsed);
+    localStorage.setItem('sidebar-collapsed', JSON.stringify(collapsed));
+  };
+
   return (
     <div className="min-h-screen relative" style={{ background: '#EEEADE' }}>
       {/* Ambient glow blobs */}
@@ -14,10 +28,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Desktop sidebar */}
-      <SidebarNav />
+      <SidebarNav onToggle={handleToggleSidebar} defaultCollapsed={sidebarCollapsed} />
 
       {/* Content area: shifts right on desktop */}
-      <div className="md:ml-64 flex flex-col min-h-screen relative z-10">
+      <div className={`flex flex-col min-h-screen relative z-10 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'}`}>
+        <MetaTags />
         <AppHeader />
         <main className="flex-1 pb-28 md:pb-10 px-4 py-8 md:px-10 md:py-10 overflow-y-auto overflow-x-hidden
           max-w-5xl mx-auto w-full

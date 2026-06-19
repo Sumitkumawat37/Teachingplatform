@@ -218,7 +218,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
+    const timeoutId: NodeJS.Timeout = setTimeout(() => {
+      if (mounted && auth.loading && isInitializing.current) {
+        console.warn("Auth initialization timeout - forcing render");
+        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false, isProcessingOAuth: false });
+      }
+    }, 5000); // Reduced from 20s to 5s for faster fallback
 
     console.log("=== AuthProvider initializing ===");
     console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
@@ -270,14 +275,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isInitializing.current = false;
     });
 
-    // Increased timeout to 20s for PKCE flow, only fires if still initializing
-    timeoutId = setTimeout(() => {
-      if (mounted && auth.loading && isInitializing.current) {
-        console.warn("Auth initialization timeout - forcing render");
-        setAuth({ isLoggedIn: false, role: "student", user: null, loading: false, isProcessingOAuth: false });
-      }
-    }, 20000);
-
     return () => {
       console.log("=== AuthProvider cleanup ===");
       mounted = false;
@@ -299,8 +296,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const demoRole = email === "teacher@demo.com" ? "teacher"
                        : email === "superadmin@demo.com" ? "admin"
                        : "student";
+        // First delete any existing roles for this user
+        await supabase.from("user_roles").delete().eq("user_id", signInData.user.id);
+        // Then insert the correct role
         await supabase.from("user_roles")
-          .upsert({ user_id: signInData.user.id, role: demoRole as any }, { onConflict: "user_id,role" });
+          .insert({ user_id: signInData.user.id, role: demoRole as any });
         // Clear cache so setUserFromSession re-fetches roles with updated value
         lastSessionToken.current = null;
         await setUserFromSession(signInData.session);
@@ -323,8 +323,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const demoRole = email === "teacher@demo.com" ? "teacher" 
                      : email === "superadmin@demo.com" ? "admin" 
                      : "student";
+      // First delete any existing roles for this user
+      await supabase.from("user_roles").delete().eq("user_id", signUpData.user.id);
+      // Then insert the correct role
       await supabase.from("user_roles")
-        .upsert({ user_id: signUpData.user.id, role: demoRole as any }, { onConflict: "user_id,role" });
+        .insert({ user_id: signUpData.user.id, role: demoRole as any });
       await supabase.from("profiles")
         .upsert({ user_id: signUpData.user.id, name }, { onConflict: "user_id" });
     }
@@ -335,11 +338,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (email: string, password: string, name: string): Promise<boolean> => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/verify-email`;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name }, emailRedirectTo: redirectUrl },
+      options: { 
+        data: { name },
+        emailRedirectTo: redirectUrl,
+      },
     });
 
     if (error) {
@@ -352,11 +358,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await supabase.from("profiles")
           .upsert({ user_id: data.user.id, name, email }, { onConflict: "user_id" });
-      } catch (_) {}
+      } catch (error) {
+        console.error("Profile upsert error:", error);
+      }
       try {
         await supabase.from("user_roles")
           .upsert({ user_id: data.user.id, role: "student" }, { onConflict: "user_id,role" });
-      } catch (_) {}
+      } catch (error) {
+        console.error("Role upsert error:", error);
+      }
     }
 
     // Sign out immediately — user must verify email before logging in
@@ -489,19 +499,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false;
     }
   };
-
-  if (auth.loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center mx-auto mb-3 animate-pulse">
-            <span className="text-primary-foreground text-lg">📚</span>
-          </div>
-          <p className="text-muted-foreground text-sm">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <AuthContext.Provider value={{ ...auth, login, signup, signInWithGoogle, resetPassword, updatePassword, logout, switchRole }}>

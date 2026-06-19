@@ -1,0 +1,8 @@
+# Razorpay Environment Variables
+# Copy this file to .env and fill in your credentials
+
+# Razorpay Key ID (can be used in frontend)
+VITE_RAZORPAY_KEY_ID=rzp_test_T2lnMYwkSird1N
+
+# Razorpay Key Secret (NEVER use in frontend, backend only)
+RAZORPAY_KEY_SECRET=tCMIf4xz3wcX0tys6jocpZFt

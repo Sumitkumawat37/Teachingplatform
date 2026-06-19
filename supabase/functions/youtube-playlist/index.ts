@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
 
     const data = JSON.parse(match[1]);
     const tabs = data?.contents?.twoColumnBrowseResultsRenderer?.tabs || [];
-    let items: any[] = [];
+    const items: any[] = [];
     for (const tab of tabs) {
       const sections = tab?.tabRenderer?.content?.sectionListRenderer?.contents || [];
       for (const sec of sections) {
@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    let playlistTitle: string | undefined =
+    const playlistTitle: string | undefined =
       data?.metadata?.playlistMetadataRenderer?.title
       || data?.header?.playlistHeaderRenderer?.title?.simpleText;
 

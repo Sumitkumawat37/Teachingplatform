@@ -10,6 +10,10 @@ const CoursesPage = memo(() => {
   const navigate = useNavigate();
   const { hasPurchased, purchaseCourse } = usePurchase();
   const { data: courses = [], isLoading } = useCourses();
+  
+  // Ensure courses is always an array before mapping
+  const coursesArray = Array.isArray(courses) ? courses : [];
+  const scrollRef = useScrollReveal();
 
   const handleBuyCourse = (e: React.MouseEvent, courseId: string) => {
     e.stopPropagation();
@@ -37,8 +41,6 @@ const CoursesPage = memo(() => {
     </div>
   );
 
-  const scrollRef = useScrollReveal();
-
   return (
     <div className="space-y-5" ref={scrollRef}>
       {/* Header */}
@@ -49,13 +51,13 @@ const CoursesPage = memo(() => {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-slate-800">Course Marketplace</h2>
-            <p className="text-slate-500 text-xs">Tap any course · 2 free lectures included</p>
+            <p className="text-slate-500 text-xs">Tap any course to explore</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {courses.map((course) => {
+        {coursesArray.map((course) => {
           const purchased = hasPurchased(course.id);
           return (
             <div
@@ -80,13 +82,9 @@ const CoursesPage = memo(() => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
                 {/* Status badge */}
-                {purchased ? (
+                {purchased && (
                   <div className="absolute top-2 right-2 bg-emerald-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
                     <CheckCircle2 className="w-2.5 h-2.5" /> ENROLLED
-                  </div>
-                ) : (
-                  <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-slate-600 text-[9px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
-                    <Eye className="w-2.5 h-2.5" /> 2 FREE
                   </div>
                 )}
 
@@ -133,7 +131,7 @@ const CoursesPage = memo(() => {
         })}
       </div>
 
-      {courses.length === 0 && (
+      {coursesArray.length === 0 && (
         <div className="p-8 text-center bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500 text-sm">
           No courses yet. Check back soon!
         </div>

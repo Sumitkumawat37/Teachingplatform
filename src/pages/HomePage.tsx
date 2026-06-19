@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Brain, BookMarked, Mail, Youtube, X, ChevronLeft } from "lucide-react";
+import { Play, FileText, BookOpen, TrendingUp, Star, Video, Users, ChevronRight, GraduationCap, CheckCircle, Clock, Shield, ChevronDown, Skull, BookMarked, Mail, Youtube, X, ChevronLeft } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,8 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 
 import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
+
+import { SuccessStoriesCarousel } from "@/components/SuccessStoriesCarousel";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -58,23 +60,12 @@ const programs = [
 
 
 const faqs = [
-
-  { q: "What is included in the Live Classes batch?", a: "Each batch includes 150+ live interactive classes, doubt sessions, current affairs coverage, full notes PDFs, and weekly mock tests. All sessions are recorded for later revision." },
-
-  { q: "How long will it take to prepare for UPSC with this platform?", a: "Our structured 12-month program is designed to cover the complete UPSC syllabus. Most students see significant improvement within 3–4 months. We also offer crash courses for specific papers." },
-
-  { q: "Can I access the content after the batch ends?", a: "Yes! All recorded lectures and notes remain accessible for 2 years after your batch ends. You can revisit any topic anytime." },
-
-  { q: "Is there any free trial available?", a: "Absolutely! You get 4 free lecture previews in every course. Simply sign up, browse the Course Marketplace, and tap any course to access the free preview lectures." },
-
-  { q: "How is Nadiya Ma'am different from other UPSC mentors?", a: "Nadiya Ma'am combines simplified teaching with personal feedback. With a 92% student satisfaction rate, her track record speaks for itself. She personally reviews doubts within 24 hours." },
-
-  { q: "What if I miss a live class?", a: "No worries! All live classes are recorded and available within 24 hours. You can watch them anytime at your convenience. The recording includes the complete session with all Q&A." },
-
-  { q: "Do you provide study material?", a: "Yes, comprehensive study material is provided including notes PDFs, current affairs compilations, PYQ analysis, and answer writing templates. All material is regularly updated." },
-
-  { q: "How can I ask doubts during the course?", a: "You can ask doubts directly during live classes, through our dedicated doubt section, or via email. Our faculty responds within 24 hours. You can also schedule one-on doubt clearing sessions." },
-
+  { q: "Mentoring Course mujhe kya provide karega? 🙄", a: "Boss, simple hai! 😎\n\nKya padhna hai?\nUPSC ke liye right sources aur right topics.\n\nKaise padhna hai?\nPrelims + Mains dono ke liye proven study strategy.\n\nSources Ready-Made\nTaaki YouTube aur Telegram ke jungle mein na bhatko.\n\nPersonalized Time Table Guidance\nJob, college ya full-time preparation ke according.\n\nStudy Techniques\nWahi mistakes avoid karne ke liye jo aspirants ke 2-3 saal kha jaati hain.\n\nPlan B / Plan C Guidance\nUPSC dynamic hai. Safety net bhi zaroori hai.\n\nSab kuch sirf ₹499/- mein!" },
+  { q: "Then what will be different in 1:1 Mentoring? 🧐", a: "Simple Boss! 😎\n\nHum aapke saath poori journey mein rahenge…jab tak aap Officer nahi ban jaate!\n\n📞 Personalized 1:1 Calls\nAapki strengths, weaknesses aur preparation level ke according guidance.\n\n🎯 Weekly Targets & Accountability\nTaaki consistency sirf motivation reel tak limited na rahe.\n\n📝 Mains Answer Evaluation\nRegular feedback ke saath answer writing improve karenge.\n\n📊 Personalized Study Plan\nAapke available time aur background ke hisaab se.\n\n🚨 Doubt Solving & Course Correction\nGalat direction mein jaane se pehle hi preparation ko track par laayenge.\n\nHow to Join?\n1:1 Mentoring ke liye ek separate application form fill karna hoga.\n\nEligibility:\nAptitude & seriousness assess karne ke liye ek screening test hoga.\n\n40%+ score karne wale aspirants 1:1 Mentoring ke liye eligible honge.\n\nSeats limited hongi, kyunki personal attention sabko dena possible nahi hota." },
+  { q: "Polity & Governance course kya UPSC ke dynamic nature ko cater karta hai? 🤨", a: "100% Yes! 🔥\n\nUPSC sirf static Polity nahi puchta, balki usse current governance issues ke saath connect karke questions banata hai.\n\nIsliye course ko 3 phases mein design kiya gaya hai:\n\n📚 Phase 1: NCERT Foundation\nBasic concepts crystal clear karenge.\nKyuki strong building ki shuruaat strong foundation se hoti hai. 🏗️\n\n🏛️ Phase 2: Core Polity & Governance\nConstitution, Parliament, Judiciary, Federalism, Governance, Committees, Current Developments etc. ko UPSC-oriented approach se cover karenge.\n\n📝 Phase 3: PYQs + Mains Answer Writing\nUPSC ne pichle saalon mein kaise questions puche?\nUnka pattern kya hai?\nAur answers kaise likhne hain?\nSab scratch se sikhaya jayega.\n\nEverything in one course, aligned with how UPSC question setters actually think." },
+  { q: "Course lene se pehle kaise pata chalega ki ye mere liye useful hai? 🙂", a: "Simple!\nPehli 4 Classes Bilkul FREE hain! (All Courses)\n\nDekhiye ki concepts aapko clear ho rahe hain ya nahi\n\nUske baad hi course continue karne ka decision lijiye.\n\nNo blind purchase. First learn, then decide!\n\n- Except (Mentoring)" },
+  { q: "Notes available hain? Aur classes Live hongi ya Recorded?", a: "Dono milenge, Boss! 😎🔥\n\n📝 Notes Included FREE\nCourse ke saath structured notes provide kiye jayenge.\n\n🎥 Classes Live bhi hongi aur Recorded bhi!\n\nWith - Live Doubt Solving Sessions\nConcepts, strategy aur preparation related doubts discuss kiye jayenge!" },
+  { q: "Will there be more courses coming up?", a: "Yes, absolutely!\n\nThis is just the beginning. More UPSC-focused courses are in the pipeline.\n\n🌍 International Relations (IR)\n🤝 Social Justice\n📈 Economy\n🏛️ Public Administration (Optional)\n🌐 PSIR (Political Science & International Relations - Optional)\n\nEach course will follow the same philosophy:\n\nStrong Fundamentals\nUPSC-Oriented Approach\nPYQ Integration\nAnswer Writing Focus\n\nOur goal is simple: build a complete UPSC ecosystem where aspirants can learn every subject with clarity and confidence.\n\nMore subjects. More guidance. Same mission." },
 ];
 
 
@@ -94,16 +85,12 @@ const HomePage = () => {
   const { data: liveClasses = [] } = useLiveClasses();
 
   const [teacherProfiles, setTeacherProfiles] = useState<any[]>([]);
-  const [reviewVideosByCourse, setReviewVideosByCourse] = useState<any[]>([]);
-  const [selectedVideo, setSelectedVideo] = useState<any>(null);
-  const [selectedVideoIndex, setSelectedVideoIndex] = useState<number>(0);
-  const [selectedCourseIndex, setSelectedCourseIndex] = useState<number>(0);
 
 
 
-  const upcomingLive = liveClasses.filter((c) => c.status === "upcoming");
+  const upcomingLive = Array.isArray(liveClasses) ? liveClasses.filter((c) => c.status === "upcoming") : [];
 
-  const purchasedCourses = courses.filter((c) => hasPurchased(c.id));
+  const purchasedCourses = Array.isArray(courses) ? courses.filter((c) => hasPurchased(c.id)) : [];
 
 
 
@@ -119,7 +106,7 @@ const HomePage = () => {
           .select("user_id")
           .eq("role", "teacher" as any);
         
-        const teacherIds = roleData?.map((r: any) => r.user_id) || [];
+        const teacherIds = Array.isArray(roleData) ? roleData.map((r: any) => r.user_id) : [];
         
         if (teacherIds.length > 0) {
           const { data } = await supabase
@@ -154,38 +141,6 @@ const HomePage = () => {
   ];
 
   const displayFaculties = hardcodedFaculties;
-
-  useEffect(() => {
-    const fetchReviewVideos = async () => {
-      try {
-        const { data } = await supabase
-          .from("course_review_videos" as any)
-          .select("*, courses(title)")
-          .order("created_at", { ascending: false });
-        
-        // Group by course
-        const grouped = data?.reduce((acc: any, video: any) => {
-          const courseName = video.courses?.title || "General";
-          if (!acc[courseName]) {
-            acc[courseName] = [];
-          }
-          acc[courseName].push(video);
-          return acc;
-        }, {}) || {};
-
-        // Convert to array format
-        const groupedArray = Object.entries(grouped).map(([courseName, videos]: [string, any]) => ({
-          courseName,
-          videos: videos.slice(0, 4) // Limit to 4 videos per course
-        }));
-
-        setReviewVideosByCourse(groupedArray);
-      } catch (err) {
-        console.error("Error fetching review videos:", err);
-      }
-    };
-    fetchReviewVideos();
-  }, []);
 
 
 
@@ -338,7 +293,7 @@ const HomePage = () => {
                     />
                   ) : (
                     <span className="text-violet-600 font-bold text-lg">
-                      {(teacher.name || "T").split(" ").map(n => n[0]).join("").slice(0, 2)}
+                      {(teacher.name || "T").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                     </span>
                   )}
                 </div>
@@ -468,62 +423,14 @@ const HomePage = () => {
 
 
 
-      {/* ══ REVIEW VIDEOS ══ */}
-      {reviewVideosByCourse.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Review Videos</h2>
-            <button onClick={() => navigate('/review-videos')} className="text-violet-600 text-xs font-semibold flex items-center gap-1">
-              View all <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-          <div className="space-y-4">
-            {reviewVideosByCourse.slice(0, 3).map((courseGroup) => (
-              <div
-                key={courseGroup.courseName}
-                className="rounded-2xl p-4 shadow-sm border border-slate-100/40"
-                style={{ background: '#F3EEFF' }}
-              >
-                <h3 className="font-semibold text-sm text-slate-800 mb-3">{courseGroup.courseName} - Review Videos</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {courseGroup.videos.map((video: any) => (
-                    <div
-                      key={video.id}
-                      className="relative aspect-[9/16] bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
-                      onClick={() => {
-                        setSelectedVideo(video);
-                        setSelectedVideoIndex(courseGroup.videos.indexOf(video));
-                        setSelectedCourseIndex(reviewVideosByCourse.indexOf(courseGroup));
-                      }}
-                    >
-                      <img
-                        src={`https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.currentTarget.style.display = 'none');
-                          const parent = e.currentTarget.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-pink-500 text-white text-xs font-semibold p-2 text-center">${video.title || 'Video'}</div>`;
-                          }
-                        }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
-                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                          <Play className="w-4 h-4 text-violet-600 ml-0.5" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
 
+
+      {/* ══ SUCCESS STORIES CAROUSEL ══ */}
+      <SuccessStoriesCarousel
+        playlistId="PLKqQrIhHYOc0"
+        videoIds={["P-PhdwbhVyg", "MzsQ_yla2SI", "mSmMmWHGCBY", "9yn2XDmvoEM"]}
+      />
 
       {/* ══ STUDENT REVIEWS ══ */}
 
@@ -533,7 +440,7 @@ const HomePage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-          {reviews.slice(0, 2).map((r, i) => (
+          {Array.isArray(reviews) && reviews.slice(0, 2).map((r, i) => (
 
             <div
 
@@ -561,7 +468,7 @@ const HomePage = () => {
 
                 <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-bold text-[10px] shrink-0">
 
-                  {r.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                  {(r.name || "").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
 
                 </div>
 
@@ -593,7 +500,7 @@ const HomePage = () => {
 
         <div className="space-y-2">
 
-          {faqs.slice(0, 2).map((faq, i) => (
+          {Array.isArray(faqs) && faqs.map((faq, i) => (
 
             <div
 
@@ -627,7 +534,7 @@ const HomePage = () => {
 
               <div className={`faq-answer ${openFaq === i ? 'open' : ''}`}>
 
-                <p className="text-slate-500 text-xs leading-relaxed px-4 pb-3.5">{faq.a}</p>
+                <div className="text-slate-500 text-xs leading-relaxed px-4 pb-3.5 whitespace-pre-line">{faq.a}</div>
 
               </div>
 
@@ -651,11 +558,11 @@ const HomePage = () => {
 
           <h2 className="text-white font-bold text-xl mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
 
-            The future belongs to those<br />who prepare for it today
+            Every topper was once a beginner<br />with strong basics ! 💀
 
           </h2>
 
-          <p className="text-white/70 text-xs mb-5">Join 50K+ aspirants on the path to IAS · First 2 lectures free</p>
+          <p className="text-white/70 text-xs mb-5">Ready to begin with us ? ( first 4 lectures free )</p>
 
           <div className="flex gap-3 justify-center">
 
@@ -705,7 +612,7 @@ const HomePage = () => {
 
         >
 
-          <Brain className="w-5 h-5 text-white" />
+          <Skull className="w-5 h-5 text-white" />
 
         </button>
 
@@ -713,63 +620,6 @@ const HomePage = () => {
 
       </div>
 
-      {/* Video Player Modal */}
-      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
-        <DialogContent className="w-full max-w-md p-0 overflow-hidden">
-          <button
-            onClick={() => setSelectedVideo(null)}
-            className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-lg p-2 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-          {selectedVideo && (
-            <div className="relative aspect-[9/16] w-full bg-black">
-              <CustomVideoPlayer
-                youtubeId={selectedVideo.youtube_id}
-                title={selectedVideo.title}
-                autoplay={true}
-                aspectRatio="aspect-[9/16]"
-              />
-              {/* Previous Button */}
-              <button
-                onClick={() => {
-                  const currentCourse = reviewVideosByCourse[selectedCourseIndex];
-                  if (selectedVideoIndex > 0) {
-                    setSelectedVideoIndex(selectedVideoIndex - 1);
-                    setSelectedVideo(currentCourse.videos[selectedVideoIndex - 1]);
-                  } else if (selectedCourseIndex > 0) {
-                    const prevCourse = reviewVideosByCourse[selectedCourseIndex - 1];
-                    setSelectedCourseIndex(selectedCourseIndex - 1);
-                    setSelectedVideoIndex(prevCourse.videos.length - 1);
-                    setSelectedVideo(prevCourse.videos[prevCourse.videos.length - 1]);
-                  }
-                }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              {/* Next Button */}
-              <button
-                onClick={() => {
-                  const currentCourse = reviewVideosByCourse[selectedCourseIndex];
-                  if (selectedVideoIndex < currentCourse.videos.length - 1) {
-                    setSelectedVideoIndex(selectedVideoIndex + 1);
-                    setSelectedVideo(currentCourse.videos[selectedVideoIndex + 1]);
-                  } else if (selectedCourseIndex < reviewVideosByCourse.length - 1) {
-                    const nextCourse = reviewVideosByCourse[selectedCourseIndex + 1];
-                    setSelectedCourseIndex(selectedCourseIndex + 1);
-                    setSelectedVideoIndex(0);
-                    setSelectedVideo(nextCourse.videos[0]);
-                  }
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
     </div>
 

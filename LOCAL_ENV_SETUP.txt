@@ -1,0 +1,8 @@
+# LOCAL ENVIRONMENT SETUP FOR RAZORPAY
+# Copy these variables to your .env.local file
+
+VITE_RAZORPAY_KEY_ID=rzp_test_T2p640NZlRuTgr
+
+# After adding this to .env.local, restart your dev server:
+# 1. Stop the current dev server (Ctrl+C)
+# 2. Run: npm run dev

@@ -9,7 +9,7 @@ import {
   ChevronRight, RefreshCw, AlertCircle, CheckCircle, Loader2,
   BookOpen, Trophy, Video, Megaphone, MessageCircle
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+// import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 const API = "http://localhost:5000/api/v1/email-center";
 
@@ -436,7 +436,8 @@ const AnalyticsTab = ({ teacherId }: { teacherId: string }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-5 bg-card border border-border">
           <h3 className="font-bold text-foreground mb-4 text-sm">Emails — Last 7 Days</h3>
-          <ResponsiveContainer width="100%" height={180}>
+          {/* Chart temporarily disabled due to recharts library issue */}
+          {/* <ResponsiveContainer width="100%" height={180}>
             <BarChart data={data.last7}>
               <XAxis dataKey="day" tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: "#9ca3af", fontSize: 11 }} axisLine={false} tickLine={false} />
@@ -444,7 +445,11 @@ const AnalyticsTab = ({ teacherId }: { teacherId: string }) => {
               <Bar dataKey="count" fill="url(#grad)" radius={[6,6,0,0]} />
               <defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8b5cf6" /><stop offset="100%" stopColor="#ec4899" /></linearGradient></defs>
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer> */}
+          <div className="flex items-center justify-center h-[180px] text-muted-foreground">
+            <BarChart3 className="w-12 h-12 opacity-50" />
+            <span className="ml-2 text-sm">Chart temporarily disabled</span>
+          </div>
         </Card>
 
         <Card className="p-5 bg-card border border-border">

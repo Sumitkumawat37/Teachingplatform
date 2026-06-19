@@ -10,6 +10,7 @@ import { useAntiPiracy } from "@/hooks/useAntiPiracy";
 import { useScreenProtection } from "@/hooks/useScreenProtection";
 import { WatermarkOverlay } from "@/components/protection/WatermarkOverlay";
 import { TabBlurOverlay } from "@/components/protection/TabBlurOverlay";
+import { convertToEmbedUrl, extractYouTubeVideoId } from "@/lib/youtube/utils";
 
 declare global {
   interface Window {
@@ -73,8 +74,7 @@ const VideoPlayerPage = () => {
   const completed = myProgress?.completed ?? false;
   // Get lecture index in the course (sorted by chapter order and lecture order)
   const lectureIndex = lectures.findIndex(l => l.id === lectureId);
-  const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
-  const canAccess = lecture ? (lecture.free_preview || hasPurchased(courseId || "") || isFirstFive) : false;
+  const canAccess = lecture ? (lecture.free_preview || hasPurchased(courseId || "")) : false;
 
   // Extract YouTube video ID from various URL formats or direct ID
   const extractYoutubeId = (input: string | undefined): string | null => {
@@ -113,7 +113,7 @@ const VideoPlayerPage = () => {
   // Get Drive embed URL
   const getDriveEmbedUrl = () => {
     if (!isDriveVideo || !videoUrl) return "";
-    const match = videoUrl.match(/\/file\/d\/([^\/]+)/);
+    const match = videoUrl.match(/\/file\/d\/([^/]+)/);
     if (match) {
       return "https://drive.google.com/file/d/" + match[1] + "/preview?rm=minimal";
     }
@@ -341,8 +341,11 @@ const VideoPlayerPage = () => {
   // Build YouTube embed URL with privacy-enhanced mode and redirect lock
   const getYoutubeEmbedUrl = () => {
     if (!hasYoutubeVideo) return "";
-    const ytParams = "autoplay=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&controls=1&playsinline=1&cc_load_policy=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin) + "&widget_referrer=" + encodeURIComponent(window.location.href) + "&fs=0";
-    return "https://www.youtube-nocookie.com/embed/" + youtubeId + "?" + ytParams;
+    const embedUrl = convertToEmbedUrl(lecture!.video_url || "", {
+      autoplay: true,
+      mute: false,
+    });
+    return embedUrl || "";
   };
 
   return (
@@ -595,7 +598,7 @@ const VideoPlayerPage = () => {
         )}
 
         {/* Free Preview Badge */}
-        {(lecture.free_preview || isFirstFive) && !isFullscreen && (
+        {lecture.free_preview && !isFullscreen && (
           <div className="absolute top-3 left-3 pointer-events-none z-10">
             <div className="flex items-center gap-1 bg-emerald-500/90 text-white text-[9px] font-bold px-2.5 py-1 rounded-full">
               <Eye className="w-3 h-3" /> Free Preview

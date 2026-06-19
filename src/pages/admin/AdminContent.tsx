@@ -331,7 +331,7 @@ const AdminContent = () => {
 
     // Extract YouTube video ID from URL
     let youtubeId = reviewVideoUrl;
-    const match = reviewVideoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    const match = reviewVideoUrl.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
     if (match && match[1]) {
       youtubeId = match[1];
     }

@@ -21,8 +21,8 @@ const LecturePage = () => {
   const createDoubt = useCreateDoubt();
   const [newDoubt, setNewDoubt] = useState("");
 
-  const course = courses.find((c) => c.id === courseId);
-  const lecture = lectures.find((l) => l.id === lectureId);
+  const course = Array.isArray(courses) ? courses.find((c) => c.id === courseId) : undefined;
+  const lecture = Array.isArray(lectures) ? lectures.find((l) => l.id === lectureId) : undefined;
   const purchased = hasPurchased(courseId || "");
 
   const handleDoubtSubmit = () => {
@@ -45,9 +45,8 @@ const LecturePage = () => {
       return;
     }
     // Get lecture index in the course (sorted by chapter order and lecture order)
-    const lectureIndex = lectures.findIndex(l => l.id === lectureId);
-    const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
-    const canAccess = lecture?.free_preview || purchased || isFirstFive;
+    const lectureIndex = Array.isArray(lectures) ? lectures.findIndex(l => l.id === lectureId) : -1;
+    const canAccess = lecture?.free_preview || purchased;
     if (!canAccess) {
       toast.error("Purchase this course to access this lecture");
       navigate(`/courses/${courseId}`);
@@ -57,9 +56,9 @@ const LecturePage = () => {
 
   if (!lecture || !course) return null;
 
-  const lectureIndex = lectures.findIndex((l) => l.id === lectureId);
-  const prevLecture = lectureIndex > 0 ? lectures[lectureIndex - 1] : null;
-  const nextLecture = lectureIndex < lectures.length - 1 ? lectures[lectureIndex + 1] : null;
+  const lectureIndex = Array.isArray(lectures) ? lectures.findIndex((l) => l.id === lectureId) : -1;
+  const prevLecture = lectureIndex > 0 && Array.isArray(lectures) ? lectures[lectureIndex - 1] : null;
+  const nextLecture = lectureIndex >= 0 && lectureIndex < (lectures?.length || 0) - 1 && Array.isArray(lectures) ? lectures[lectureIndex + 1] : null;
 
   const handlePrev = () => {
     if (prevLecture) navigate(`/courses/${courseId}/lecture/${prevLecture.id}`);
@@ -96,7 +95,7 @@ const LecturePage = () => {
                 <Clock className="w-4 h-4" /> {lecture.duration}
               </span>
             )}
-            <span>Chapter: {chapters.find((c) => c.id === lecture.chapter_id)?.title}</span>
+            <span>Chapter: {Array.isArray(chapters) ? chapters.find((c) => c.id === lecture.chapter_id)?.title : ''}</span>
           </div>
         </Card>
 
@@ -140,7 +139,7 @@ const LecturePage = () => {
         <Card className="p-6">
           <h2 className="text-lg font-semibold text-slate-800 mb-4">All Lectures</h2>
           <div className="space-y-3">
-            {chapters.map((chapter, ci) => (
+            {Array.isArray(chapters) && chapters.map((chapter, ci) => (
               <div key={chapter.id}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-lg bg-violet-600 flex items-center justify-center text-[10px] text-white font-bold shrink-0">
@@ -149,13 +148,12 @@ const LecturePage = () => {
                   <h4 className="font-semibold text-sm text-slate-800">{chapter.title}</h4>
                 </div>
                 <div className="space-y-2 pl-2">
-                  {lectures
+                  {Array.isArray(lectures) && lectures
                     .filter((l) => l.chapter_id === chapter.id)
                     .map((l) => {
                       // Get lecture index in the course (sorted by chapter order and lecture order)
                       const lIndex = lectures.findIndex(lec => lec.id === l.id);
-                      const lIsFirstFive = lIndex >= 0 && lIndex < 5;
-                      const lCanAccess = l.free_preview || purchased || lIsFirstFive;
+                      const lCanAccess = l.free_preview || purchased;
                       return (
                         <div
                           key={l.id}

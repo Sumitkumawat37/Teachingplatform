@@ -50,11 +50,11 @@ const DoubtsPage = () => {
       </Card>
 
       <div className="space-y-3">
-        {doubts.map((d, i) => (
+        {Array.isArray(doubts) && doubts.map((d, i) => (
           <Card key={d.id} className="p-4 bg-white border border-slate-100/60 shadow-sm rounded-2xl reveal hover:shadow-md hover:-translate-y-0.5 transition-all duration-250" style={{ transitionDelay: `${i * 35}ms` }}>
             <div className="flex items-start gap-2 mb-2">
               <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
-                {d.student_name.split(" ").map((n: string) => n[0]).join("")}
+                {(d.student_name || "").split(" ").map((n: string) => n[0]).join("")}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">

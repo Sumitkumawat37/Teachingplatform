@@ -2,7 +2,7 @@ import { useCourses, useLectures, useChapters, useCourseFeedback, useCreateFeedb
 import { CustomVideoPlayer } from "@/components/CustomVideoPlayer";
 import { usePurchase } from "@/lib/purchase-context";
 import { useParams, useNavigate } from "react-router-dom";
-import { Play, ChevronLeft, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star, Trash2, Send } from "lucide-react";
+import { Play, ChevronLeft, ChevronRight, Clock, Lock, Eye, ShoppingCart, CheckCircle, Users, BookOpen, Star, Trash2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { memo, useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ReviewVideoGallery } from "@/components/ReviewVideoGallery";
+import { RazorpayCheckout } from "@/components/RazorpayCheckout";
+import { trackCoursePageVisit } from "@/lib/analytics";
 
 const CourseDetailPage = memo(() => {
   const { courseId } = useParams();
@@ -38,6 +40,13 @@ const CourseDetailPage = memo(() => {
   const course = courses.find((c) => c.id === courseId);
   const purchased = hasPurchased(courseId || "");
 
+  // Track course page visit
+  useEffect(() => {
+    if (course) {
+      trackCoursePageVisit(course.id, course.title);
+    }
+  }, [course]);
+
   // Feedback state
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -54,19 +63,19 @@ const CourseDetailPage = memo(() => {
     </div>
   );
 
-  const handleBuy = () => {
-    toast.info("Processing demo payment...", { duration: 1500 });
-    setTimeout(() => {
-      purchaseCourse(course.id);
-      toast.success("🎉 Course purchased successfully! All lectures are now unlocked.");
-    }, 1500);
+  const handlePaymentSuccess = (paymentId: string, orderId: string) => {
+    purchaseCourse(course.id);
+    toast.success("🎉 Course purchased successfully! All lectures are now unlocked.");
+  };
+
+  const handlePaymentFailure = (error: string) => {
+    toast.error(`Payment failed: ${error}`);
   };
 
   const handleLectureClick = (lecture: typeof lectures[0]) => {
     // Get lecture index in the course (sorted by chapter order and lecture order)
     const lectureIndex = lectures.findIndex(l => l.id === lecture.id);
-    const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
-    const canAccess = lecture.free_preview || purchased || isFirstFive;
+    const canAccess = lecture.free_preview || purchased;
     if (!canAccess) {
       toast.error("Purchase this course to unlock all lectures.");
       return;
@@ -182,12 +191,15 @@ const CourseDetailPage = memo(() => {
               <p className="text-xs text-slate-400 mt-1">{freeLectures} free preview{freeLectures !== 1 ? "s" : ""} included</p>
               <p className="text-2xl font-bold text-violet-600 mt-1">₹{course.price}</p>
             </div>
-            <button
-              onClick={handleBuy}
+            <RazorpayCheckout
+              amount={course.price}
+              courseId={course.id}
+              courseTitle={course.title}
+              onSuccess={handlePaymentSuccess}
+              onFailure={handlePaymentFailure}
+              buttonText="Enroll Now"
               className="bg-gradient-to-r from-violet-600 to-pink-500 text-white px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 shrink-0 shadow-sm hover:shadow-md transition-all"
-            >
-              <ShoppingCart className="w-4 h-4" /> Enroll Now
-            </button>
+            />
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
             <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
@@ -226,8 +238,7 @@ const CourseDetailPage = memo(() => {
                 .map((lecture) => {
                   // Get lecture index in the course (sorted by chapter order and lecture order)
                   const lectureIndex = lectures.findIndex(l => l.id === lecture.id);
-                  const isFirstFive = lectureIndex >= 0 && lectureIndex < 5;
-                  const canAccess = lecture.free_preview || purchased || isFirstFive;
+                  const canAccess = lecture.free_preview || purchased;
                   return (
                     <div
                       key={lecture.id}
@@ -257,7 +268,7 @@ const CourseDetailPage = memo(() => {
                               <Clock className="w-2.5 h-2.5" /> {lecture.duration}
                             </span>
                           )}
-                          {(lecture.free_preview || isFirstFive) && !purchased && (
+                          {(lecture.free_preview) && !purchased && (
                             <span className="flex items-center gap-0.5 text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100">
                               <Eye className="w-2.5 h-2.5" /> Free
                             </span>
@@ -328,11 +339,11 @@ const CourseDetailPage = memo(() => {
               <Card key={fb.id} className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                    {(fb.profiles?.name || "U").split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    {"U"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-sm text-slate-800">{fb.profiles?.name || "Anonymous"}</p>
+                      <p className="font-semibold text-sm text-slate-800">Anonymous</p>
                       <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
@@ -370,40 +381,110 @@ const CourseDetailPage = memo(() => {
         )}
       </div>
 
-      {/* Review Videos Section - Grid like homepage */}
+      {/* Review Videos Section - Carousel like homepage */}
       {reviewVideos.length > 0 && (
         <div className="mt-6">
-          <h3 className="font-semibold text-base text-slate-800 mb-3">Course Review Videos</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {reviewVideos.map((rv: any, index: number) => (
-              <div
-                key={rv.id}
-                className="relative aspect-[9/16] bg-slate-100 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all hover:-translate-y-0.5"
-                onClick={() => {
-                  setSelectedVideoIndex(index);
-                  setShowReviewGallery(true);
-                }}
+          <h3 className="font-semibold text-base text-slate-800 mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>Aspirant - Loved Courses</h3>
+          <div className="relative">
+            {/* Navigation Buttons */}
+            <div className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10">
+              <button
+                onClick={() => setSelectedVideoIndex((prev) => (prev - 1 + reviewVideos.length) % reviewVideos.length)}
+                className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white transition-all hover:scale-110"
               >
-                <img
-                  src={`https://img.youtube.com/vi/${rv.youtube_id}/hqdefault.jpg`}
-                  alt={rv.title}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.currentTarget.style.display = 'none');
-                    const parent = e.currentTarget.parentElement;
-                    if (parent) {
-                      parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-pink-500 text-white text-xs font-semibold p-2 text-center">${rv.title || 'Video'}</div>`;
-                    }
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                    <Play className="w-4 h-4 text-violet-600 ml-0.5" />
+                <ChevronLeft className="w-5 h-5 text-violet-600" />
+              </button>
+            </div>
+            
+            <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10">
+              <button
+                onClick={() => setSelectedVideoIndex((prev) => (prev + 1) % reviewVideos.length)}
+                className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white transition-all hover:scale-110"
+              >
+                <ChevronRight className="w-5 h-5 text-violet-600" />
+              </button>
+            </div>
+
+            {/* Carousel */}
+            <div className="relative h-[400px] md:h-[450px] overflow-hidden">
+              {reviewVideos.map((rv: any, index: number) => {
+                const isActive = index === selectedVideoIndex;
+                const isPrev = index === (selectedVideoIndex - 1 + reviewVideos.length) % reviewVideos.length;
+                const isNext = index === (selectedVideoIndex + 1) % reviewVideos.length;
+                
+                if (!isActive && !isPrev && !isNext) return null;
+
+                return (
+                  <div
+                    key={rv.id}
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+                      isActive ? 'opacity-100 scale-100 z-10' : isPrev || isNext ? 'opacity-50 scale-85 z-5' : 'opacity-0 scale-70 z-0'
+                    }`}
+                    style={{
+                      transform: isActive ? 'translateX(0)' : isPrev ? 'translateX(-100px)' : isNext ? 'translateX(100px)' : 'translateX(0)',
+                    }}
+                  >
+                    <div
+                      className={`relative aspect-[9/16] w-[200px] md:w-[240px] rounded-2xl overflow-hidden cursor-pointer shadow-2xl transition-all ${
+                        isActive ? 'hover:shadow-violet-500/25' : ''
+                      }`}
+                      style={{
+                        boxShadow: isActive ? '0 25px 50px -12px rgba(139, 92, 246, 0.25)' : '0 10px 30px -10px rgba(0, 0, 0, 0.1)',
+                      }}
+                      onClick={() => {
+                        setSelectedVideoIndex(index);
+                        setShowReviewGallery(true);
+                      }}
+                    >
+                      {/* Glassmorphism overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
+                      
+                      {/* Thumbnail */}
+                      <img
+                        src={`https://img.youtube.com/vi/${rv.youtube_id}/hqdefault.jpg`}
+                        alt={rv.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.currentTarget.style.display = 'none');
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-pink-500 text-white text-xs font-semibold p-2 text-center">${rv.title || 'Video'}</div>`;
+                          }
+                        }}
+                      />
+                      
+                      {/* Play button overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center z-20">
+                        <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl">
+                          <Play className="w-6 h-6 text-violet-600 ml-1" />
+                        </div>
+                      </div>
+                      
+                      {/* Title overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+                        <h4 className="text-white font-semibold text-sm line-clamp-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                          {rv.title}
+                        </h4>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
+
+            {/* Mobile Navigation Indicators */}
+            <div className="flex justify-center gap-2 mt-4 md:hidden">
+              {reviewVideos.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedVideoIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === selectedVideoIndex ? 'bg-violet-600 w-6' : 'bg-slate-300'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -427,21 +508,13 @@ const CourseDetailPage = memo(() => {
               <Card key={f.id} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    {f.profiles?.avatar_url ? (
-                      <img
-                        src={f.profiles.avatar_url}
-                        alt={f.profiles.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
-                        <span className="text-sm font-medium text-slate-600">
-                          {(f.profiles?.name || "U").split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
-                        </span>
-                      </div>
-                    )}
+                    <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
+                      <span className="text-sm font-medium text-slate-600">
+                        {"U"}
+                      </span>
+                    </div>
                     <div>
-                      <p className="font-medium text-sm text-slate-800">{f.profiles?.name || "Anonymous"}</p>
+                      <p className="font-medium text-sm text-slate-800">Anonymous</p>
                       <div className="flex gap-0.5">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star

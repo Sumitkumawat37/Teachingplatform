@@ -24,6 +24,7 @@ Set these environment variables in Vercel:
 - `VITE_SUPABASE_URL`: Your Supabase project URL
 - `VITE_SUPABASE_PUBLISHABLE_KEY`: Your Supabase anon/public key
 - `EMAIL_PASSWORD`: Gmail app-specific password (not your regular password)
+- `VITE_RAZORPAY_KEY_ID`: Razorpay key ID for payment integration (rzp_test_T2lnMYwkSird1N)
 
 ### How to get Gmail App-Specific Password:
 1. Go to Google Account settings
@@ -79,6 +80,7 @@ After deployment:
 VITE_SUPABASE_URL = your-supabase-url
 VITE_SUPABASE_PUBLISHABLE_KEY = your-supabase-anon-key
 EMAIL_PASSWORD = your-gmail-app-password
+VITE_RAZORPAY_KEY_ID = rzp_test_T2lnMYwkSird1N
 ```
 
 4. Redeploy after adding variables

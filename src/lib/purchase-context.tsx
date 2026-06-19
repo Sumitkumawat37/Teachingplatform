@@ -23,7 +23,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase.from("purchases").select("course_id").eq("user_id", user!.id);
       if (error) throw error;
-      return data.map((p) => p.course_id);
+      return Array.isArray(data) ? data.map((p) => p.course_id) : [];
     },
   });
 

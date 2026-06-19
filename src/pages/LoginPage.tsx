@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, Eye, EyeOff, Shield, Users, Star } from "lucide-react";
 import { toast } from "sonner";
+import { trackLoginClick } from "@/lib/analytics";
 
 const LoginPage = () => {
   const { login, signInWithGoogle } = useAuth();
@@ -16,6 +17,7 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    trackLoginClick();
     setLoading(true);
     const success = await login(email, password);
     setLoading(false);
@@ -62,7 +64,7 @@ const LoginPage = () => {
           <p className="text-violet-100 text-sm md:text-base mt-1.5 md:mt-3">Sign in to continue your UPSC prep</p>
 
           <div className="hidden md:flex flex-col gap-3 mt-10">
-            {featureItems.map((f) => {
+            {Array.isArray(featureItems) && featureItems.map((f) => {
               const Icon = f.icon;
               return (
                 <div key={f.text} className="flex items-center gap-3">
@@ -171,7 +173,7 @@ const LoginPage = () => {
           </p>
 
           <div className="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-slate-200">
-            {proofItems.map((b) => {
+            {Array.isArray(proofItems) && proofItems.map((b) => {
               const Icon = b.icon;
               return (
                 <div key={b.label} className="flex flex-col items-center gap-0.5">
