@@ -11,10 +11,12 @@ export function useCourses(page: number = 1, limit: number = 20) {
     queryFn: async () => {
       const cacheKey = `courses:page:${page}:limit:${limit}`;
       
-      // Try cache first
-      const cached = await cacheGet(cacheKey);
-      if (cached) {
-        return cached;
+      // Try cache first (only on server)
+      if (typeof window === 'undefined') {
+        const cached = await cacheGet(cacheKey);
+        if (cached) {
+          return cached;
+        }
       }
       
       const { from, to } = getSupabasePaginationRange(page, limit);
@@ -30,8 +32,10 @@ export function useCourses(page: number = 1, limit: number = 20) {
         pagination: calculatePagination(page, limit, count || 0),
       };
       
-      // Cache for 5 minutes
-      await cacheSet(cacheKey, result, 300);
+      // Cache for 5 minutes (only on server)
+      if (typeof window === 'undefined') {
+        await cacheSet(cacheKey, result, 300);
+      }
       
       return result;
     },
@@ -45,10 +49,12 @@ export function useChapters(courseId?: string) {
     queryFn: async () => {
       const cacheKey = courseId ? `chapters:course:${courseId}` : "chapters:all";
       
-      // Try cache first
-      const cached = await cacheGet(cacheKey);
-      if (cached) {
-        return cached;
+      // Try cache first (only on server)
+      if (typeof window === 'undefined') {
+        const cached = await cacheGet(cacheKey);
+        if (cached) {
+          return cached;
+        }
       }
       
       let q = supabase.from("chapters").select("*").order("sort_order");
@@ -56,8 +62,10 @@ export function useChapters(courseId?: string) {
       const { data, error } = await q;
       if (error) throw error;
       
-      // Cache for 10 minutes
-      await cacheSet(cacheKey, data, 600);
+      // Cache for 10 minutes (only on server)
+      if (typeof window === 'undefined') {
+        await cacheSet(cacheKey, data, 600);
+      }
       
       return data;
     },
@@ -71,10 +79,12 @@ export function useLectures(courseId?: string) {
     queryFn: async () => {
       const cacheKey = courseId ? `lectures:course:${courseId}` : "lectures:all";
       
-      // Try cache first
-      const cached = await cacheGet(cacheKey);
-      if (cached) {
-        return cached;
+      // Try cache first (only on server)
+      if (typeof window === 'undefined') {
+        const cached = await cacheGet(cacheKey);
+        if (cached) {
+          return cached;
+        }
       }
       
       let q = supabase
@@ -92,8 +102,10 @@ export function useLectures(courseId?: string) {
         return (a.sort_order || 0) - (b.sort_order || 0);
       });
       
-      // Cache for 10 minutes
-      await cacheSet(cacheKey, sortedData, 600);
+      // Cache for 10 minutes (only on server)
+      if (typeof window === 'undefined') {
+        await cacheSet(cacheKey, sortedData, 600);
+      }
       
       return sortedData;
     },
@@ -153,17 +165,21 @@ export function useLectureProgress() {
       
       const cacheKey = `lecture_progress:user:${user.id}`;
       
-      // Try cache first
-      const cached = await cacheGet(cacheKey);
-      if (cached) {
-        return cached;
+      // Try cache first (only on server)
+      if (typeof window === 'undefined') {
+        const cached = await cacheGet(cacheKey);
+        if (cached) {
+          return cached;
+        }
       }
       
       const { data, error } = await supabase.from("lecture_progress").select("*").eq("user_id", user.id);
       if (error) throw error;
       
-      // Cache for 5 minutes
-      await cacheSet(cacheKey, data, 300);
+      // Cache for 5 minutes (only on server)
+      if (typeof window === 'undefined') {
+        await cacheSet(cacheKey, data, 300);
+      }
       
       return data;
     },
@@ -178,8 +194,10 @@ export function useUpsertLectureProgress() {
       const { error } = await supabase.from("lecture_progress").upsert(progress, { onConflict: "user_id,lecture_id" });
       if (error) throw error;
       
-      // Invalidate cache for this user's progress
-      await cacheDeletePattern(`lecture_progress:user:${progress.user_id}:*`);
+      // Invalidate cache for this user's progress (only on server)
+      if (typeof window === 'undefined') {
+        await cacheDeletePattern(`lecture_progress:user:${progress.user_id}:*`);
+      }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["lecture_progress"] }),
   });

@@ -73,10 +73,7 @@ function AppRoutes() {
   if (!isLoggedIn) {
     return (
       <Routes>
-        {/* Public routes - no auth required for SEO and landing page */}
-        <Route path="/" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-        <Route path="/toonhub" element={<ToonHubCarousel />} />
-        
+        {/* Public routes - no auth required */}
         <Route path="/login" element={<Suspense fallback={<PageLoader />}><LoginPage /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<PageLoader />}><SignupPage /></Suspense>} />
         <Route path="/check-email" element={<Suspense fallback={<PageLoader />}><CheckEmailPage /></Suspense>} />
@@ -85,6 +82,7 @@ function AppRoutes() {
         <Route path="/reset-password" element={<Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>} />
         <Route path="/privacy-policy" element={<Suspense fallback={<PageLoader />}><PrivacyPolicyPage /></Suspense>} />
         <Route path="/terms-of-service" element={<Suspense fallback={<PageLoader />}><TermsOfServicePage /></Suspense>} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
@@ -111,6 +109,9 @@ function AppRoutes() {
             ? <Navigate to="/admin/profile" replace />
             : <Suspense fallback={<PageLoader />}><HomePage /></Suspense>
         } />
+        
+        {/* Public landing page with auth layout */}
+        <Route path="/home" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         
         {/* Student Routes */}
         <Route path="/courses" element={<Suspense fallback={<PageLoader />}><CoursesPage /></Suspense>} />
@@ -163,10 +164,14 @@ function AppRoutes() {
 }
 
 const App = () => {
-  // Initialize Sentry error tracking
-  useEffect(() => {
-    initSentry();
-  }, []);
+  // Disable Sentry temporarily to fix initialization error
+  // useEffect(() => {
+  //   try {
+  //     initSentry();
+  //   } catch (error) {
+  //     console.error("Failed to initialize Sentry:", error);
+  //   }
+  // }, []);
 
   return (
     <ErrorBoundary>

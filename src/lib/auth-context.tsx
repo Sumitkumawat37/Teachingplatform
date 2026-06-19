@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoggedIn: false,
     role: "student",
     user: null,
-    loading: true,
+    loading: true, // Start with loading true to prevent routing issues
     isProcessingOAuth: false,
   });
 
@@ -223,7 +223,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn("Auth initialization timeout - forcing render");
         setAuth({ isLoggedIn: false, role: "student", user: null, loading: false, isProcessingOAuth: false });
       }
-    }, 5000); // Reduced from 20s to 5s for faster fallback
+    }, 3000); // Reduced to 3s for faster fallback
 
     console.log("=== AuthProvider initializing ===");
     console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
